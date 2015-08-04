@@ -80,6 +80,34 @@
 		});
 		})
 
+		$(function() {
+		var AppRouter = Backbone.Router.extend({  
+            routes: {  
+                "/posts/:id" : "getPost",  
+                "/download/*path": "downloadFile",  //对应的链接为<a href="#/download/user/images/hey.gif">download gif</a>  
+                "/:route/:action": "loadView",      //对应的链接为<a href="#/dashboard/graph">Load Route/Action View</a>  
+                "*actions" : "defaultRoute"  
+            },  
+            getPost: function(id) {  
+                console.log(id);  
+            },  
+            defaultRoute : function(actions){  
+                console.log(actions);  
+            },  
+            downloadFile: function( path ){   
+                console.log(path); // user/images/hey.gif   
+            },  
+            loadView: function( route, action ){   
+                console.log(route + "_" + action); // dashboard_graph   
+            }  
+        });  
+          
+        var app_router = new AppRouter;  
+          
+        Backbone.history.start();  
+          
+    	});  
+
 		</script>
 		<button>fetch</button>
 		<div id="chart"></div>

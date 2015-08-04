@@ -64,95 +64,19 @@
 
                 <div class="row projectlist">
                     <div class="col-md-12">
-                        <a class="badge project active">kxd</a>
-                        <a class="badge project">kxf</a>
                         <span class="icon-plus-sign add"></span>
                     </div>
+                    <script type="text/template" id="project-temp">
+                        <%_.each(projectlist,function (project) {%>
+                            <%console.log(project.get('name'))%>
+                            <a class="badge project" projectid="<%=project.get('id')%>"><span><%=project.get('name')%></span><span class="icon-trash projectdelete"></span></a>
+                        <% }) %>
+                    </script>
                 </div>
                 <div class="row monitor">
                     <div class="leftcolumn col-lg-6">
-                        <div class="monitorpage testpage">
-                            <div class="header">
-                                <span class="title">CPU监测</span>
-                                <div class="dropdown">
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="iconlse">
-                                        <i class="icon icon-cog"></i> <i class="icon icon-caret-down"></i>
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-right dropdown-setting">
-                                        <li><a href="#"><i class="icon-trash"></i>delete</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li><a href="#"><i class="icon-edit"></i>edit</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="monitorcontent">
-                                <div class="service">
-                                    <span><b>HOSTA</b></span>
-                                    <a href="#"><span class="badge monitorok">CPU</span></a>
-                                    <a href="#"><span class="badge monitorwarning">内存</span></a>
-                                    <a href="#"><span class="badge monitorcritical">mysql</span></a>
-                                    <a href="#"><span class="badge monitorok">ssh</span></a>
-                                    <a href="#"><span class="badge monitorcritical">httpd</span></a>
-                                    <a href="#"><span class="badge monitorok">tomcat</span></a>
-                                    <a href="#"><span class="badge monitorwarning">warning</span></a>
-                                    <a href="#"><span class="badge monitorcritical">critical</span></a>
-                                    <a href="#"><span class="badge monitorok">ok</span></a>
-                                </div>
-                                <div class="service">
-                                    <span><b>HOSTA</b></span>
-                                    <a href="#"><span class="badge monitorok">CPU</span></a>
-                                    <a href="#"><span class="badge monitorwarning">内存</span></a>
-                                    <a href="#"><span class="badge monitorcritical">mysql</span></a>
-                                    <a href="#"><span class="badge monitorok">ssh</span></a>
-                                    <a href="#"><span class="badge monitorok">ok</span></a>
-                                </div>
-                                <div class="service">
-                                    <span><b>HOSTA</b></span>
-                                    <a href="#"><span class="badge monitorok">CPU</span></a>
-                                    <a href="#"><span class="badge monitorwarning">内存</span></a>
-                                    <a href="#"><span class="badge monitorcritical">mysql</span></a>
-                                    <a href="#"><span class="badge monitorok">ssh</span></a>
-                                    <a href="#"><span class="badge monitorcritical">httpd</span></a>
-                                    <a href="#"><span class="badge monitorok">tomcat</span></a>
-                                    <a href="#"><span class="badge monitorwarning">warning</span></a>
-                                    <a href="#"><span class="badge monitorcritical">critical</span></a>
-                                    <a href="#"><span class="badge monitorok">ok</span></a>
-                                </div>
-                                <div class="service">
-                                    <span><b>HOSTA</b></span>
-                                    <a href="#"><span class="badge monitorok">CPU</span></a>
-                                    <a href="#"><span class="badge monitorwarning">内存</span></a>
-                                    <a href="#"><span class="badge monitorcritical">mysql</span></a>
-                                    <a href="#"><span class="badge monitorok">ssh</span></a>
-                                    <a href="#"><span class="badge monitorcritical">httpd</span></a>
-                                    <a href="#"><span class="badge monitorok">tomcat</span></a>
-                                </div>
-<!--                                 <table class="table table-striped">
-                                    <tr>
-                                        <th>host</th>
-                                        <th>CPU</th>
-                                        <th>memory</th>
-                                        <th>mysql</th>
-                                        <th>disk</th>
-                                        <th>mysql</th>
-                                        <th>disk</th>
-                                    </tr>
-                                    <tr>
-                                        <td>hostA</td>
-                                        <td><div class="monitorok">OK</div></td>
-                                        <td><div class="monitorwarning">warning</div></td>
-                                        <td><div class="monitorcritical">critical</div></td>
-                                        <td><div class="monitorok">OK</div></td>
-                                        <td><div class="monitorcritical">critical</div></td>
-                                        <td><div class="monitorok">OK</div></td>
-                                    </tr>
-                                </table> -->
-                            </div>
-                        </div>
                         <script type="text/template" id="module-temp">
-                            <div class="monitorpage">
+                            <div class="monitorpage showpage">
                                 <div class="header">
                                     <span class="title"><%=module.get('note')%></span>
                                     <div class="dropdown">
@@ -160,10 +84,10 @@
                                             <i class="icon icon-cog"></i> <i class="icon icon-caret-down"></i>
                                         </a>
                                         <ul class="dropdown-menu dropdown-menu-right dropdown-setting">
-                                            <li><a href="#"><i class="icon-trash"></i>delete</a>
+                                            <li><a class="delete"><i class="icon-trash"></i>delete</a>
                                             </li>
                                             <li class="divider"></li>
-                                            <li><a href="#" class="editmodule" ><i class="icon-edit"></i>edit</a>
+                                            <li><a class="editmodule editleft" ><i class="icon-edit"></i>edit</a>
                                             </li>
                                         <ul>
                                     </div>
@@ -171,9 +95,9 @@
                                 <div class="monitorcontent">
                                     <%_.each(module.get('monitors'),function(monitor) {%>
                                         <div class="service">
-                                            <span><b><%=monitor.get("host")%></b></span>
-                                            <%_.each(monitor.get('items'),function(item) {%>
-                                                <a href="#"><span class="badge monitorok"><%=item%></span></a>
+                                            <span><b><%=monitor.host%></b></span>
+                                            <%_.each(monitor.items,function(item) {%>
+                                                <a  data-toggle="tooltip" data-placement="top"><span class="badge monitorok"><%=item%></span></a>
                                             <%})%>
                                         </div>
                                     <%})%>
@@ -185,6 +109,40 @@
                         </div>
                     </div>
                     <div class="rightcolumn col-lg-6">
+                        <script type="text/template" id="chart-temp">
+                            <div class="monitorpage showpage">
+                                <div class="header">
+                                    <span class="title"><%=module.get('note')%></span>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="iconlse">
+                                            <i class="icon icon-cog"></i> <i class="icon icon-caret-down"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-right dropdown-setting">
+                                            <li><a class="delete"><i class="icon-trash"></i>delete</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li><a class="editmodule editright" ><i class="icon-edit"></i>edit</a>
+                                            </li>
+                                        <ul>
+                                    </div>
+                                </div>
+                                <div class="monitorcontent">
+                                    <div class="servicelist">
+                                        <%var n=0;%>
+                                        <%_.each(module.get('monitors'),function(monitor) {%>
+                                            <%_.each(monitor.items,function(item) {%>
+                                                <button class="btn btn-xs btn-default changechart" type="button">
+                                                    <span><%=monitor.host%></span><span class="badge"><%=item%></span>
+                                                </button>
+                                            <%})%>
+                                        <%})%>
+                                        <div id="servicechart">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </script>
+
                         <div class="monitorpage pagehide">
                             <span class="icon-plus-sign"></span>
                         </div>
@@ -210,6 +168,15 @@
                                         <input type="note" class="form-control" placeholder="模块备注" name="note">
                                 </div>
                             </div>
+                            <div class="form-group typeselect">
+                                <label for="note" class="col-sm-2">选择类型</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control">
+                                        <option name="no">即时监测</option>
+                                        <option name="yes">历史监测图表</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="row changelabel">
                                 <div class="col-xs-6">
                                     <label class="control-label">监测内容</label>
@@ -218,7 +185,7 @@
                                     <label class=" control-label">监测主机</label>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group multiselect">
                                 <div class="col-xs-6 firstselect" id="serviceoption">
                                     <select name="from" id="multiselect" class="form-control" size="8">
                                     </select>
@@ -252,13 +219,12 @@
                             </tr>
                         </table>
                             <script type="text/template" id="service-temp">
-                                <% console.log(service.get('items')) %>
-                                <% _.each(service.get('items'),function (item) { %>
+                                <% _.each(service.items,function (item) { %>
                                     <tr name="content">
                                         <td>#</td>
-                                        <td><%= service.get('host') %></td>
+                                        <td><%= service.host %></td>
                                         <td><%= item %></td>
-                                        <td><a href="#">删除</a></td>
+                                        <td><a class="deleteservice">删除</a></td>
                                     </tr>
                                 <%})%>
                             </script>
@@ -270,20 +236,42 @@
         </div>
     </div>
 
+    <div class="modal fade" role="dialog" id="addproject-modal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">添加监测</h4>
+                </div>
+                <div class="modal-body">     
+                    <div class="inputbody">                   
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="note" class="col-sm-2">监测名称</label>
+                                <div class="col-sm-10">
+                                    <input type="note" class="form-control" placeholder="监测名称" name="note">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveproject">Save changes</button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <script src="lib/jquery-1.11.3.js"></script>
     <!-- Bootstrap Js -->
     <script src="lib/bootstrap.min.js"></script>
     <script type="text/javascript" src="lib/underscore-min.js"></script>
     <script src="lib/backbone-min.js"></script>
+    <script type="text/javascript" src="lib/highcharts.js"></script>
     <script src="index.js"></script>
-    <script type="text/javascript">
-        // $(function () {
-        //     $(".pagehide").on('click',function () {
-        //         $(".modal").modal('toggle');
-        //     })
-        // })
-    </script>
-
 
 </body>
 

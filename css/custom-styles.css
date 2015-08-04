@@ -12,6 +12,10 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
+body a{
+    cursor: pointer;
+}
+
  #wrapper {
     width: 100%;
     background:#09192A;
@@ -230,7 +234,7 @@ line-height: 1.428571429;
  border-radius: 0px; 
 }
 
-    #modal .modal-dialog{
+    #add-modal .modal-dialog{
         width: 800px;
     }
    
@@ -261,8 +265,26 @@ font-size: 19px;
 }
 
 #page-inner > .projectlist .project{
-    padding: 10px 40px 10px 40px;
+    padding: 10px 0px 10px 0px;
+    margin-left: 20px;
     background-color: #000;
+}
+
+#page-inner > .projectlist .project:hover{
+    background-color: #225081;
+}
+
+#page-inner > .projectlist .project >span{
+    padding: 10px 30px 10px 40px;
+}
+
+#page-inner > .projectlist .project > .projectdelete{
+    padding: 5px 5px 5px 5px;
+    font-size: 18px;
+}
+
+#page-inner > .projectlist .project > .projectdelete:hover{
+    color: red;
 }
 
 #page-inner > .projectlist  .active{
@@ -371,6 +393,19 @@ font-size: 19px;
 #page-inner .monitorpage .monitorcritical{
     color: #fff;
     background-color: red;
+}
+#page-inner .monitorpage .servicelist >button{
+    padding: 1px 10px 1px 10px;
+}
+#page-inner .monitorpage .servicelist >button .badge{
+    font-size: 12px;
+    margin-bottom: 2px;
+    padding: 1px 10px 1px 10px;
+    margin-left: 10px;
+}
+
+#page-inner .servicechart{
+    padding-top: 30px;
 }
 
 #page-inner .pagehide{
