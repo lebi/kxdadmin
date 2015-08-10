@@ -222,10 +222,13 @@ font-size: 19px;
     color: #fff;
     background-color: red;
 }
-#page-inner .monitorpage .servicelist >button{
+#page-inner .monitorpage .servicelist .button-list{
+    padding: 10px;
+}
+#page-inner .monitorpage .servicelist > .button-list >button{
     padding: 1px 10px 1px 10px;
 }
-#page-inner .monitorpage .servicelist >button .badge{
+#page-inner .monitorpage .servicelist > .button-list >button .badge{
     font-size: 12px;
     margin-bottom: 2px;
     padding: 1px 10px 1px 10px;

@@ -1,3 +1,11 @@
+//********************************************************************************************************************//
+//														2015.8.10
+//													edited by Huang Yan
+//
+//
+//********************************************************************************************************************
+
+
 var HostList=Backbone.Collection.extend({
 	url:"/demo/monitor/hosts",
 	initialize:function () {
@@ -28,6 +36,15 @@ var RegList=Backbone.Collection.extend({
 	model:RegModel,
 	url:'/demo/chart/reg/list'
 })
+
+/*************************************************************************************************************************************************/
+//
+//															this view show the details of a regular expression
+//																edit thie view to update the regualr expression
+//																		and update it's parameters 
+//																
+//
+/*************************************************************************************************************************************************/
 
 var RegView=Backbone.View.extend({
 	el:$('.service'),
@@ -118,6 +135,17 @@ var RegView=Backbone.View.extend({
         }
 	}
 })
+
+
+/*************************************************************************************************************************************************/
+//
+//																	this view decide which expression to show
+//															hostList and serviceList fetched when the page load successfully
+//
+//
+//
+//
+/*************************************************************************************************************************************************/
 
 var PageView=Backbone.View.extend({
 	el:$('body'),
@@ -214,35 +242,35 @@ $(function  () {
 	var view=new PageView();
 })
 
-function match (dom) {
-	var output="swap=4031MB;3225;2419;0;4031";
-	var reg=$(dom).val();
-	reg='/'+reg+'/g';
-	reg=eval(reg);
-	var res=reg.exec(output);
-	if(res!=null){
-		var str="";
-		for(var i=1;i<res.length;i++)
-			str+=res[i];
-		$("#output").val(str);
-	}
-}
+// function match (dom) {
+// 	var output="swap=4031MB;3225;2419;0;4031";
+// 	var reg=$(dom).val();
+// 	reg='/'+reg+'/g';
+// 	reg=eval(reg);
+// 	var res=reg.exec(output);
+// 	if(res!=null){
+// 		var str="";
+// 		for(var i=1;i<res.length;i++)
+// 			str+=res[i];
+// 		$("#output").val(str);
+// 	}
+// }
 
-function addParam() {
-	var html="<div><input name='paramName'><input onchange='regexec(this)' name='position'></div>"
-	$('body').append(html);
-}
+// function addParam() {
+// 	var html="<div><input name='paramName'><input onchange='regexec(this)' name='position'></div>"
+// 	$('body').append(html);
+// }
 
-function regexec(dom) {
-	var reg=$('input[name=reg]').val();
-	reg='/'+reg+'/g';
-	reg=eval(reg);
-	var output="swap=4031MB;3225;2419;0;4031";
-	var value=$(dom).val();
-	var check=/^\$(\d+)$/;
-	console.log(check.exec(value))
-	if(check.exec(value)!=null){
-		var i=check.exec(value)[1];
-		console.log(reg.exec(output)[i]);
-	}
-}
+// function regexec(dom) {
+// 	var reg=$('input[name=reg]').val();
+// 	reg='/'+reg+'/g';
+// 	reg=eval(reg);
+// 	var output="swap=4031MB;3225;2419;0;4031";
+// 	var value=$(dom).val();
+// 	var check=/^\$(\d+)$/;
+// 	console.log(check.exec(value))
+// 	if(check.exec(value)!=null){
+// 		var i=check.exec(value)[1];
+// 		console.log(reg.exec(output)[i]);
+// 	}
+// }

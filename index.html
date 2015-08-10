@@ -68,8 +68,7 @@
                                         }else{
                                             templist[index].items.push({status:monitor.status,item:monitor.item,id:monitor.id});
                                         }
-                                    });
-                                    console.log(templist);%>
+                                    });%>
 
                                     <%_.each(templist,function(monitor) {%>
                                         <div class="service">
@@ -117,6 +116,11 @@
                                 </div>
                                 <div class="monitorcontent">
                                     <div class="servicelist">
+                                        <div class="button-list">
+                                            <%_.each(module.get('monitors'),function (monitor) {%>
+                                                <button class="btn btn-default"><%=monitor.host%><span class="badge"> <%=monitor.item%></span></button>
+                                            <%}) %>
+                                        </div>
                                         <div id="servicechart">
                                         </div>
                                     </div>

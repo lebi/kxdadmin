@@ -43,14 +43,14 @@ body a{
 	width: 100%;
 	padding-top: 5px;
 	padding-bottom: 5px;
-	background-color: #555555;
 	padding-bottom: 5px;
-	color: #fff;
+	color: #000;
+	padding-left: 40px;
 }
 
-.page-title>span{
-	padding-left: 80px;
-	padding-right: 0px;
+.page-title > span{
+	font-family: inherit;
+	padding-right: 30px;
 	font-size: 20px;
 }
 
@@ -84,10 +84,10 @@ body a{
 	font-weight:600;
 }
 .page-block{
+	border-radius: 10px;
 	background-color: #fff;
-	margin-top: 50px;
-	border: 1px solid;
-	padding: 5px;
+	margin-top: 25px;
+	padding: 40px 20px;
 	    -webkit-box-shadow: 5px 5px 5px #9E9E9E;  
     -moz-box-shadow: 3px 3px 3px #9E9E9E;  
     box-shadow: 3px 3px 3px #9E9E9E;

@@ -41,17 +41,17 @@
                         <div class="service" id="service<%=reg.get('objectId')%>">
                             <div class="header">
                             <%console.log(reg) %>
-                                <span><strong>host:</strong><%=reg.get('host')%></span>
-                                <span><strong> service:</strong><%=reg.get('service')%></span><a class='edit-reg'><i class="icon-edit"></i>修改</a>
+                                <span><strong>主机:</strong><%=reg.get('host')%></span>
+                                <span><strong>服务:</strong><%=reg.get('service')%></span><a class='edit-reg'><i class="icon-edit"></i>修改</a>
                             </div>
                             <div class="content">
                                 <form class="form-horizontal">
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">sample</label>
+                                        <label class="col-sm-2 control-label">输出</label>
                                         <div class="col-sm-10 content-text"><%=reg.get('sample')%></div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">parameters</label>
+                                        <label class="col-sm-2 control-label">参数</label>
                                         <div class="col-sm-8 content-text">
                                             <% if(reg.get('parameters')!=null)
                                                     var paramList=reg.get('parameters').split(';');
@@ -64,11 +64,11 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">Regx</label>
+                                        <label class="col-sm-2 control-label">正则表达式</label>
                                         <div class="col-sm-8 content-text"><%=reg.get('reg')%></div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">output</label>
+                                        <label class="col-sm-2 control-label">匹配输出</label>
                                         <div class="col-sm-8 content-text output" name="output">
                                             <% var regx=eval('/'+reg.get('reg')+'/g')%>
                                             <% if(regx!=null){ %>
@@ -87,16 +87,17 @@
                     <script type="text/template" id="edit-temp">
                         <div class="service-edit service" id="service<%=reg.get('objectId')%>">
                             <div class="header">
-                                <span><strong>host:</strong><%=reg.get('host')%> </span><span><strong> service:</strong><%=reg.get('service')%></span><a class='cancel-reg'><i class="icon-reply"></i>返回</a>
+                                <span><strong>主机:</strong><%=reg.get('host')%> </span>
+                                <span><strong>服务:</strong><%=reg.get('service')%></span><a class='cancel-reg'><i class="icon-reply"></i>返回</a>
                             </div>
                             <div class="content">
                                 <form class="form-horizontal">
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">sample</label>
+                                        <label class="col-sm-2 control-label">输出</label>
                                         <div class="col-sm-10 content-text"><%=reg.get('sample')%></div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">parameters</label>
+                                        <label class="col-sm-2 control-label">参数</label>
                                         <div class="col-sm-7">
                                             <% if(reg.get('parameters')!=null)
                                                     var paramList=reg.get('parameters').split(';');
@@ -113,13 +114,13 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">Regx</label>
+                                        <label class="col-sm-2 control-label">正则表达式</label>
                                         <div class="col-sm-7">
                                             <input class="form-control" name="regexp" value="<%=reg.get('reg')%>">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">output</label>
+                                        <label class="col-sm-2 control-label">匹配输出</label>
                                         <span class="col-sm-7 content-text output" name="output"></span>
                                         <div class="col-md-3">
                                             <button class="btn btn-primary save-reg" type="button">保存更改</button>

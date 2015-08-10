@@ -63,10 +63,14 @@ var Module=Backbone.Model.extend({
 })
 
 var Chart=Backbone.Model.extend({
+	urlRoot:'/demo/chart',
 	defaults:{
+		'id':null,
 		'host':null,
 		'item':null,
 		'data':new Array(),
+		'reg':null,
+		'parameters':null,
 		'x-line':new Array(),
 		'y-line':new Array(),
 	},
@@ -147,7 +151,6 @@ var ModuleView=Backbone.View.extend({
 			Backbone.sync("update",self.module,{
 				success:function(module) {
 					self.module=new Module(module);
-					console.log(self.module);
 					var p=self.$el;
 					var next=$(p).next();
 					$(p).remove();
@@ -200,22 +203,33 @@ var ChartView=Backbone.View.extend({
 	},
 	fetchAndRenderChart:function (){
 		var page=this.$el;
-		var series=new Array();
-		// var dom=$(page).find('.btn-default').each(function () {
-		// 	var host=$($(this).find('span').get(0)).text();
-		// 	var item=$($(this).find('span').get(1)).text();
-		// 	var chart=new Chart();
-		// 	series.push({name:host+"-"+item,data:chart.get('data')})
-		// })
+		var self=this;
 		var monitors=this.module.get('monitors');
-		for(var i=0;i<monitors.length;i++){
-			var chart=new Chart();
-			series.push({name:monitors[i].host+'::'+monitors[i].item,data:chart.get('data')})
-		}
-		this.renderChart(series,page);
+			$.getJSON('/demo/chart/'+this.module.get('id'),function (chartList) {
+				var series=new Array();
+				_.each(chartList,function (chart) {
+					var offset=series.length;
+					if(chart.parameters==null||chart.reg==null||chart.reg=="") return;
+					var params=chart.parameters.split(';');
+					for(var j=0;j<params.length;j++)
+						series.push({name:params[j],data:new Array()});
+
+					var reg='/'+chart.reg+'/g';
+					var regx=eval(reg);
+					for(var j=0;j<chart.data.length;j++){
+						var match=regx.exec(chart.data[j]);
+						if(match!=null)
+							for(var n=1;n<params.length+1;n++){
+								if (isNaN(match[n])) break;
+								series[n-1+offset].data.push(parseFloat(match[n]));
+							}
+					}
+					self.renderChart(series);
+				});
+			})
 	},
-	renderChart:function (series,page){
-		$("#servicechart",page).highcharts({
+	renderChart:function (series){
+		$("#servicechart",this.$el).highcharts({
 			title:null,
 			chart:{
 				height:300
@@ -228,18 +242,6 @@ var ChartView=Backbone.View.extend({
 	},
 	editmodule:function () {        //将页面上的数据转化为Module对象  并态模态框渲染
 		var page=this.$el;
-		// var note=$('.title',page).text();
-		// var monlist=new Array();
-		// $('.servicelist button',page).each(function () {
-		// 	var host=$($(this).find('span').get(0)).text();
-		// 	var items=[];
-		// 	items[0]=$($(this).find('span').get(1)).text();
-		// 	monlist.push({host:host,items:items});
-		// });
-		// }
-		// var module=new Module({note:note,monitors:monlist});
-		// console.log(module);
-		// console.log(this.module);
 
 		$('.typeselect select').attr('disabled','disabled');
 		modalView.rendermodule(this.module);
@@ -251,17 +253,19 @@ var ChartView=Backbone.View.extend({
 			module.set('pid',self.module.get('pid'));
 			module.set('pos',self.module.get('pos'));
 			self.module=module;
-			Backbone.sync("update",self.module);
-
-			var p=self.$el;
-			var next=$(p).next();
-			$(p).remove();
-			var temp=_.template($("#chart-temp").html());
-			$(next).before(temp({module:self.module}));
-			self.setpage($(next).prev());
-			self.fetchAndRenderChart();
+			Backbone.sync("update",self.module,{
+				success:function(module) {
+					self.module=new Module(module);
+					var p=self.$el;
+					var next=$(p).next();
+					$(p).remove();
+					var temp=_.template($("#chart-temp").html());
+					$(next).before(temp({module:self.module}));
+					self.setpage($(next).prev());
+					self.fetchAndRenderChart();
+				}
+			});
 		});
-
 	},
 	deletemodule:function () {
 		var msg=confirm("确定删除:"+this.module.get('note'));
@@ -294,17 +298,25 @@ var ProjectView=Backbone.View.extend({
 	},
 	initialize:function () {
 		this.projectList=new ProjectList();
-		// this.projectList.on('update',this.renderproject);
 		var self=this;
 		this.projectList.fetch()
 		.done(function(){
-			self.renderproject(self.projectList);
+			self.renderproject();
 		});
+		var self=this;
+		setInterval(function () {
+			self.renderproject();
+		},10000);
 	},
 	renderproject:function (projectList) {
+		console.log(this.pid);
+		$('.projectlist .project').remove();
 		var temp=_.template($("#project-temp").html());
-		$('.add','.projectlist').before(temp({projectlist:projectList.models}));
-		$($('.projectlist').find('.project').get(0)).addClass('active');
+		$('.add','.projectlist').before(temp({projectlist:this.projectList.models}));
+		if(this.pid==null)
+			$($('.projectlist').find('.project').get(0)).addClass('active');
+		else
+			$('.projectlist').find('.project[projectid='+this.pid+']').addClass('active');
 		this.fetchandrenderlist();
 	},
 	changeproject:function (dom) {
@@ -317,7 +329,6 @@ var ProjectView=Backbone.View.extend({
 	fetchandrenderlist:function(){
 		var self=this;
 		this.pid=$('.projectlist',this.$el).find('.active').attr('projectid');
-		console.log(this.pid);
 		if(this.pid==null) return;
 		var moduleList=new ModList();
 		moduleList.fetch({data:{pid:this.pid}})
@@ -591,7 +602,6 @@ var services=new ServiceList();
 var modalView=new ModalView();
 $(function (){
 	$("#warpper-top").load("wrapper-top.html",function () {
-		console.log($(".top-navbar .nav li").get(0));
 		$($(".top-navbar .nav li").get(0)).addClass('active');
 	});
 	var projectView=new ProjectView();
