@@ -10,55 +10,14 @@
     <!-- FontAwesome Styles-->
     <link href="css/font-awesome.min.css" rel="stylesheet" />
     <!-- Custom Styles-->
-    <link href="css/custom-styles.css" rel="stylesheet" />
+    <link href="css/index.css" rel="stylesheet" />
     <!-- Google Fonts-->
 </head>
 
 <body>
     <div id="wrapper">
-        <nav class="navbar navbar-deiconult top-navbar" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="index.html">Dream</a>
-            </div>
-
-    		<ul class="nav navbar-nav choose-nav">
-        		<li class="active"><a href="#">Link</a></li>
-        	</ul>
-
-            <ul class="nav navbar-top-links navbar-right">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="iconlse">
-                        <i class="icon icon-envelope icon-fw"></i> <i class="icon icon-caret-down"></i>
-                    </a>
-                </li>
-                <!-- /.dropdown -->
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="iconlse">
-                        <i class="icon icon-tasks icon-fw"></i> <i class="icon icon-caret-down"></i>
-                    </a>
-                </li>
-                <!-- /.dropdown -->
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="iconlse">
-                        <i class="icon icon-bell icon-fw"></i> <i class="icon icon-caret-down"></i>
-                    </a>
-                </li>
-                <!-- /.dropdown -->
-                <li class="dropdown">
-                    <a data-toggle="dropdown" href="#" aria-expanded="iconlse">
-                        <i class="icon icon-user icon-fw"></i> <i class="icon icon-caret-down"></i>
-                    </a>
-                </li>
-                <!-- /.dropdown -->
-            </ul>
-        </nav>
-
+        <div id="warpper-top">
+        </div>
         <div id="page-wrapper">
             <div id="page-inner">
 
@@ -68,8 +27,12 @@
                     </div>
                     <script type="text/template" id="project-temp">
                         <%_.each(projectlist,function (project) {%>
-                            <%console.log(project.get('name'))%>
-                            <a class="badge project" projectid="<%=project.get('id')%>"><span><%=project.get('name')%></span><span class="icon-trash projectdelete"></span></a>
+                            <% var clazz="";
+                            if(project.get('status')>0) 
+                                clazz="<span class='icon-warning-sign' style='color:#EE3B3B'>WARN！</span>";
+                            %>
+
+                            <a class="badge project" projectid="<%=project.get('id')%>"><span><%=project.get('name')%> <%=clazz%></span><span class="icon-trash projectdelete"></span></a>
                         <% }) %>
                     </script>
                 </div>
@@ -93,11 +56,37 @@
                                     </div>
                                 </div>
                                 <div class="monitorcontent">
-                                    <%_.each(module.get('monitors'),function(monitor) {%>
+                                    <% var templist=new Array();
+                                    var hosts=new Array();
+                                    _.each(module.get('monitors'),function(monitor) {
+                                        var index=$.inArray(monitor.host,hosts);
+                                        if(index<0){
+                                            var object={host:monitor.host,items:new Array()};
+                                            object.items.push({status:monitor.status,item:monitor.item,id:monitor.id});
+                                            hosts.push(monitor.host);
+                                            templist.push(object);
+                                        }else{
+                                            templist[index].items.push({status:monitor.status,item:monitor.item,id:monitor.id});
+                                        }
+                                    });
+                                    console.log(templist);%>
+
+                                    <%_.each(templist,function(monitor) {%>
                                         <div class="service">
                                             <span><b><%=monitor.host%></b></span>
                                             <%_.each(monitor.items,function(item) {%>
-                                                <a  data-toggle="tooltip" data-placement="top"><span class="badge monitorok"><%=item%></span></a>
+                                                <% var clazz;
+                                                    if(item.status==0){
+                                                        clazz="monitorok";
+                                                    }else if(item.status==1){
+                                                        clazz="monitorwarning";
+                                                    }else if(item.status==2){
+                                                        clazz="monitorcritical";
+                                                    }else if(item.status==3){
+                                                        clazz="monitorunknown";
+                                                    }%>
+                                                <a data-toggle="tooltip" data-placement="top" serviceid="<%=item.id%>" href="detail.html"><span class="badge <%=clazz%>">
+                                                    <%=item.item%></span></a>
                                             <%})%>
                                         </div>
                                     <%})%>
@@ -128,14 +117,6 @@
                                 </div>
                                 <div class="monitorcontent">
                                     <div class="servicelist">
-                                        <%var n=0;%>
-                                        <%_.each(module.get('monitors'),function(monitor) {%>
-                                            <%_.each(monitor.items,function(item) {%>
-                                                <button class="btn btn-xs btn-default changechart" type="button">
-                                                    <span><%=monitor.host%></span><span class="badge"><%=item%></span>
-                                                </button>
-                                            <%})%>
-                                        <%})%>
                                         <div id="servicechart">
                                         </div>
                                     </div>
@@ -179,19 +160,18 @@
                             </div>
                             <div class="row changelabel">
                                 <div class="col-xs-6">
-                                    <label class="control-label">监测内容</label>
-                                </div>
-                                <div class="col-xs-6">
                                     <label class=" control-label">监测主机</label>
+                                </div>                                
+                                <div class="col-xs-6">
+                                    <label class="control-label">监测内容</label>
                                 </div>
                             </div>
                             <div class="form-group multiselect">
-                                <div class="col-xs-6 firstselect" id="serviceoption">
-                                    <select name="from" id="multiselect" class="form-control" size="8">
+                                <div class="col-xs-6 firstselect"id="hostoption">
+                                    <select name="from" id="multiselect" class="form-control" size="8" >
                                     </select>
                                 </div>
-
-                                <div class="col-xs-6 secondselect"id="hostoption">
+                                <div class="col-xs-6 secondselect" id="serviceoption">
                                     <select name="from" id="multiselect" class="form-control" size="8" multiple="multiple">
                                     </select>
                                 </div>
@@ -219,11 +199,11 @@
                             </tr>
                         </table>
                             <script type="text/template" id="service-temp">
-                                <% _.each(service.items,function (item) { %>
+                                <% _.each(monitors,function (monitor) { %>
                                     <tr name="content">
                                         <td>#</td>
-                                        <td><%= service.host %></td>
-                                        <td><%= item %></td>
+                                        <td><%= monitor.host %></td>
+                                        <td><%= monitor.item %></td>
                                         <td><a class="deleteservice">删除</a></td>
                                     </tr>
                                 <%})%>

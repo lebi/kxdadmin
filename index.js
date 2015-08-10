@@ -5,6 +5,28 @@
 //
 //********************************************************************************************************************
 
+var HostList=Backbone.Collection.extend({
+	url:"/demo/monitor/hosts",
+	initialize:function () {
+		var self=this;
+		this.fetch()
+		.done(function (collection) {
+			self.list=collection;
+		})
+	}
+})
+
+var ServiceList=Backbone.Collection.extend({
+	url:"/demo/monitor/services",
+	initialize:function () {
+		var self=this;
+		this.fetch()
+		.done(function (collection) {
+			self.list=collection;
+		})
+	}
+})
+
 var Project=Backbone.Model.extend({
 	urlRoot:"/demo/project",
 	defaults:{
@@ -21,9 +43,10 @@ var ProjectList=Backbone.Collection.extend({
 
 var Monitor=Backbone.Model.extend({
 	defaults:{
+		"id":null,
 		"host":'localhost',
-		"items":new Array(),
-		"status":new Array()
+		"item":null,
+		"status":null
 	}
 })
 
@@ -84,49 +107,56 @@ var ModuleView=Backbone.View.extend({
 	},
 	setpage:function (page) {
 		this.$el=$(page);
+		this.delegateEvents();
 
-		$('[data-toggle=tooltip]',this.$el).on('mouseover',function  () {
-			$(this).attr('data-original-title',$(this).text());
+		$('[data-toggle=tooltip]',this.$el).each(function() {
+			var id=$(this).attr('serviceid');
+			var dom=this;
+			$.getJSON('/demo/monitor/status',{id:id}, function (data) {
+				$(dom).attr('data-original-title',data.status);
+			});
 		})
 
+
+		// $('[data-toggle=tooltip]',this.$el).on('mouseover',function  () {
+		// 	var id=$(this).attr('serviceid');
+		// 	var dom=this;
+		// 	$.getJSON('/demo/monitor/status',{id:id}, function (data) {
+		// 		$(dom).attr('data-original-title',data.status);
+		// 	});
+		// })
+
 		$('[data-toggle=tooltip]',this.$el).tooltip();
-		this.delegateEvents();
-		this.pid=$('.projectlist .active').attr('projectid');
-		this.module.set('pid',this.pid);
 	},
 	setmodule:function (module) {
 		this.module=module;
 	},
 	editmodule:function () {  //将页面上的数据转化为Module对象  并态模态框渲染
 		var page=this.$el;
-		var note=$('.title',page).text();
-		var monlist=new Array();  //将页面上的模型转换为module对象   左右两种情况不同
-		$('.service',page).each(function (){
-			var host=$($(this).children().get(0)).text();
-			var items=new Array();
-			$(this).find('a').each(function () {
-				items.push($(this).text());
-			});
-			monlist.push({host:host,items:items});
-		});
-		var module=new Module({note:note,monitors:monlist});
 
-		modalView.rendermodule(module);
+		$('.typeselect select').attr('disabled','disabled');
+		modalView.rendermodule(this.module);
 		$("#savemodule").unbind();	//绑定模态框点击保存的事件
 		var self=this;
 		$("#savemodule").on('click',function() {  //模块保存更新
 			var module=modalView.savemodule();
 			module.set('id',self.module.get('id'));
-			module.set('chart',self.module.get('chart'));
 			module.set('pid',self.module.get('pid'));
-			Backbone.sync("update",module);
+			module.set('pos',self.module.get('pos'));
+			self.module=module;
+			Backbone.sync("update",self.module,{
+				success:function(module) {
+					self.module=new Module(module);
+					console.log(self.module);
+					var p=self.$el;
+					var next=$(p).next();
+					$(p).remove();
+					var temp=_.template($("#module-temp").html());
+					$(next).before(temp({module:self.module}));
+					self.setpage($(next).prev());
+				}
+			});
 
-			var p=self.$el;
-			var next=$(p).next();
-			$(p).remove();
-			var temp=_.template($("#module-temp").html());
-			$(next).before(temp({module:module}));
-			self.setpage($(next).prev());
 		});
 	},
 	deletemodule:function () {
@@ -171,12 +201,17 @@ var ChartView=Backbone.View.extend({
 	fetchAndRenderChart:function (){
 		var page=this.$el;
 		var series=new Array();
-		var dom=$(page).find('.btn-default').each(function () {
-			var host=$($(this).find('span').get(0)).text();
-			var item=$($(this).find('span').get(1)).text();
+		// var dom=$(page).find('.btn-default').each(function () {
+		// 	var host=$($(this).find('span').get(0)).text();
+		// 	var item=$($(this).find('span').get(1)).text();
+		// 	var chart=new Chart();
+		// 	series.push({name:host+"-"+item,data:chart.get('data')})
+		// })
+		var monitors=this.module.get('monitors');
+		for(var i=0;i<monitors.length;i++){
 			var chart=new Chart();
-			series.push({name:host+"-"+item,data:chart.get('data')})
-		})
+			series.push({name:monitors[i].host+'::'+monitors[i].item,data:chart.get('data')})
+		}
 		this.renderChart(series,page);
 	},
 	renderChart:function (series,page){
@@ -193,32 +228,36 @@ var ChartView=Backbone.View.extend({
 	},
 	editmodule:function () {        //将页面上的数据转化为Module对象  并态模态框渲染
 		var page=this.$el;
-		var note=$('.title',page).text();
-		var monlist=new Array();
-		$('.servicelist button',page).each(function () {
-			var host=$($(this).find('span').get(0)).text();
-			var items=[];
-			items[0]=$($(this).find('span').get(1)).text();
-			monlist.push({host:host,items:items});
-		});
+		// var note=$('.title',page).text();
+		// var monlist=new Array();
+		// $('.servicelist button',page).each(function () {
+		// 	var host=$($(this).find('span').get(0)).text();
+		// 	var items=[];
+		// 	items[0]=$($(this).find('span').get(1)).text();
+		// 	monlist.push({host:host,items:items});
+		// });
 		// }
-		var module=new Module({note:note,monitors:monlist});
-		console.log(module);
+		// var module=new Module({note:note,monitors:monlist});
+		// console.log(module);
+		// console.log(this.module);
 
-		modalView.rendermodule(module);
+		$('.typeselect select').attr('disabled','disabled');
+		modalView.rendermodule(this.module);
 		$("#savemodule").unbind();	//绑定模态框点击保存的事件
 		var self=this;
 		$("#savemodule").on('click',function() {  //模块保存更新
 			var module=modalView.savemodule();
 			module.set('id',self.module.get('id'));
-			module.set('chart',self.module.get('chart'));
-			Backbone.sync("update",module);
+			module.set('pid',self.module.get('pid'));
+			module.set('pos',self.module.get('pos'));
+			self.module=module;
+			Backbone.sync("update",self.module);
 
 			var p=self.$el;
 			var next=$(p).next();
 			$(p).remove();
 			var temp=_.template($("#chart-temp").html());
-			$(next).before(temp({module:module}));
+			$(next).before(temp({module:self.module}));
 			self.setpage($(next).prev());
 			self.fetchAndRenderChart();
 		});
@@ -291,23 +330,20 @@ var ProjectView=Backbone.View.extend({
 	},
 	rendermodule:function (module){ //将模型添加到相应位置
 		var column=module.get('pos')+"column";   //left or right
-		console.log(module);
 		if(module.get('chart')=="no"){
 			var temp=_.template($("#module-temp").html());
 			$('.pagehide','.'+column).before(temp({module:module}));
-			console.log($('.pagehide','.'+column));
 
 			var moduleView=new ModuleView();
+			moduleView.setpage( $('.pagehide','.'+column).prev() );
 			moduleView.setmodule(module);
-			moduleView.setpage($('pagehide','.'+column).prev());
 		}else{
 			var temp=_.template($("#chart-temp").html());
 			$('.pagehide','.'+column).before(temp({module:module}));
-			console.log($('pagehide','.'+column));
 
 			var chartView=new ChartView();
 			chartView.setmodule(module);
-			chartView.setpage($('.pagehide','.'+column).prev());
+			chartView.setpage( $('.pagehide','.'+column).prev() );
 			chartView.fetchAndRenderChart();
 		}
 	},
@@ -317,6 +353,7 @@ var ProjectView=Backbone.View.extend({
 			return;
 		}
 		this.pos="right";
+		$('.typeselect select').attr('disabled',null);
 		modalView.render();
 
 		$("#savemodule").unbind();
@@ -327,13 +364,14 @@ var ProjectView=Backbone.View.extend({
 			module.set('pid',self.pid);
 			Backbone.sync('create',module,
 				{
-					success:function (id) {
-						module.set('id',id);
+					success:function (result) {
+						module=new Module(result)
+						console.log(module);
+						self.rendermodule(module);
 					}
 				}
 			);
-			console.log(module);
-			self.rendermodule(module);
+
 		});
 	},
 	addleft:function () {
@@ -342,6 +380,7 @@ var ProjectView=Backbone.View.extend({
 			return;
 		}
 		this.pos="left";
+		$('.typeselect select').attr('disabled',null);
 		modalView.render();
 
 		$("#savemodule").unbind();
@@ -352,13 +391,13 @@ var ProjectView=Backbone.View.extend({
 			module.set('pid',self.pid);
 			Backbone.sync('create',module,
 				{
-					success:function (id) {
-						module.set('id',id);
+					success:function (result) {
+						module=new Module(result)
+						console.log(module);
+						self.rendermodule(module);
 					}
 				}
 			);
-			console.log(module);
-			self.rendermodule(module);
 		});
 	},
 	addproject:function(dom) {
@@ -408,14 +447,14 @@ var ProjectView=Backbone.View.extend({
 	}
 })
 
-//***********************************************************************************************************************************
-//																modal view
-//											when user want to edit or add a new chart or module,this view will show
-//													this view transfer the items on the view into a module object
-//													user can exchange the selection to choose hosts and items
-//													
-//													
-//************************************************************************************************************************************
+//**********************************************************************************************************************************//
+//																modal ModalView                         							//	
+//											when user want to edit or add a new chart or module,this view will show 	  			//
+//													this view transfer the items on the view into a module object					//
+//													user can exchange the selection to choose hosts and items 						//
+//																																	//			
+//																																	//	
+//**********************************************************************************************************************************//
 
 
 var ModalView=Backbone.View.extend({
@@ -438,11 +477,12 @@ var ModalView=Backbone.View.extend({
 	},
 	rendermodule:function(module) {
 		$('#servicetable tr[name=content]').remove();
-		_.each(module.get('monitors'),function(service){
-			var temp=_.template($('#service-temp').html());
-			$("#servicetable tbody").append(temp({service:service}));
-		})
+		// _.each(module.get('monitors'),function(service){
+		var temp=_.template($('#service-temp').html());
+		$("#servicetable tbody").append(temp({monitors:module.get('monitors')}));
+		// })
 		$('input[name=note]',this.el).val(module.get('note'));
+		$('.typeselect option[name='+module.get("chart")+']').attr("selected",true);
 		this.renderoptions();
 		this.delegateEvents();
 		$(this.el).modal('toggle');
@@ -465,11 +505,12 @@ var ModalView=Backbone.View.extend({
 		$('#hostoption select',this.el).find("option:selected").each(function () {
 			hosts.push($(this).text());
 		});
-		for (var i = hosts.length - 1; i >= 0; i--) {
-			var service={host:hosts[i],items:items};
-			var temp=_.template($('#service-temp').html());
-			$("#servicetable tbody").append(temp({service:service}));
-		};
+		var monitors=new Array();
+		for (var i=0; i < hosts.length; i++) 
+			for(var j=0;j<items.length; j++)
+				monitors.push({host:hosts[i],item:items[j]})
+		var temp=_.template($('#service-temp').html());
+		$("#servicetable tbody").append(temp({monitors:monitors}));
 	},
 	deleteservice:function (dom) {
 		dom=dom.target;
@@ -492,26 +533,39 @@ var ModalView=Backbone.View.extend({
 	savemodule:function() {
 		var note=$("#add-modal input[name=note]").val();
 		var type=$("#add-modal .typeselect option:selected").attr("name");
-
+		console.log(type);
 		var len=$("#servicetable").find("tr").length;
-		var hostArr=new Array();
-		var hostItems=new Array();
-		for (var i = 1; i<len; i++) {
-			var tr=$("#servicetable").find("tr").get(i);
-			var index=$.inArray($($(tr).find("td").get(1)).text(),hostArr);
-			if(index<0){
-				hostArr.push($($(tr).find("td").get(1)).text());
-				index=hostArr.length-1;
-				hostItems[index]=new Array();
-			}
-			if($.inArray($($(tr).find("td").get(2)).text(),hostItems[index])<0)
-				hostItems[index].push($($(tr).find("td").get(2)).text());
-		};
+		// var hostArr=new Array();
+		// var hostItems=new Array();
+		var check=new Array();
 		var monlist=new Array();
-		for (var i = hostArr.length - 1; i >= 0; i--) {
-			var monitor=new Monitor({host:hostArr[i],items:hostItems[i]});
-			monlist.push({host:hostArr[i],items:hostItems[i]});
-		};
+
+		// for (var i = 1; i<len; i++) {
+		// 	var tr=$("#servicetable").find("tr").get(i);
+		// 	var index=$.inArray($($(tr).find("td").get(1)).text(),hostArr);
+		// 	if(index<0){
+		// 		hostArr.push($($(tr).find("td").get(1)).text());
+		// 		index=hostArr.length-1;
+		// 		hostItems[index]=new Array();
+		// 	}
+		// 	if($.inArray($($(tr).find("td").get(2)).text(),hostItems[index])<0)
+		// 		hostItems[index].push($($(tr).find("td").get(2)).text());
+		// };
+
+		for(var i=1;i<len;i++){
+			var tr=$("#servicetable").find("tr").get(i);
+			var host=$($(tr).find("td").get(1)).text();
+			var service=$($(tr).find("td").get(2)).text();
+			var index=$.inArray(host+"|"+service,check);
+			if(index<0){
+				check.push(host+"|"+service);
+				monlist.push({host:host,item:service});
+			}
+		}
+		// for (var i = hostArr.length - 1; i >= 0; i--) {
+		// 	var monitor=new Monitor({host:hostArr[i],items:hostItems[i]});
+		// 	monlist.push({host:hostArr[i],items:hostItems[i]});
+		// };
 		var module=new Module({monitors:monlist,note:note,chart:type});
 		$('#add-modal').modal('toggle');
 		return module;
@@ -521,22 +575,24 @@ var ModalView=Backbone.View.extend({
 		if($($('.changelabel label',this.el).get(0)).text()=='监测内容'){
 			this.options.url='/demo/monitor/items';
 			this.options.set('target','hosts');
+			this.options.set('list',services.list);
 		}else{
 			this.options.url='/demo/monitor/hosts';
 			this.options.set('target','items');
+			this.options.set('list',hosts.list);
 		}
-		var self=this;
-		var response=Backbone.sync('read',this.options,{
-			success:function (list) {
-				self.options.set('list',list);
-				var temp=_.template($('#option-temp',self.el).html());
-				$('.firstselect select',self.el).append(temp({options:self.options.get('list')}));
-			}
-		});
+		var temp=_.template($('#option-temp',this.el).html());
+		$('.firstselect select',this.el).append(temp({options:this.options.get('list')}));
 	}
 })
 
+var hosts=new HostList();
+var services=new ServiceList();
 var modalView=new ModalView();
 $(function (){
+	$("#warpper-top").load("wrapper-top.html",function () {
+		console.log($(".top-navbar .nav li").get(0));
+		$($(".top-navbar .nav li").get(0)).addClass('active');
+	});
 	var projectView=new ProjectView();
 })
