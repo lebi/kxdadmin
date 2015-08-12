@@ -1,5 +1,5 @@
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: arial;
 }
 
 body a{
@@ -48,10 +48,14 @@ body a{
 	padding-left: 40px;
 }
 
-.page-title > span{
-	font-family: inherit;
+.page-title strong{
 	padding-right: 30px;
 	font-size: 20px;
+}
+
+.page-title >span {
+	padding-right: 30px;
+	font-size: 15px;
 }
 
 .page-button{
@@ -103,6 +107,18 @@ body a{
 
 .page-detail .ok{
 	background-color: green;
+}
+
+.page-detail .warning{
+	background-color: #EEB422;
+}
+
+.page-detail .critical{
+	background-color: red;
+}
+
+.page-detail .unknown{
+	background-color: #777;
 }
 
 .alert-history .time-title{

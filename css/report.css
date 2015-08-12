@@ -1,0 +1,26 @@
+body {
+    font-family: arial;
+}
+
+body a{
+    cursor: pointer;
+}
+
+#wrapper {
+	height: auto;
+    width: 100%;
+    background:#09192A;
+}
+
+#page-wrapper{
+    min-height: 600px;
+    padding: 0px 15px;
+    background:#E5EBF2;
+}
+
+#page-inner {
+    width:100%;
+    margin:0px 20px 10px 0px;
+    background-color:transparent;
+    padding:0px;
+}

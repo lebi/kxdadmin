@@ -84,7 +84,7 @@
                                                     }else if(item.status==3){
                                                         clazz="monitorunknown";
                                                     }%>
-                                                <a data-toggle="tooltip" data-placement="top" serviceid="<%=item.id%>" href="detail.html"><span class="badge <%=clazz%>">
+                                                <a data-toggle="tooltip" data-placement="top" serviceid="<%=item.id%>" class="service-detail"><span class="badge <%=clazz%>">
                                                     <%=item.item%></span></a>
                                             <%})%>
                                         </div>
@@ -255,7 +255,8 @@
     <script type="text/javascript" src="lib/underscore-min.js"></script>
     <script src="lib/backbone-min.js"></script>
     <script type="text/javascript" src="lib/highcharts.js"></script>
-    <script src="index.js"></script>
+    <script src="lib/jquery.cookie.js"></script>
+    <script src="js/index.js"></script>
 
 </body>
 

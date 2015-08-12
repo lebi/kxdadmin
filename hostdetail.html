@@ -18,16 +18,15 @@
                     <div class="page-title">
                     </div>
                     <script type="text/template" id="title-temp">
-                        <span><strong>ServiceInformation </strong></span>
-                        <span>Service:<b><%=monitor.get('item')%></b></span>
-                        <span> Host:<b><a href="hostdetail.html"><%=monitor.get('host')%></a></b></span>
+                        <span><strong>HostInformation </strong></span>
+                        <span> Host:<b><%=monitor.get('name')%></b></span>
                         <span> Address:<b><%=monitor.get('address')%></b></span>
-                        <span><a href="hostdetail.html"><b>查看主机信息</b></a></span>
                     </script>
 
                     <div>
                         <ul class="page-button">
                             <li class="view-button active" target="page-detail"><span>StatusDetail</span></li>
+                            <li class="view-button" target="service-status"><span>ServiceStatus</span></li>
                             <li class="view-button" target="alert-history"><span>AlertHistory</span></li>
                             <li class="view-button" target="page-trends"><span>Trends</span></li>
                             <li class="view-button" target="page-report"><span>Reposrt</span></li>
@@ -167,6 +166,39 @@
                                 </div>
                             </div>
                         </script>
+                        <div class="service-status col-lg-offset-2 col-lg-8 page-block">
+                            <table class="table" valign="middle">
+                                <tr>
+                                    <th>Host</th><th>Service</th><th>Status</th><th>Last Check</th><th>Duration</th><th>Attempt</th><th>Status Infomation</th>
+                                </tr>
+                                <tr>
+                                    <td class="serviceok" rowspan="">OK</td><td>Unscheduled</td><td>1d 0h 0s 0s</td><td>100.00%</td><td>100.00%</td>
+                                </tr>
+                                <tr>
+                                    <td>Unscheduled</td><td>1d 0h 0s 0s</td><td>100.00%</td><td>100.00%</td>
+                                </tr>
+                                <tr>
+                                    <td>Unscheduled</td><td>1d 0h 0s 0s</td><td>100.00%</td><td>100.00%</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <script type="text/template" id="services-temp">
+                            <div class="service-status col-lg-offset-2 col-lg-8 page-block">
+                                <tr>
+                                    <th>Host</th><th>Service</th><th>Status</th><th>Last Check</th><th>Duration</th><th>Attempt</th><th>Status Infomation</th>
+                                </tr>
+                                <tr>
+                                    <td rowspan="<%=serivces.length%>"></td><td>Unscheduled</td><td>1d 0h 0s 0s</td><td>100.00%</td><td>100.00%</td>
+                                </tr>
+                                <tr>
+                                    <td>Unscheduled</td><td>1d 0h 0s 0s</td><td>100.00%</td><td>100.00%</td>
+                                </tr>
+                                <tr>
+                                    <td>Unscheduled</td><td>1d 0h 0s 0s</td><td>100.00%</td><td>100.00%</td>
+                                </tr>
+                            </div>
+                        </script>
 
                         <div class="alert-history col-lg-offset-2 col-lg-8 page-block">
                             <table class="time-title">
@@ -260,6 +292,6 @@
         <script type="text/javascript" src="lib/highcharts.js"></script>
         <script src="lib/jquery.cookie.js"></script>
         <script src="js/detail_model.js"></script>
-        <script src="js/detail.js"></script>
+        <script src="js/hostdetail.js"></script>
     </body>
 </html>
