@@ -1,0 +1,111 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="../css/bootstrap.min.css" rel="stylesheet" />
+		<link href="../css/font-awesome.min.css" rel="stylesheet" />
+		<link href="operation.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="background">
+		</div>
+		<div class="wrapper">
+			<nav class='nav-menu board'>
+			</nav>
+			<div class="content-wrapper">
+				<div class="content board">
+					<div class="operation-nav">
+						<script type="text/template" id="operation-nav-temp">
+							<ul class="operation-tree">
+								<li class='unit-li active'>
+									<a class=" parent">
+										<i class="tree-icon">
+											<i class="icon-caret-down"></i>
+											<i class="icon-caret-right"></i>
+										</i>
+										<span>父操作</span>
+									</a>
+									<ul>
+										<li class='unit-li active'>
+											<a class=" children">
+												<span>父操作</span>
+											</a>
+										</li>
+										<li class='unit-li'>
+											<a class="parent">
+												<i class="tree-icon">
+													<i class="icon-caret-down"></i>
+													<i class="icon-caret-right"></i>
+												</i>
+												<span>父操作</span>
+											</a>
+											<div class="dropdown">
+												<a class="icon-cogs dropdown-toggle" data-toggle="dropdown" ></a>
+												<ul class="version-dropdown dropdown-menu">
+				  									<a href="#add"><li >添加同级操作</li></a>
+				  									<a href="#add"><li >添加子操作</li></a>
+				  									<a href="#"><li >删除</li></a>
+					  							</ul>
+					  						</div>
+					  					</li>
+					  				</ul>
+					  			</il>
+					  		</ul>
+				  		</script>
+					</div>
+					<div class="operation-edit">
+						<script type="text/template" id="operation-edit-temp">
+							<div class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="col-sm-2 control-label">操作名</label>
+							    	<div class="col-sm-10">
+							      		<input class="form-control">
+							    	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-2 control-label">操作定义</label>
+							    	<div class="col-sm-10">
+							      		<input class="form-control">
+							    	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-2 control-label">添加参数</label>
+							    	<div class="col-sm-8">
+										<input class="form-control">
+									</div>
+									<div class="col-sm-2">
+										<button class="btn btn-default">添加参数</button>
+									</div>
+								</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-2 control-label">操作参数</label>
+						    		<div class="col-sm-10 control-label label-content">
+							    		<a class="badge">扩展属性A <i class="badge-remove icon-remove-sign"></i></a>
+									</div>
+								</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-2 control-label">操作说明</label>
+							    	<div class="col-sm-10">
+							      		<input class="form-control">
+							    	</div>
+							  	</div>
+								<div class="col-sm-offset-2">
+									<div class='btn btn-success'>保存</div>
+								</div>
+							</div>
+						</script>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="../lib/bootstrap.min.js"></script>
+		<script type="text/javascript" src="require.js" data-main="app/operation.js"></script>
+
+		<script type="text/javascript">
+			$('.nav-menu').load('nav.html',function () {
+				$($('.nav-menu a').get(2)).addClass('active');
+			});
+		</script>
+	</body>
+</html>

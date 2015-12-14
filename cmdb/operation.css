@@ -1,0 +1,39 @@
+.content-wrapper{
+	height: 100%;
+	margin-left:200px;
+	padding: 30px 30px;
+}
+.content{
+	height: 100%;
+}
+.operation-nav{
+	height: 100%;
+	float: left;
+	width: 35%;
+	padding: 70px 0px;
+	padding-left: 120px;
+}
+.operation-edit{
+	height: 100%;
+	float: left;
+	width: 55%;
+	padding: 90px 0px;
+}
+.operation-tree{
+	padding: 10px 20px;
+	width: 200px;
+	border: 1px solid #fff;
+	height: 100%;
+	border-radius: 4px;
+}
+.operation-tree ul{
+	padding-left: 10px;
+}
+.badge{
+	background-color: #412FC9;
+	border-radius: 4px;
+	font-size: 13px;
+}
+.badge-remove:hover{
+	color: #FF0202;
+}

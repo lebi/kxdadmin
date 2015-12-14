@@ -1,0 +1,75 @@
+.content-wrapper{
+	margin-left: 180px;
+	height: 100%;
+	padding: 20px;
+}
+.unit-nav{
+	position: fixed;
+	height: 100%;
+	width: 200px;
+	padding: 20px 0px;
+	float: left;
+}
+.unit-nav ul{
+	padding-left: 10px;
+	list-style: none;
+	margin: 0px;
+}
+.unit-nav a>span:hover{
+	color: #eee;
+}
+.unit-content{
+	margin-left: 220px;
+}
+.unit-detail{
+	width: 100%;
+	display: table;
+	padding: 20px 40px;
+}
+.manage-tab{
+	margin-top: 20px;
+	height: 40px;
+	line-height: 40px;
+	border-radius: 0px;
+}
+.manage-tab>a{
+	padding: 10px 60px;
+}
+.manage-tab>.active{
+	background: rgba(55,55,55,0.5);	
+}
+.manage-tab>a:hover{
+	background: rgba(55,55,55,0.5);
+	-webkit-transition:background 0.3s;
+}
+.manage-content{
+	border-radius: 0px;
+	display: table;
+	width: 100%;
+}
+.manage-wrapper{
+	padding-top: 10px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+.manage-table{
+	overflow-y: auto;
+	height: 480px;
+	display: block;
+}
+.pagination{
+	margin: 5px 0px;
+}
+.table>tbody>tr>td{
+	padding: 5px;
+}
+.pagination-nav{
+	float: right;
+}
+.unit-manage{
+	min-height: 500px;
+	padding: 40px 0px;
+	max-width: 650px;
+	margin: auto;
+}
+

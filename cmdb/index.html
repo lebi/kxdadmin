@@ -1,0 +1,252 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="../css/bootstrap.min.css" rel="stylesheet" />
+		<link href="../css/font-awesome.min.css" rel="stylesheet" />
+		<link href="index.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="background">
+		</div>
+		<div class="wrapper">
+			<nav class='nav-menu board'>
+			</nav>
+			<div class="content-wrapper">
+				<nav class="unit-nav board">
+					<script type="text/template" id="unit-nav-temp">
+					<ul>
+						<li class='unit-li active'>
+							<a href="#" class=" parent">
+								<i class="tree-icon">
+									<i class="icon-caret-down"></i>
+									<i class="icon-caret-right"></i>
+								</i>
+								<span>父单位</span>
+							</a>
+							<ul>
+								<li class='unit-li active'>
+									<a href="#" class=" parent">
+										<i class="tree-icon">
+											<i class="icon-caret-down"></i>
+											<i class="icon-caret-right"></i>
+										</i>
+										<span>父单位</span>
+									</a>
+								</li>
+								<li class='unit-li'>
+									<a href="#" class="parent">
+										<i class="tree-icon">
+											<i class="icon-caret-down"></i>
+											<i class="icon-caret-right"></i>
+										</i>
+										<span>父单位</span>
+									</a>
+									<div class="dropdown">
+										<a class="icon-cogs dropdown-toggle" data-toggle="dropdown" href="#"></a>
+										<ul class="version-dropdown dropdown-menu">
+			  								<a href="#add"><li >添加同级单位</li></a>
+			  								<a href="#add"><li >添加子单位</li></a>
+			  								<a href="#"><li >删除</li></a>
+			  							</ul>
+			  						</div>
+									<ul>
+										<li class='unit-li active'>
+											<a href="#" class=" parent">
+												<i class="tree-icon">
+													<i class="icon-caret-down"></i>
+													<i class="icon-caret-right"></i>
+												</i>
+												<span>父单位</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+								<li class='unit-li'>
+									<a href="#" class="children"><span>父单位</span></a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+					</script>
+				</nav>
+				<div class="unit-content">
+					<div class="unit-detail board">
+						<script type="text/template" id="unit-detail-temp">
+							<div class="col-lg-10">
+								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
+								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
+								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
+								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
+								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
+							</div>
+							<div class="col-lg-1 col-sm-12">
+								<a href="#edit" class="btn btn-success">编辑信息</a>
+							</div>
+						</script>
+					</div>
+					<div class="manage-tab board">
+						<a href="#asset" manage='asset'>资产管理</a><a href="#edit" manage='unit'>单位管理</a>
+					</div>
+					<div class="manage-content board">
+						<div class="manage-wrapper">
+ 							<script type="text/template" id="asset-temp">
+								<div id="asset">
+									<div class="form-horizontal">
+									  	<div class="form-group">
+									    	<label class="col-sm-1 control-label">资产类型</label>
+									    	<div class="col-sm-5">
+									      		<select class="form-control">
+									      		</select>
+									    	</div>
+									  	</div>
+									</div>
+									<div class="manage-table">
+										<table class="table">
+											<thead>
+												<tr>
+													<th><span>#</span></th>
+													<th><span>资产序号</span></th>
+													<th><span>资产用途</span></th>
+													<th><span>所属单位</span></th>
+													<th><span>责任人</span></th>
+													<th><span>详情</span></th>
+													<th><span>操作</span></th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td><span>搜索</span></td>
+													<td><input></td>
+													<td><input></td>
+													<td><input></td>
+													<td><input></td>
+												</tr>
+												<tr>
+													<td><span>#a</span></td>
+													<td><span>#a</span></td>
+													<td><span>#a</span></td>
+													<td><span>#a</span></td>
+													<td><span>#a</span></td>
+													<td><span>#a</span></td>
+													<td><span>#a</span></td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<nav class="pagination-nav">
+									  	<ul class="pagination">
+									    	<li>
+									      		<a href="#" aria-label="Previous">
+									        		<span aria-hidden="true">&laquo;</span>
+									      		</a>
+									    	</li>
+									    	<li><a href="#">1</a></li>
+									    	<li><a href="#">2</a></li>
+									    	<li><a href="#">3</a></li>
+									    	<li><a href="#">4</a></li>
+									    	<li><a href="#">5</a></li>
+									    	<li>
+										      	<a href="#" aria-label="Next">
+											        <span aria-hidden="true">&raquo;</span>
+										      	</a>
+									    	</li>
+									  	</ul>
+									</nav>
+								</div>
+							</script>
+
+ 							<script type="text/template" id="unit-edit-temp">
+	 							<div class="unit-manage">
+									<div class="form-horizontal">
+									  	<div class="form-group">
+									    	<label class="col-sm-2 control-label">单位编码</label>
+									    	<div class="col-sm-10">
+									    	  	<input class="form-control">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">单位名称</label>
+										    <div class="col-sm-10">
+											    <input class="form-control">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">上级单位</label>
+										    <div class="col-sm-10">
+											    <input class="form-control">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">单位负责人</label>
+										    <div class="col-sm-10">
+											    <input class="form-control">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">联系电话</label>
+										    <div class="col-sm-10">
+											    <input class="form-control">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+									    	<div class="col-sm-offset-2 col-sm-10">
+									    		<button type="button" class="btn btn-success" id="add-property" data-toggle="modal" data-target="#property-modal">添加新属性</button>
+									    	  	<button class="btn btn-default">保存</button>
+									    	</div>
+									  	</div>
+									</div>
+								</script>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="property-modal">
+		  	<div class="modal-dialog">
+			    <div class="modal-content">
+			      	<div class="modal-header">
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        	<h4 class="modal-title" id="myModalLabel">单位添加属性</h4>
+			      	</div>
+			      	<div class="modal-body">
+						<div class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">属性名</label>
+								<div class="col-sm-10">
+									<input class="form-control">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">属性说明</label>
+								<div class="col-sm-10">
+									<input class="form-control">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">属性代码</label>
+								<div class="col-sm-10">
+									<input class="form-control">
+								</div>
+							</div>
+						</div>
+			      	</div>
+			      	<div class="modal-footer">
+			        	<button type="button" class="btn btn-warning" data-dismiss="modal">关闭</button>
+			        	<button type="button" class="btn btn-success">添加</button>
+			      	</div>
+			    </div>
+		 	</div>
+		</div>
+		<script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="../lib/bootstrap.min.js"></script>
+		<script type="text/javascript" src="require.js" data-main="main.js"></script>
+
+		<script type="text/javascript">
+			$('.nav-menu').load('nav.html',function () {
+				$($('.nav-menu a').get(0)).addClass('active');
+			});
+		</script>
+	</body>
+</html>

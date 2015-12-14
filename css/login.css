@@ -1,0 +1,59 @@
+body{
+	background: #EEEEEE;
+}
+.header{
+	height: 47px;
+	width: 100%;
+	top: 0px;
+	background-color: #555;
+	box-shadow: -1px -1px 1px 1px #333 inset;
+	z-index: 100;
+	position: fixed;
+	border-bottom: 7px solid #00ba8b;
+}
+.tool{
+	width: 700px;
+	margin:100 auto;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.14);
+	background-color: #fff;
+	
+}
+.login-tool{
+	width: 700px;
+	height: 400px;
+}
+.login-form{
+	padding: 110px 40px;
+}
+.login-form .form-group{
+	margin-bottom: 30px;
+}
+.form-group .form-control{
+	border-radius: 1;
+}
+.buttonlist{
+	padding: 0px 15px;
+	float: right;
+	margin-top: 30px;
+}
+.control-botton.control-botton-2{
+	margin-left: 38px;
+	padding: 7px 110px;
+}
+
+.control-botton{
+	display: inline-block;
+	margin-left: 20px;
+	padding: 7px 67px;
+	text-align: center;
+	background-color: #555;
+	color: #fff;
+	cursor: pointer;
+	border: 2px solid #fff;
+	-webkit-transition: all .10s ease-out;
+}
+.control-botton:hover{
+	border: 2px solid #555;
+	background-color: #fff;
+	color: #555;
+}

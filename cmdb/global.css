@@ -1,0 +1,165 @@
+body{
+	font-family:"Microsoft Yahei";
+}
+a,span,label{
+	color: #fff;
+	text-decoration: none;
+}
+li{
+	list-style: none;
+}
+a:hover{
+	color: #fff;
+	text-decoration: none;
+	cursor: pointer;
+}
+a:focus{
+	color: #fff;
+	text-decoration: none;
+}
+.board{
+	background: rgba(85,85,85,0.5);
+	border-radius: 3px;
+}
+.background{
+	background:url(background.jpg) no-repeat;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+}
+.wrapper{
+	width: 100%;
+	height: 100%;
+}
+.nav-menu{
+	height: 100%;
+	position: fixed;
+	width: 175px;
+}
+.nav-menu>ul{
+	list-style: none;
+	margin-top:25px;
+	padding: 0px;
+}
+.nav-menu>ul a{
+	font-size: 17px;
+	padding: 7px 90px 7px 15px;
+	display: block;
+}
+.nav-menu>ul a:hover{
+	background: rgba(55,55,55,0.5);
+	-webkit-transition:background 0.3s;
+}
+.nav-menu a.active{
+	background: rgba(55,55,55,0.5);
+}
+body::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: #555;
+}
+body::-webkit-scrollbar {
+	border-radius: 10px;
+	width: 10px;
+	background-color: #ccc;
+}
+.manage-table::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: #555;
+}
+.manage-table::-webkit-scrollbar {
+	border-radius: 10px;
+	width: 10px;
+	background-color: #ccc;
+}
+.btn-default{
+	background-color: transparent;
+	color: #fff;
+}
+.btn-default:hover{
+	background: rgba(55,55,55,0.5);
+	color: #fff;
+}
+.modal label{
+	color: #555;
+}
+.board .form-control{
+	background-color: transparent;
+	color: #fff;
+}
+.board option{
+	color: #000;
+}
+.tree-icon{
+	width: 12px;
+	display: inline-block;
+	text-align: center;
+	padding: 5px 0px;
+}
+.icon-caret-right{
+	padding: 5px;
+}
+.children{
+	padding-left: 16px;
+}
+.unit-li>ul{
+	display: none;
+}
+.unit-li.active>ul{
+	display: block;
+}
+.unit-li>.parent .icon-caret-down{
+	display: none;
+}
+.unit-li.active>.parent .icon-caret-down{
+	display: inherit;
+}
+.unit-li.active>.parent .icon-caret-right{
+	display: none;
+}
+.unit-li >a{
+	display: block;
+}
+.tree-icon:hover{
+	color: #555;
+}
+.unit-li >a:hover +.dropdown{
+	display: inherit;
+	margin-top: -18;
+}
+.dropdown:hover{
+	display: inherit;
+	margin-top: -18;
+}
+.dropdown{
+	display: none;
+	float: right;
+	padding-right: 10px;
+}
+.dropdown-menu{
+	background: rgba(85,85,85,0.8);	
+}
+
+.manage-table table{
+	margin-bottom: 0px;
+}
+.manage-table input{
+	border-radius: 3px;
+	border: 1px solid #ccc;
+	padding: 3px;
+	max-width: 120px;
+}
+.pagination>li>a{
+	background-color: transparent;
+	color: #fff;
+}
+.pagination>li>a:hover{
+	background-color: #555;
+	color: #fff;
+}
+.control-label.label-content{
+	text-align: left;
+}
+.btn-table{
+	padding: 3px 15px;
+}

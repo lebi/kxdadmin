@@ -1,0 +1,149 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="../css/bootstrap.min.css" rel="stylesheet" />
+		<link href="../css/font-awesome.min.css" rel="stylesheet" />
+		<link href="asset-type.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="background">
+		</div>
+		<div class="wrapper">
+			<nav class='nav-menu board'>
+			</nav>
+			<div class='content-wrapper'>
+				<script type="text/template" id="property-temp">
+					<div class='content board'>
+	 					<a href="#edit" class="btn btn-success"> 添加属性 </a>
+						<table class="table">
+							<thead>
+								<tr>
+									<th><span>名称</span></th><th><span>扩展属性</span></th>
+									<th><span>修改属性</span></th><th><span>操作</span></th>
+								</tr>
+							</thead>
+							<tbody>
+								<%collection.each(function (type) {%>
+									<tr>
+										<td><span><%=type.get('name')+'('+type.get('code')+')'%></span></td>
+										<td class='properties'>
+											<%_.each(type.get('extendType').split(','),function (data) {%>
+												<a class="badge"><%=data%></a>
+											<%})%>
+										</td>
+										<td class='operations'>
+											<%_.each(type.get('operations'),function (data) {%>
+												<a class="badge"><%=data.name%></a>
+											<%})%>
+										</td>
+										<td>
+											<a class="btn-default btn btn-table" href="#edit?<%=type.get('id')%>">修改</a>
+										</td>
+									</tr>
+								<%})%>
+							</tbody>
+						</table> 
+					</div>
+				</script>
+
+				<script type="text/template" id="property-edit-temp">
+					<div class="edit-content board">
+						<a href="#" class="btn btn-success"> <返回 </a>
+						<div class="form-horizontal">
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">类型名称</label>
+						    	<div class="col-sm-10">
+						      		<input class="form-control" value="<%=property.get('name')%>">
+						    	</div>
+						  	</div>
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">编码</label>
+						    	<div class="col-sm-10">
+						      		<input class="form-control" value="<%=property.get('code')%>">
+						    	</div>
+						  	</div>
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">扩展属性名</label>
+						    	<div class="col-sm-3">
+									<input class="form-control" name="extendName">
+								</div>
+						    	<label class="col-sm-2 control-label">扩展属性编码</label>
+						    	<div class="col-sm-3">
+									<input class="form-control" name="extendCode">
+								</div>
+								<div class="col-sm-2">
+									<button class="btn btn-default add-type">添加属性</button>
+								</div>
+							</div>
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">扩展属性</label>
+						    	<div class="col-sm-10 control-label label-content" id="extend-list">
+						    		<% if(property.get('extendCode')){
+						    			var codes=property.get('extendCode').split(',');
+						    			var types=property.get('extendType').split(',');
+						    			for(var i in types){%>
+						    				<a class="badge">
+						    					<span><%=types[i]%></span>
+						    					(<span><%=codes[i]%></span>) 
+						    					<i class="badge-remove icon-remove-sign extend-remove"></i>
+						    				</a>
+						    			<%}
+						    		}%>
+
+								</div>
+							</div>
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">添加操作</label>
+						    	<div class="col-sm-10">
+						    		<ul class="operation-tree">
+						    			<%for(var i in tree){%>
+							    			<li class='unit-li active'>
+												<a class=" parent">
+													<i class="tree-icon">
+														<i class="icon-caret-down"></i>
+														<i class="icon-caret-right"></i>
+													</i>
+													<span><%=i%></span>
+												</a>
+												<ul>
+						    						<%for(var j in tree[i]){%>
+														<li class='unit-li active'>
+															<a class="children">
+																<span><%=tree[i][j]%></span>
+															</a>
+														</li>
+													<%}%>
+												</ul>
+											</li>
+						    			<%}%>
+									</ul>
+								</div>
+							</div>
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">操作</label>
+						    	<div class="col-sm-10 control-label label-content">
+						    		<%_.each(property.get('operations'),function (op) {%>
+										<a class="badge"><%=op.name%> <i class="badge-remove icon-remove-sign"></i></a>
+						    		<%})%>
+								</div>
+							</div>
+							<div class="col-sm-offset-2">
+								<div class='btn btn-success'>保存</div>
+							</div>
+						</div>
+					</div>
+				</script>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="../lib/bootstrap.min.js"></script>
+		<script type="text/javascript" src="require.js" data-main="app/asset-type.js"></script>
+
+		<script type="text/javascript">
+			$('.nav-menu').load('nav.html',function () {
+				$($('.nav-menu a').get(3)).addClass('active');
+			});
+		</script>
+	</body>
+</html>
