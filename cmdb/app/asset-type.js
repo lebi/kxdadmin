@@ -115,7 +115,30 @@ define(['underscore','backbone','cookie','AssetType','AssetTypeList','Operation'
 		},
 		removeExtend:function () {
 			var parent=$(event.target).closest('.badge');
+			
+			var name=$(parent.children('span').get(0)).html();
+			var code=$(parent.children('span').get(1)).html();
+			var newname=_.reduce(this.property.get('extendType').split(','),function (memo,t) {
+				if(t!=name)
+					if(memo=='')
+						memo+=t;
+					else
+						memo+=','+t;
+				return memo;
+			},'')
 
+			var newcode=_.reduce(this.property.get('extendCode').split(','),function (memo,t) {
+				if(t!=code)
+					if(memo=='')
+						memo+=t;
+					else
+						memo+=','+t;
+				return memo;
+			},'')
+
+			this.property.set('extendType',newname);
+			this.property.set('extendCode',newcode);
+			this.property.trigger('myupdate');
 		}
 	})
 

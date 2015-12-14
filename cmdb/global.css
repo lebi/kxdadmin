@@ -17,8 +17,11 @@ a:focus{
 	color: #fff;
 	text-decoration: none;
 }
+.nav-icon{
+	font-size: 30px;
+}
 .board{
-	background: rgba(85,85,85,0.5);
+	background: rgba(39,39,39,0.45);
 	border-radius: 3px;
 }
 .background{
@@ -35,16 +38,16 @@ a:focus{
 .nav-menu{
 	height: 100%;
 	position: fixed;
-	width: 175px;
+	width: 75px;
 }
 .nav-menu>ul{
 	list-style: none;
-	margin-top:25px;
 	padding: 0px;
 }
 .nav-menu>ul a{
-	font-size: 17px;
-	padding: 7px 90px 7px 15px;
+	text-align: center;
+	font-size: 12px;
+	padding: 7px 10px 7px 10px;
 	display: block;
 }
 .nav-menu>ul a:hover{
@@ -162,4 +165,10 @@ body::-webkit-scrollbar {
 }
 .btn-table{
 	padding: 3px 15px;
+}
+.table-striped>tbody>tr:nth-of-type(odd) {
+	background: rgba(86, 86, 86, 0.5);
+}
+.table>tbody>tr>td{
+	border-top: transparent;
 }
