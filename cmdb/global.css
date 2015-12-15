@@ -130,6 +130,7 @@ body::-webkit-scrollbar {
 	display: inherit;
 	margin-top: -18;
 }
+
 .dropdown:hover{
 	display: inherit;
 	margin-top: -18;
@@ -167,7 +168,7 @@ body::-webkit-scrollbar {
 	padding: 3px 15px;
 }
 .table-striped>tbody>tr:nth-of-type(odd) {
-	background: rgba(86, 86, 86, 0.5);
+	background: rgba(95,95,95, 0.5);
 }
 .table>tbody>tr>td{
 	border-top: transparent;

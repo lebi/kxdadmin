@@ -4,10 +4,10 @@ define(['underscore','backbone','model'],function (_,Backbone,MyModel) {
 			name:null,
 			id:null,
 			code:null,
-			operations:null,
-			extendType:null,
-			extendCode:null
-		}
+			operations:[],
+			properties:[]
+		},
+		urlRoot:'/cmdbAPI/type'
 	})
 	return AssetType;
 })

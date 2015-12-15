@@ -46,3 +46,6 @@
 .operation-tree ul{
 	padding-left: 10px;
 }
+.children:hover{
+	background: rgba(55,55,55,0.5);
+}
