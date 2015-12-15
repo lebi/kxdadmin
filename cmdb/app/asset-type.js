@@ -27,7 +27,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 		el:$('.content-wrapper'),
 		initialize:function () {
 			this.collection=new AssetTypeList();
-			this.collection.on('update',this.render,this);
+			this.collection.on('sync',this.render,this);
 			this.collection.fetch();
 
 			this.operations=new OperationList();
@@ -113,10 +113,22 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 			var code=$(event.target).val();
 			this.assetType.set('code',code);
 		},
+		/*
+		*	@Usage: add new type or save edit type;
+		*			if create, add this type to main view's collection.
+		*/
 		save:function () {
+			if(!(this.assetType.get('name')&&this.assetType.get('code'))){
+				alert('名称或编码不能为空');
+				return;
+			}
 			var dom=$(event.target);
+			var flag=this.checkTypeId();
+			var self=this;
 			this.assetType.save().done(function () {
 				$(dom).after(" <span id='save-hint'> <i class='icon-ok-sign'></i> 保存成功</span>");
+				if(!flag)
+					assetView.collection.add(self.assetType);
 				setTimeout(function () {
 					$('#save-hint').remove();
 				},1000);
@@ -150,7 +162,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 		*	@Usage: check if this is an exist type.
 		*			if false, can't add propery and operation to this type;
 		*/
-		checkPropertyId:function () {
+		checkTypeId:function () {
 			if(!this.assetType.get('id'))
 				return false;
 			return true;
@@ -160,6 +172,12 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 		*			add the property to the view and this.assetType;
 		*/
 		addExtend:function () {
+			if(!this.checkTypeId()){
+				alert('请先添加资产类型');
+				return;
+			}
+
+
 			var name=$('input[name=extendName]').val();
 			var code=$('input[name=extendCode]').val();
 
@@ -213,6 +231,11 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 			})
 		},
 		addOp:function () {
+			if(!this.checkTypeId()){
+				alert('请先添加资产类型');
+				return;
+			}
+
 			var id=$(event.target).closest('.children').attr('nodeid');
 			var op=assetView.operations.get(id).toJSON();
 			for(var i in this.assetType.get('operations')){
