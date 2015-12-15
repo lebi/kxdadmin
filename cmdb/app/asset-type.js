@@ -22,7 +22,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 		$($('.nav-menu a').get(3)).addClass('active');
 	});
 
-	var PropertyView=Backbone.View.extend({
+	var AssetTypeView=Backbone.View.extend({
 		template:_.template($('#property-temp').html()),
 		el:$('.content-wrapper'),
 		initialize:function () {
@@ -86,7 +86,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 		parseTree:function(){
 			this.operationTree={};
 			var self=this;
-			property.operations.each(function (op) {
+			assetView.operations.each(function (op) {
 				if(!self.operationTree[op.get('type')])
 					self.operationTree[op.get('type')]=new Array();
 				self.operationTree[op.get('type')].push(op);
@@ -214,7 +214,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 		},
 		addOp:function () {
 			var id=$(event.target).closest('.children').attr('nodeid');
-			var op=property.operations.get(id).toJSON();
+			var op=assetView.operations.get(id).toJSON();
 			for(var i in this.assetType.get('operations')){
 				if(this.assetType.get('operations')[i].name==op.name){
 					alert('操作已存在');
@@ -262,13 +262,13 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 			'edit':'edit'
 		},
 		view:function () {
-			if(property)
-				property.render();
+			if(assetView)
+				assetView.render();
 			else
-				property=new PropertyView();
+				assetView=new AssetTypeView();
 		},
 		edit:function (id) {
-			if(!property){
+			if(!assetView){
 				window.location.href="#";
 				return;
 			}
@@ -278,7 +278,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 				edit=new AssetEditView();
 			
 			if(id)
-				edit.createView(property.collection.get(id));
+				edit.createView(assetView.collection.get(id));
 			else
 				edit.createView();
 			
@@ -286,6 +286,6 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 	})
 	var router=new AppRouter();
 	Backbone.history.start();
-	var property;
+	var assetView;
 	var edit;
 })
