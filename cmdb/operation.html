@@ -15,97 +15,165 @@
 				<div class="content board">
 					<div class="operation-nav">
 						<script type="text/template" id="operation-nav-temp">
+							<div class="btn btn-default" id="type-add">添加操作类型</div>
 							<ul class="operation-tree">
-								<li class='unit-li active'>
-									<a class=" parent">
-										<i class="tree-icon">
-											<i class="icon-caret-down"></i>
-											<i class="icon-caret-right"></i>
-										</i>
-										<span>父操作</span>
-									</a>
-									<ul>
-										<li class='unit-li active'>
-											<a class=" children">
-												<span>父操作</span>
-											</a>
-										</li>
-										<li class='unit-li'>
-											<a class="parent">
-												<i class="tree-icon">
-													<i class="icon-caret-down"></i>
-													<i class="icon-caret-right"></i>
-												</i>
-												<span>父操作</span>
-											</a>
-											<div class="dropdown">
-												<a class="icon-cogs dropdown-toggle" data-toggle="dropdown" ></a>
-												<ul class="version-dropdown dropdown-menu">
-				  									<a href="#add"><li >添加同级操作</li></a>
-				  									<a href="#add"><li >添加子操作</li></a>
-				  									<a href="#"><li >删除</li></a>
-					  							</ul>
-					  						</div>
-					  					</li>
-					  				</ul>
-					  			</il>
+								<%for(var i in tree){%>
+									<li class='unit-li active'>
+										<a class="parent" href="#">
+											<i class="tree-icon">
+												<i class="icon-caret-down"></i>
+												<i class="icon-caret-right"></i>
+											</i>
+											<span><%=types.get(i).get('name')%></span>
+										</a>
+										<div class="dropdown">
+											<a class="icon-edit type-edit" typeId="<%=i%>"></a>
+											<a class="icon-plus-sign-alt" href="#add?<%=i%>"></a>
+						  				</div>
+						  				<%if(tree[i].length>0){%>
+										<ul>
+											<%for(var j in tree[i]){%>
+												<li class='unit-li'>
+													<a class="children" href="#detail?<%=tree[i][j].get('id')%>">
+														<span><%=tree[i][j].get('name')%></span>
+													</a>
+													<div class="dropdown">
+														<a class="icon-edit" href="#edit?<%=tree[i][j].get('id')%>"></a>
+														<a class="icon-trash"></a>
+							  						</div>
+							  					</li>
+						  					<%}%>
+						  				</ul>
+						  				<%}%>
+						  			</il>
+						  		<%}%>
 					  		</ul>
+							<div class="modal fade" id="type-modal">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span></button>
+											<h4 class="modal-title">添加新的操作类型</h4>
+										</div>
+										<div class="modal-body">
+											<div class="form-horizontal">
+											  	<div class="form-group">
+											    	<label class="col-sm-2 control-label">类型名</label>
+											    	<div class="col-sm-10">
+											      		<input class="form-control" name="type">
+											    	</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-primary" id="type-save">保存</button>
+										</div>
+									</div>
+								</div>
+							</div>
 				  		</script>
 					</div>
 					<div class="operation-edit">
+						<script type="text/template" id="operation-detail-temp">
+							<div class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="col-sm-offset-1 col-sm-2 control-label">操作名</label>
+							    	<label class="col-sm-9 control-label label-content"><%=operation.get('name')%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-offset-1 col-sm-2 control-label">操作定义</label>
+							    	<label class="col-sm-9 control-label label-content"><%=operation.get('definition')%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-offset-1 col-sm-2 control-label">操作类型</label>
+							    	<label class="col-sm-9 control-label label-content"><%=types.get(operation.get('typeId')).get('name')%></label>
+								</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-offset-1 col-sm-2 control-label">操作参数</label>
+						    		<div class="col-sm-9 control-label label-content">
+								    <%if(operation.get('parameters')){
+								    	_.each(operation.get('parameters').split(';'),function (param) {%>
+								    		<%if(param){%>
+								    			<a class="badge"><%=param%></a>
+								    		<%}%>
+								    	<%})
+								    }%>
+									</div>
+								</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-offset-1 col-sm-2 control-label">操作说明</label>
+							    	<label class="col-sm-9 control-label label-content"><%=operation.get('description')%></label>
+							  	</div>
+								<div class="col-sm-offset-3 col-sm-2">
+									<a class='btn btn-success' href="#edit?<%=operation.get('id')%>">修改</a>
+								</div>
+							</div>
+						</script>
+					</div>
 						<script type="text/template" id="operation-edit-temp">
 							<div class="form-horizontal">
 							  	<div class="form-group">
 							    	<label class="col-sm-2 control-label">操作名</label>
 							    	<div class="col-sm-10">
-							      		<input class="form-control">
+							      		<input class="form-control" value="<%=operation.get('name')%>" name="name">
 							    	</div>
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-2 control-label">操作定义</label>
 							    	<div class="col-sm-10">
-							      		<input class="form-control">
+							      		<input class="form-control" value="<%=operation.get('definition')%>" name="definition">
 							    	</div>
 							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-2 control-label">操作类型</label>
+							    	<div class="col-sm-10">
+										<select class="form-control">
+										<%types.each(function (t) {%>
+											<%if(t.get('name')==types.get(operation.get('typeId')).get('name')){%>
+												<option selected='selected' value="<%=t.get('id')%>"><%=t.get('name')%></option>
+											<%}else{%>
+												<option value="<%=t.get('id')%>"><%=t.get('name')%></option>
+											<%}%>
+										<%})%>
+										</select>
+									</div>
+								</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-2 control-label">添加参数</label>
 							    	<div class="col-sm-8">
 										<input class="form-control">
 									</div>
 									<div class="col-sm-2">
-										<button class="btn btn-default">添加参数</button>
+										<button class="btn btn-default" id="add-param">添加参数</button>
 									</div>
 								</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-2 control-label">操作参数</label>
 						    		<div class="col-sm-10 control-label label-content">
-							    		<a class="badge">扩展属性A <i class="badge-remove icon-remove-sign"></i></a>
+								    <%if(operation.get('parameters')){
+								    	_.each(operation.get('parameters').split(';'),function (param) {%>
+								    		<%if(param){%>
+								    			<a class="badge"><span><%=param%></span> <i class="badge-remove icon-remove-sign param-remove"></i></a>
+								    		<%}%>
+								    	<%})
+								    }%>
 									</div>
 								</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-2 control-label">操作说明</label>
 							    	<div class="col-sm-10">
-							      		<input class="form-control">
+							      		<input class="form-control" value="<%=operation.get('description')%>" name="description">
 							    	</div>
 							  	</div>
 								<div class="col-sm-offset-2">
-									<div class='btn btn-success'>保存</div>
+									<div class='btn btn-success' id="save">保存</div>
 								</div>
 							</div>
 						</script>
-					</div>
 				</div>
 			</div>
 		</div>
-
-		<script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
-		<script type="text/javascript" src="../lib/bootstrap.min.js"></script>
 		<script type="text/javascript" src="require.js" data-main="app/operation.js"></script>
-
-		<script type="text/javascript">
-			$('.nav-menu').load('nav.html',function () {
-				$($('.nav-menu a').get(2)).addClass('active');
-			});
-		</script>
 	</body>
 </html>

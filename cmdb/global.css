@@ -90,6 +90,13 @@ body::-webkit-scrollbar {
 	background-color: transparent;
 	color: #fff;
 }
+.modal span{
+	color: #333;
+}
+.modal .form-control{
+	color: #555;
+	background-color: #fff;
+}
 .board option{
 	color: #000;
 }
@@ -128,12 +135,14 @@ body::-webkit-scrollbar {
 }
 .unit-li >a:hover +.dropdown{
 	display: inherit;
-	margin-top: -18;
+	margin-top: -22;
 }
-
+.dropdown>a:hover{
+	color: #333;
+}
 .dropdown:hover{
 	display: inherit;
-	margin-top: -18;
+	margin-top: -22;
 }
 .dropdown{
 	display: none;
@@ -141,7 +150,8 @@ body::-webkit-scrollbar {
 	padding-right: 10px;
 }
 .dropdown-menu{
-	background: rgba(85,85,85,0.8);	
+	background: rgba(85,85,85,0.8);
+	min-width: 120px;
 }
 
 .manage-table table{

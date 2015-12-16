@@ -1,13 +1,15 @@
-define(['underscore','backbone','model'],function (_,Backbone,MyModel) {
+define(['jquery','underscore','backbone','model'],function ($,_,Backbone,MyModel) {
 	var Operation=MyModel.extend({
 		defaults:{
 			name:null,
-			parameters:null,
-			type:null,
+			parameters:'',
+			type:'',
+			typeId:null,
 			id:null,
-			definition:null,
-			description:null
-		}
+			definition:'',
+			description:''
+		},
+		urlRoot:'/cmdbAPI/ops'
 	})
 	return Operation;
 })
