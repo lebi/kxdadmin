@@ -52,7 +52,6 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			
 			var self=this;
 			this.typeList.each(function (type) {
-				// console.log(type.get('name'));
 				self.tree.models[type.get('id')]=new Array();
 			})
 			this.operationList.each(function (op) {
@@ -62,6 +61,8 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			this.tree.trigger('update');
 		},
 		render:function () {
+			console.log(this.tree);
+			console.log('render');
 			this.$el.empty();
 			this.$el.append(this.template({tree:this.tree.models,types:this.typeList}));
 		},
@@ -157,8 +158,6 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			this.render();
 		},
 		refreshView:function (operation) {
-			console.log('edit');
-			console.log(operation);
 			this.operation=operation;
 			this.operation.on('myupdate',this.render,this);
 			this.render();
@@ -250,9 +249,9 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 				return;
 			}
 			if(edit)
-				edit.refreshView(mainView.operationList.get(id));
+				edit.refreshView(mainView.operationList.get(id).clone());
 			else
-				edit=new OperationEditView(mainView.operationList.get(id));
+				edit=new OperationEditView(mainView.operationList.get(id).clone());
 		},
 		add:function (id) {
 			if(!mainView){

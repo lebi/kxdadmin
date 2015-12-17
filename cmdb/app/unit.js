@@ -8,12 +8,14 @@ require.config({
 		model:'../../js/base-model',
 		collection:'../../js/base-collection',
 		Unit:'model/Unit',
-		UnitList:'model/UnitList'
+		UnitList:'model/UnitList',
+		AssetType:'model/AssetType',
+		AssetTypeList:'model/AssetTypeList'
 	}
 })
 
-define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList'],
-	function ($,_,Backbone,cookie,bootstrap,Unit,UnitList) {
+define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList','AssetTypeList'],
+	function ($,_,Backbone,cookie,bootstrap,Unit,UnitList,AssetTypeList) {
 
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(0)).addClass('active');
@@ -26,7 +28,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 		initialize:function(){
 			// this.detail=new UnitDetailView();
 			$('.manage-tab>a[manage=asset]').addClass('active');
-			UnitView.manage=new AssetView();
+			// UnitView.manage=new AssetView();
 			new UnitRouter();
 		}
 	})
@@ -41,8 +43,17 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 		initialize:function () {
 			this.unitList=new UnitList();
 			this.unitList.on('update',this.render,this);
-			this.unitList.fetch();
+			var self=this;
+			this.unitList.fetch().done(function () {
+				detailView=new UnitDetailView(self.unitList.at(0).get('id'));
+				assetView=new AssetView();
+			});
 		},
+		/*
+		*	@tips: 	root's layer is '/{id}'
+		*			if parent's id is 5 and it's layer is /1/4/5
+		*			it's children's layer is /1/4/5/{id}
+		*/
 		render:function () {
 			var stack=[];
 			this.tree={children:[]};
@@ -71,7 +82,6 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 					}
 				}
 			})
-			console.log(this.tree);
 			this.$el.append(this.template({trees:this.tree.children,parent:0}));
 		},
 		toggle:function () {
@@ -93,12 +103,13 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 			this.unitDetail.fetch({wait:true});
 		},
 		createView:function (id) {
-			this.unitDetail=new Unit({id:id});
+			this.unitDetail.set('id',id);
 			this.unitDetail.on('change',this.render,this);
 			this.unitDetail.fetch();
 		},
 		render:function () {
-			console.log(this.unitDetail)
+			// console.log('d change');
+			// console.log(this.unitDetail)
 			this.$el.empty()
 			this.$el.append(this.template({detail:this.unitDetail}));
 		}
@@ -111,6 +122,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 		template:_.template($('#unit-edit-temp').html()),
 		initialize:function (detail) {
 			this.detail=detail;
+			this.detail.on('change',this.render,this)
 			this.render();
 		},
 		createView:function (detail) {
@@ -118,9 +130,19 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 			this.render();
 		},
 		render:function () {
-			console.log(this.detail);
+			this.getParent();
 			$('.manage-wrapper').empty();
-			$('.manage-wrapper').append(this.template({detail:this.detail}));
+			$('.manage-wrapper').append(this.template({detail:this.detail,parent:this.parent}));
+		},
+		getParent:function () {
+			var layer=this.detail.get('layer');
+			var arr=layer.split('/');
+			var pid=arr[arr.length-2];
+			var parent=navView.unitList.get(pid);
+			if(!parent){
+				parent=new Unit({id:0});
+			}
+			this.parent=parent;
 		}
 	})
 
@@ -128,12 +150,15 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 		el:$('.manage-wrapper'),
 		template:_.template($('#asset-temp').html()),
 		initialize:function () {
+			this.typeList=new AssetTypeList();
+			this.typeList.fetch();
 			this.render();
 		},
 		render:function () {
+			console.log('change');
 			$('.manage-wrapper').empty();
 			$('.manage-wrapper').append(this.template());
-		}
+		}	
 	})
 
 	var UnitRouter=Backbone.Router.extend({
@@ -144,6 +169,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 			'detail':'detail'
 		},
 		asset:function () {
+			if(!detailView){
+				window.location.href="#";
+				return;
+			}
+
 			$('.manage-tab>.active').removeClass('active');
 			$('.manage-tab>a[manage=asset]').addClass('active');
 			// if(UnitView.manage instanceof UnitEditView)
@@ -157,11 +187,16 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 			// console.log(UnitView.manage)
 			// UnitView.manage.render();
 
-			if(asset)
-				asset.render();
-			else asset=new AssetView();
+			if(assetView)
+				assetView.render();
+			else assetView=new AssetView();
 		},
 		edit:function (id) {
+			if(!detailView){
+				window.location.href="#";
+				return;
+			}
+
 			$('.manage-tab>.active').removeClass('active');
 			$('.manage-tab>a[manage=unit]').addClass('active');
 			// if(UnitView.manage instanceof AssetView)
@@ -174,34 +209,39 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList']
 			// UnitView.manage.createView(detail.unitDetail.clone());
 			// console.log(UnitView.manage)
 			// UnitView.manage.render();
-			if(!detail){
+			if(!detailView){
 				window.location.href="#";
 				return;
 			}
-			
-			if(edit)
-				edit.createView(detail.unitDetail.clone());
-			else 
-				edit=new UnitEditView(detail.unitDetail.clone());
+
+
+			if(editView){
+				editView.createView(detailView.unitDetail);
+			}else {
+				editView=new UnitEditView(detailView.unitDetail);
+			}
 		},
 		add:function (id) {
 			$('.manage-tab>.active').removeClass('active');
 			$('.manage-tab>a[manage=unit]').addClass('active');
-
-
 		},
 		detail:function  (id) {
-			if(detail)
-				detail.createView(id);
+			if(!detailView){
+				window.location.href="#";
+				return;
+			}
+
+			if(detailView)
+				detailView.createView(id);
 			else
-				detail=new UnitDetailView(id);
+				detailView=new UnitDetailView(id);
 		}
 	})
 	var mainView=new UnitView();
-	var detail;
-	var asset;
-	var edit;
-	var nav=new UnitNavView();
+	var detailView;
+	var assetView;
+	var editView;
+	var navView=new UnitNavView();
 
 	Backbone.history.start();
 })

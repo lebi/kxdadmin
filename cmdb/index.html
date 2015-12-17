@@ -158,24 +158,32 @@
 									  	</div>
 									  	<div class="form-group">
 										    <label class="col-sm-2 control-label">上级单位</label>
-										    <label class="col-sm-10 control-label label-content"><%=detail.get('name')%></label>
+										    <label class="col-sm-10 control-label label-content"><%=parent.get('name')%></label>
 									  	</div>
 									  	<div class="form-group">
 										    <label class="col-sm-2 control-label">上级单位ID</label>
-										    <label class="col-sm-10 control-label label-content">上级单位</label>
+										    <label class="col-sm-10 control-label label-content"><%=parent.get('id')%></label>
 									  	</div>
 									  	<div class="form-group">
 										    <label class="col-sm-2 control-label">单位负责人</label>
 										    <div class="col-sm-10">
-											    <input class="form-control">
+											    <input class="form-control" value="<%=detail.get('dutyofficer')%>">
 									    	</div>
 									  	</div>
 									  	<div class="form-group">
 										    <label class="col-sm-2 control-label">联系电话</label>
 										    <div class="col-sm-10">
-											    <input class="form-control">
+											    <input class="form-control" value="<%=detail.get('phone')%>">
 									    	</div>
 									  	</div>
+									  	<%_.each(detail.get('extend'),function (ext) {%>
+										  	<div class="form-group">
+											    <label class="col-sm-2 control-label"><%=ext.name%></label>
+											    <div class="col-sm-10">
+												    <input class="form-control" value="<%=ext.value%>">
+										    	</div>
+										  	</div>
+									  	<%})%>
 									  	<div class="form-group">
 									    	<div class="col-sm-offset-2 col-sm-10">
 									    		<button type="button" class="btn btn-success" id="add-property" data-toggle="modal" data-target="#property-modal">添加新属性</button>
