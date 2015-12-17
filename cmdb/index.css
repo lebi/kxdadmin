@@ -7,7 +7,7 @@
 	font-size: 14px;
 	position: fixed;
 	height: 100%;
-	width: 160px;
+	width: 200px;
 	padding: 20px 0px;
 	float: left;
 }
@@ -19,16 +19,19 @@
 .unit-nav a>span:hover{
 	color: #eee;
 }
+.unit-li>a:hover{
+	background: rgba(55,55,55,0.6);
+}
 .unit-content{
-	margin-left: 190px;
+	margin-left: 220px;
 }
 .unit-detail{
 	width: 100%;
 	display: table;
 	padding: 20px 40px;
+	margin-bottom: 20px;
 }
-.manage-tab{
-	margin-top: 20px;
+.manage-tab.board{
 	height: 40px;
 	line-height: 40px;
 	border-radius: 0px;
@@ -43,7 +46,7 @@
 	background: rgba(55,55,55,0.4);
 	-webkit-transition:background 0.3s;
 }
-.manage-content{
+.manage-content.board{
 	border-radius: 0px;
 	display: table;
 	width: 100%;
@@ -73,4 +76,3 @@
 	max-width: 650px;
 	margin: auto;
 }
-

@@ -4,7 +4,9 @@
 	padding: 30px 30px;
 }
 .content{
-	height: 100%;
+	min-height: 100%;
+	display: table;
+	width: 100%;
 }
 
 .operation-nav{
@@ -25,13 +27,22 @@
 	width: 50%;
 	padding: 130px 0px;
 }
-.operation-tree{
-	padding: 10px 0px 10px 10px;
-	width: 200px;
+.tree-wrapper{
 	border: 1px solid #fff;
-	height: 80%;
 	border-radius: 4px;
-	margin-top: 10px
+	width: 220px;
+	height: 100%;
+}
+.tree-button{
+	text-align: center;
+	padding: 5px;
+	border-bottom: 1px solid #fff;
+	cursor: pointer;
+}
+.operation-tree{
+	padding: 0px 0px 10px 10px;
+	overflow: auto;
+	height: 550px;
 }
 .operation-tree ul{
 	padding-left: 10px;
@@ -51,6 +62,9 @@ a.children:hover>span{
 a.children.active>span{
 	color: #444;
 	font-weight: 800;
+}
+.edit-wrapper{
+	/*border: solid;*/
 }
 /*.dropdown:hover + .children{
 	background: rgba(55,55,55,0.5);

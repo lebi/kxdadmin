@@ -13,77 +13,63 @@
 			</nav>
 			<div class="content-wrapper">
 				<nav class="unit-nav board">
+					<script type="text/javascript">
+						function parse (tree) {
+							var template=_.template($('#unit-nav-temp').html());
+							return template({trees:tree.children,parent:tree.id});
+						}
+					</script>
+
 					<script type="text/template" id="unit-nav-temp">
-					<ul>
-						<li class='unit-li active'>
-							<a href="#" class=" parent">
-								<i class="tree-icon">
-									<i class="icon-caret-down"></i>
-									<i class="icon-caret-right"></i>
-								</i>
-								<span>父单位</span>
-							</a>
+						<%_.each(trees,function (tree) {%>
 							<ul>
 								<li class='unit-li active'>
-									<a href="#" class=" parent">
+								<%if(tree.children.length>0){%>
+									<a href="#detail?<%=tree.id%>" class=" parent">
 										<i class="tree-icon">
 											<i class="icon-caret-down"></i>
 											<i class="icon-caret-right"></i>
 										</i>
-										<span>父单位</span>
+										<span><%=tree.name%></span>
 									</a>
-								</li>
-								<li class='unit-li'>
-									<a href="#" class="parent">
-										<i class="tree-icon">
-											<i class="icon-caret-down"></i>
-											<i class="icon-caret-right"></i>
-										</i>
-										<span>父单位</span>
+								<%}else{%>
+									<a href="#detail?<%=tree.id%>" class="children">
+										<span><%=tree.name%></span>
 									</a>
+								<%}%>
 									<div class="dropdown">
 										<a class="icon-cogs dropdown-toggle" data-toggle="dropdown" href="#"></a>
 										<ul class="version-dropdown dropdown-menu">
-			  								<a href="#add"><li >添加同级单位</li></a>
-			  								<a href="#add"><li >添加子单位</li></a>
-			  								<a href="#"><li >删除</li></a>
-			  							</ul>
-			  						</div>
-									<ul>
-										<li class='unit-li active'>
-											<a href="#" class=" parent">
-												<i class="tree-icon">
-													<i class="icon-caret-down"></i>
-													<i class="icon-caret-right"></i>
-												</i>
-												<span>父单位</span>
-											</a>
-										</li>
-									</ul>
-								</li>
-								<li class='unit-li'>
-									<a href="#" class="children"><span>父单位</span></a>
+					  						<a href="#add?<%=parent%>"><li >添加同级单位</li></a>
+					  						<a href="#add?<%=tree.id%>"><li >添加子单位</li></a>
+					  						<a href="#"><li >删除</li></a>
+					  					</ul>
+					  				</div>
+										<%=parse(tree)%>
 								</li>
 							</ul>
-						</li>
-					</ul>
+						<%})%>
 					</script>
 				</nav>
 				<div class="unit-content">
-					<div class="unit-detail board">
-						<script type="text/template" id="unit-detail-temp">
+					<div class="detail-wrapper">
+					</div>
+					<script type="text/template" id="unit-detail-temp">
+						<div class="unit-detail board">
 							<div class="col-lg-10">
-								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
-								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
-								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
-								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
-								<div class="col-md-4"><span>单位编码：XX-XX-XX</span></div>
+								<div class="col-md-4"><span>单位名：<%=detail.get('name')%></span></div>
+								<div class="col-md-4"><span>单位编码：<%=detail.get('code')%></span></div>
+								<div class="col-md-4"><span>联系电话：<%=detail.get('phone')%></span></div>
+								<div class="col-md-4"><span>单位负责人：<%=detail.get('dutyofficer')%></span></div>
+								<%_.each(detail.get('extend'),function (data) {%>
+									<div class="col-md-4"><span><%=data.name%>：<%=data.value%></span></div>
+								<%})%>
 							</div>
 							<div class="col-lg-1 col-sm-12">
-								<a href="#edit" class="btn btn-success">编辑信息</a>
+								<a href="#edit?<%=detail.get('id')%>" class="btn btn-success">编辑信息</a>
 							</div>
-						</script>
-					</div>
+						</div>
+					</script>
 					<div class="manage-tab board">
 						<a href="#asset" manage='asset'>资产管理</a><a href="#edit" manage='unit'>单位管理</a>
 					</div>
@@ -161,20 +147,22 @@
 									  	<div class="form-group">
 									    	<label class="col-sm-2 control-label">单位编码</label>
 									    	<div class="col-sm-10">
-									    	  	<input class="form-control">
+									    	  	<input class="form-control" value="<%=detail.get('code')%>">
 									    	</div>
 									  	</div>
 									  	<div class="form-group">
 										    <label class="col-sm-2 control-label">单位名称</label>
 										    <div class="col-sm-10">
-											    <input class="form-control">
+											    <input class="form-control" value="<%=detail.get('name')%>">
 									    	</div>
 									  	</div>
 									  	<div class="form-group">
 										    <label class="col-sm-2 control-label">上级单位</label>
-										    <div class="col-sm-10">
-											    <input class="form-control">
-									    	</div>
+										    <label class="col-sm-10 control-label label-content"><%=detail.get('name')%></label>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">上级单位ID</label>
+										    <label class="col-sm-10 control-label label-content">上级单位</label>
 									  	</div>
 									  	<div class="form-group">
 										    <label class="col-sm-2 control-label">单位负责人</label>
@@ -239,14 +227,6 @@
 			    </div>
 		 	</div>
 		</div>
-		<script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
-		<script type="text/javascript" src="../lib/bootstrap.min.js"></script>
-		<script type="text/javascript" src="require.js" data-main="main.js"></script>
-
-		<script type="text/javascript">
-			$('.nav-menu').load('nav.html',function () {
-				$($('.nav-menu a').get(0)).addClass('active');
-			});
-		</script>
+		<script type="text/javascript" src="require.js" data-main="app/unit.js"></script>
 	</body>
 </html>

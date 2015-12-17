@@ -81,9 +81,9 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			var flag=this.modalType.get('id');
 			var self=this;
 			this.modalType.save().done(function () {
-				if(!flag)
-					self.typeList.add(self.modalType);
-				self.parseTree();
+				self.typeList.fetch().done(function () {
+					self.typeList.trigger('update');
+				})
 				$('.modal-backdrop').remove();
 			})
 		},
@@ -97,6 +97,10 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			$('#type-modal').modal('show');
 		},
 		bindModel:function () {
+			if(this.modalType.get('name'))
+				$('#type-modal .modal-title').html('修改操作类型');
+			else
+				$('#type-modal .modal-title').html('添加新的操作类型');
 			$('#type-modal input').val(this.modalType.get('name'));
 		},
 		bindTypename:function () {
@@ -106,6 +110,9 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 	})
 
 	var OperationDetailView=Backbone.View.extend({
+		events:{
+			'click #remove-op':'remove'
+		},
 		el:$('.operation-edit'),
 		template:_.template($('#operation-detail-temp').html()),
 		initialize:function (operation) {
@@ -119,6 +126,18 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 		render:function () {
 			this.$el.empty();
 			this.$el.append(this.template({operation:this.operation,types:mainView.typeList}));
+		},
+		remove:function () {
+			var self=this;
+			this.operation.destroy({wait: true})
+			.done(function () {
+				self.$el.empty();
+				window.location.href="#";
+			})
+			.fail(function (data) {
+				if(data.status==409)
+					alert('删除操作失败，存在资产和该操作关联！');
+			})
 		}
 	})
 
@@ -195,13 +214,15 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			var self=this;
 			this.operation.save().done(function () {
 				dom.after(" <span id='save-hint'> <i class='icon-ok-sign'></i> 保存成功</span>");
-				console.log(flag);
-				if(!flag)
-					mainView.operationList.add(self.operation);
+				mainView.operationList.fetch().done(function () {
+					mainView.operationList.trigger('update')
+					var id=self.operation.get('id');
+					window.location.href='#edit?'+id;
+				})
+
 				setTimeout(function () {
 					$('#save-hint').remove();
 				},1000);
-				mainView.parseTree();
 			})
 		}
 	})

@@ -1,12 +1,30 @@
-define(['underscore','backbone','cookie'],function (_,Backbone,cookie) {
+require.config({
+	paths:{
+		jquery:'../../lib/jquery-1.11.3.min',
+		underscore:'../../lib/underscore-min',
+		backbone:'../../lib/backbone',
+		cookie:'../../lib/jquery.cookie',
+		bootstrap:'../../lib/bootstrap.min',
+		model:'../../js/base-model',
+		collection:'../../js/base-collection',
+		Unit:'model/Unit',
+		UnitList:'model/UnitList'
+	}
+})
+
+define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList'],
+	function ($,_,Backbone,cookie,bootstrap,Unit,UnitList) {
+
+	$('.nav-menu').load('nav.html',function () {
+		$($('.nav-menu a').get(0)).addClass('active');
+	});
 	var UnitView=Backbone.View.extend({
 		el:$('body'),
 		events:{
 			'click .manage-tab>a':'switchManage'
 		},
 		initialize:function(){
-			this.nav=new UnitNavView();
-			this.detail=new UnitDetailView();
+			// this.detail=new UnitDetailView();
 			$('.manage-tab>a[manage=asset]').addClass('active');
 			UnitView.manage=new AssetView();
 			new UnitRouter();
@@ -21,10 +39,40 @@ define(['underscore','backbone','cookie'],function (_,Backbone,cookie) {
 			'click .tree-icon':'toggle'
 		},
 		initialize:function () {
-			this.render();
+			this.unitList=new UnitList();
+			this.unitList.on('update',this.render,this);
+			this.unitList.fetch();
 		},
 		render:function () {
-			this.$el.append(this.template());
+			var stack=[];
+			this.tree={children:[]};
+			var self=this;
+			this.unitList.each(function (u) {
+				var obj=u.toJSON();
+				obj.children=[];
+				if(stack.length==0){
+					self.tree.children.push(obj);
+					stack.push(obj);
+				}else{
+					while(stack.length!=0){
+						var peek=stack[stack.length-1];
+						var reg=new RegExp('^'+peek.layer+'/');
+						if(reg.test(obj.layer)){
+							peek.children.push(obj);
+							stack.push(obj);
+							break;
+						}else{
+							stack.pop();
+						}
+					}
+					if(stack.length==0){
+						self.tree.children.push(obj);
+						stack.push(obj);
+					}
+				}
+			})
+			console.log(this.tree);
+			this.$el.append(this.template({trees:this.tree.children,parent:0}));
 		},
 		toggle:function () {
 			var parent=$(event.target).closest('.unit-li');
@@ -37,13 +85,22 @@ define(['underscore','backbone','cookie'],function (_,Backbone,cookie) {
 	})
 
 	var UnitDetailView=Backbone.View.extend({
-		el:$('.unit-detail'),
+		el:$('.detail-wrapper'),
 		template:_.template($('#unit-detail-temp').html()),
-		initialize:function () {
-			this.render();
+		initialize:function (id) {
+			this.unitDetail=new Unit({id:id});
+			this.unitDetail.on('change',this.render,this);
+			this.unitDetail.fetch({wait:true});
+		},
+		createView:function (id) {
+			this.unitDetail=new Unit({id:id});
+			this.unitDetail.on('change',this.render,this);
+			this.unitDetail.fetch();
 		},
 		render:function () {
-			this.$el.append(this.template());
+			console.log(this.unitDetail)
+			this.$el.empty()
+			this.$el.append(this.template({detail:this.unitDetail}));
 		}
 	})
 
@@ -52,14 +109,18 @@ define(['underscore','backbone','cookie'],function (_,Backbone,cookie) {
 		events:{
 		},
 		template:_.template($('#unit-edit-temp').html()),
-		initialize:function () {
+		initialize:function (detail) {
+			this.detail=detail;
+			this.render();
+		},
+		createView:function (detail) {
+			this.detail=detail;
 			this.render();
 		},
 		render:function () {
+			console.log(this.detail);
 			$('.manage-wrapper').empty();
-			$('.manage-wrapper').append(this.template());
-			// this.$el=$('.unit-manage');
-			// this.delegateEvents();
+			$('.manage-wrapper').append(this.template({detail:this.detail}));
 		}
 	})
 
@@ -72,8 +133,6 @@ define(['underscore','backbone','cookie'],function (_,Backbone,cookie) {
 		render:function () {
 			$('.manage-wrapper').empty();
 			$('.manage-wrapper').append(this.template());
-			// this.$el=$('#asset');
-			// this.delegateEvents();
 		}
 	})
 
@@ -81,37 +140,68 @@ define(['underscore','backbone','cookie'],function (_,Backbone,cookie) {
 		routes:{
 			'asset':'asset',
 			'edit':'edit',
-			'add':'add'
+			'add':'add',
+			'detail':'detail'
 		},
 		asset:function () {
 			$('.manage-tab>.active').removeClass('active');
 			$('.manage-tab>a[manage=asset]').addClass('active');
-			if(UnitView.manage instanceof UnitEditView)
-				this.editTemp=UnitView.manage;
+			// if(UnitView.manage instanceof UnitEditView)
+			// 	this.editTemp=UnitView.manage;
 
-			if(this.assetTemp)
-				UnitView.manage=this.assetTemp;
-			else
-				UnitView.manage=new AssetView();
+			// if(this.assetTemp)
+			// 	UnitView.manage=this.assetTemp;
+			// else
+			// 	UnitView.manage=new AssetView();
 			
 			// console.log(UnitView.manage)
-			UnitView.manage.render();
+			// UnitView.manage.render();
+
+			if(asset)
+				asset.render();
+			else asset=new AssetView();
 		},
-		edit:function () {
+		edit:function (id) {
 			$('.manage-tab>.active').removeClass('active');
 			$('.manage-tab>a[manage=unit]').addClass('active');
-			if(UnitView.manage instanceof AssetView)
-				this.assetTemp=UnitView.manage;
+			// if(UnitView.manage instanceof AssetView)
+			// 	this.assetTemp=UnitView.manage;
 
-			if(this.editTemp)
-				UnitView.manage=this.editTemp;
-			else
-				UnitView.manage=new UnitEditView();
-			
+			// if(this.editTemp)
+			// 	UnitView.manage=this.editTemp;
+			// else
+			// 	UnitView.manage=new UnitEditView(detail.unitDetail.clone());
+			// UnitView.manage.createView(detail.unitDetail.clone());
 			// console.log(UnitView.manage)
-			UnitView.manage.render();
+			// UnitView.manage.render();
+			if(!detail){
+				window.location.href="#";
+				return;
+			}
+			
+			if(edit)
+				edit.createView(detail.unitDetail.clone());
+			else 
+				edit=new UnitEditView(detail.unitDetail.clone());
+		},
+		add:function (id) {
+			$('.manage-tab>.active').removeClass('active');
+			$('.manage-tab>a[manage=unit]').addClass('active');
+
+
+		},
+		detail:function  (id) {
+			if(detail)
+				detail.createView(id);
+			else
+				detail=new UnitDetailView(id);
 		}
 	})
+	var mainView=new UnitView();
+	var detail;
+	var asset;
+	var edit;
+	var nav=new UnitNavView();
 
-	return UnitView;
+	Backbone.history.start();
 })
