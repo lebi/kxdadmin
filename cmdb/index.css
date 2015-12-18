@@ -22,6 +22,9 @@
 .unit-li>a:hover{
 	background: rgba(55,55,55,0.6);
 }
+.unit-li>a.choose{
+	background: rgba(55,55,55,0.6);
+}
 .unit-content{
 	margin-left: 220px;
 }
@@ -56,11 +59,9 @@
 	padding-left: 20px;
 	padding-right: 20px;
 }
-
-
 .manage-table{
-	overflow-y: auto;
-	height: 480px;
+
+	min-height: 480px;
 	display: block;
 }
 .pagination{
@@ -71,10 +72,11 @@
 }
 .pagination-nav{
 	float: right;
+	margin-right: 15px;
 }
 .unit-manage{
 	min-height: 500px;
 	padding: 40px 0px;
-	max-width: 650px;
+	max-width: 750px;
 	margin: auto;
 }
