@@ -32,9 +32,10 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 		},
 		initialize:function () {
 			this.unitList=new UnitList();
-			this.unitList.on('update',this.render,this);
+			this.unitList.on('reset',this.render,this);
 			var self=this;
-			this.unitList.fetch().done(function () {
+			this.unitList.fetch({reset: true}).done(function () {
+				console.log(self.unitList);
 				UnitRouter.detailView=new UnitDetailView(self.unitList.at(0).get('id'));
 			});
 		},
@@ -44,6 +45,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 		*			it's children's layer is /1/4/5/{id}
 		*/
 		render:function () {
+			console.log('units update');
 			var stack=[];
 			this.tree={children:[]};
 			var self=this;
@@ -96,53 +98,96 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			this.unitDetail.on('change',this.render,this);
 			var self=this;
 			this.unitDetail.fetch({wait:true}).done(function () {
-
 				UnitRouter.assetView=new AssetView(self.unitDetail);
 				UnitRouter.editView=new UnitEditView(self.unitDetail);
 			})
 		},
 		createView:function (id) {
-			this.unitDetail.set('id',id);
-			this.unitDetail.fetch();
+			this.unitDetail.attributes.id=id;
+			// this.unitDetail.set('id',id);
+			var self=this;
+			this.unitDetail.fetch().done(function  () {
+				self.unitDetail.trigger('chooseChange');
+			})
 		},
 		render:function () {
-			// console.log('d change');
-			// console.log(this.unitDetail)
 			this.$el.empty()
 			this.$el.append(this.template({detail:this.unitDetail}));
 		}
 	})
 
+	/*	@Variables: detail:和detailView的detail相绑定，当detailView的值改变，就会触发chooseChange。
+	*				detailTemp:这个更改后的unit缓存，和input等相绑定，修改触发myupdate。
+	*				propertyTemp:新属性缓存，和modal框绑定，在选择添加后将属性添加到detailTemp中，并将其初始化。
+	*/
 	var UnitEditView=Backbone.View.extend({
 		el:$('.manage-wrapper'),
 		events:{
-			'change input':'bindValue'
+			'change .unit-manage input':'bindValue',
+			'change #property-modal input':'bindProperty',
+			'click #add-property':'addProperty',
+			'click #save':'save'
 		},
 		template:_.template($('#unit-edit-temp').html()),
+		/*
+		*   @Usage: 初始化detail,detailTemp,propertyTemp。
+		*/
 		initialize:function (detail) {
 			this.detail=detail;
-			this.detail.on('change',this.render,this);
+			this.detail.on('chooseChange',this.changeDetail,this);
 
 			this.detailTemp=this.detail.clone();
+			this.detailTemp.on('myupdate',this.render,this);
+
+			this.propertyTemp={code:'',description:'',value:'',name:''};
 
 			this.render();
 		},
+		/*
+		*   @Usage: 当view的功能改变时（从添加变成编辑或反之），重新初始化值。
+		*/
+		setDetail:function (detail) {
+			this.detail=detail;
+			this.detail.on('chooseChange',this.changeDetail,this);
+			this.detailTemp=this.detail.clone();
+			this.detailTemp.on('myupdate',this.render,this);
+
+			this.propertyTemp={code:'',description:'',value:'',name:''};
+
+			this.render();
+		},
+		/*
+		*   @Usage: 当单位列表选择其他单位时，修改本地缓存，并重新渲染页面。
+		*/
+		changeDetail:function () {
+			this.detailTemp.set(this.detail.toJSON());
+			this.detailTemp.trigger('myupdate');
+		},
+		/*
+		*   @Usage: tab栏选择的是单位管理时，选择渲染view，否则返回。
+		*/
 		render:function () {
+			// console.log(this.detailTemp);
+
 			if(UnitRouter.active!='edit')return;
 			this.getParent();
 			$('.manage-wrapper').empty();
-			$('.manage-wrapper').append(this.template({detail:this.detail,parent:this.parent}));
+			$('.manage-wrapper').append(this.template({detail:this.detailTemp,parent:this.parent}));
 		},
+		/*
+		*   @Usage: 根据pid，获取父单位的对象。
+		*/
 		getParent:function () {
-			var layer=this.detail.get('layer');
-			var arr=layer.split('/');
-			var pid=arr[arr.length-2];
+			var pid=this.detail.get('parent');
 			var parent=UnitRouter.navView.unitList.get(pid);
 			if(!parent){
 				parent=new Unit({id:0});
 			}
 			this.parent=parent;
 		},
+		/*
+		*   @Usage: 绑定input和detailTemp。有基本熟悉和扩展属性两种情况。
+		*/
 		bindValue:function () {
 			var name=$(event.target).attr('name');
 			var value=$(event.target).val();
@@ -157,11 +202,51 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 						extend[i].value=value;
 				}
 			}
-
-			console.log(this.detailTemp);
+			// console.log(this.detail);
+			// console.log(this.detailTemp);
+		},
+		/*
+		*   @Usage: 绑定modal和propertyTemp。
+		*/
+		bindProperty:function () {
+			var name=$(event.target).attr('name');
+			this.propertyTemp[name]=$(event.target).val();
+			// console.log(this.detailTemp);
+			// console.log(this.propertyTemp);
+		},
+		/*
+		*   @Usage: 将propertyTemp添加到detailTemp中。并将propertyTemp重置。
+		*/
+		addProperty:function () {
+			var name=this.propertyTemp.name;
+			if(!name){
+				alert("属性不能为空");
+				return;
+			}
+			for(var i in this.detailTemp.get('extend')){
+				if(this.detailTemp.get('extend')[i].name==name){
+					alert("该属性已存在");
+					return;
+				}
+			}
+			this.detailTemp.get('extend').push(this.propertyTemp);
+			this.propertyTemp={code:'',description:'',value:'',name:''};
+			this.detailTemp.trigger('myupdate');
+			$('.modal-backdrop').remove();
+		},
+		/*
+		*   @Usage: 将detail保存，detail.set会出发detail的change，使detailView也改变。
+		*			将navView.unitList更新。
+		*/
+		save:function () {
+			var self=this;
+			this.detailTemp.save().done(function () {
+				self.detail.set(self.detailTemp.toJSON());
+				UnitRouter.navView.unitList.fetch({reset: true});
+			})
 		}
 	})
-	/*	@Variables: unitDetail:和detailView的detail相绑定，当detailView的值改变，就会触发change时间。
+	/*	@Variables: unitDetail:和detailView的detail相绑定，当detailView的值改变，就会触发chooseChange。
 	*				typeList:资产类型列表。
 	*				assetList:搜索到的资产列表。
 	*				search:保存用于搜索的关键字。unitDetail改变，会改变它的unitId。
@@ -169,15 +254,15 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 	*/
 	var AssetView=Backbone.View.extend({
 		events:{
-			'change select':'bindType',
-			'change input':'bindValue',
+			'change #asset select':'bindType',
+			'change #asset input':'bindValue',
 			'click .pagination a':'page',
 		},
 		el:$('.manage-wrapper'),
 		template:_.template($('#asset-temp').html()),
 		initialize:function (unitDetail) {
 			this.unitDetail=unitDetail;
-			this.unitDetail.on('change',this.doChange,this);
+			this.unitDetail.on('chooseChange',this.doChange,this);
 
 			this.typeList=new AssetTypeList();
 			this.typeList.on('sync',this.render,this);
@@ -211,6 +296,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			this.search.trigger('change');
 		},
 		doFetch:function () {
+			if(UnitRouter.active!='asset')return;
 			this.assetList.fetch({data:this.search.model});
 		},
 		render:function () {
@@ -277,7 +363,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			$('.manage-tab>a[manage=unit]').addClass('active');
 
 			UnitRouter.active='edit';
-			UnitRouter.editView.render();
+			UnitRouter.editView.setDetail(UnitRouter.detailView.unitDetail);
 		},
 		add:function (id) {
 			if(!UnitRouter.detailView){
@@ -287,7 +373,14 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 
 			$('.manage-tab>.active').removeClass('active');
 			$('.manage-tab>a[manage=unit]').addClass('active');
-			UnitRouter.active='add';
+			id=parseInt(id);
+			UnitRouter.active='edit';
+
+			if(!id){
+				UnitRouter.editView.setDetail(new Unit({parent:0}));
+				return;
+			}
+			UnitRouter.editView.setDetail(new Unit({parent:id}));
 		},
 		detail:function  (id) {
 			if(!UnitRouter.detailView){
@@ -307,3 +400,4 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 	new UnitRouter();
 	Backbone.history.start();
 })
+

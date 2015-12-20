@@ -38,6 +38,7 @@
 	height: 40px;
 	line-height: 40px;
 	border-radius: 0px;
+	background: rgba(0, 0, 0, 0.45);
 }
 .manage-tab>a{
 	padding: 10px 60px;

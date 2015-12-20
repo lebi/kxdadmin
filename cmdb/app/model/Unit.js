@@ -5,7 +5,7 @@ define(['jquery','underscore','backbone','model'],function ($,_,Backbone,MyModel
 			name:null,
 			layer:'',
 			code:'',
-			phone:null,
+			phone:'',
 			dutyofficer:'',
 			extend:[]
 		},
