@@ -20,22 +20,28 @@
 							    	<label class="col-sm-1 control-label">资产类型</label>
 							    	<div class="col-sm-5">
 							      		<select class="form-control">
-								      		<option>aa</option>
-								      		<option>aa</option>
-								      		<option>aa</option>
+							      			<option value="0">所有类型</option>
+							      			<%typeList.each(function (type) {
+							      				if(type.get('id')==search.type){%>
+							      					<option value="<%=type.get('id')%>" selected="selected"><%=type.get('name')%></option>
+							      				<%}else{%>
+							      					<option value="<%=type.get('id')%>"><%=type.get('name')%></option>
+							      				<%}%>
+							      			<%})%>
 							      		</select>
 							    	</div>
 							    	<div class="col-sm-offset-2">
 							    		<a href="asset-type.html" class="btn btn-success">类型管理</a>
-										<a href="#edit" class="btn btn-success">添加资产</a>
+										<a href="#add" class="btn btn-success">添加资产</a>
 							    	</div>
 							  	</div>
 							</div>
 							<div class="manage-table">
-								<table class="table">
+								<table class="table table-striped">
 									<thead>
 										<tr>
 											<th><span>#</span></th>
+											<th><span>资产名</span></th>
 											<th><span>资产序号</span></th>
 											<th><span>资产用途</span></th>
 											<th><span>所属单位</span></th>
@@ -47,37 +53,45 @@
 									<tbody>
 										<tr>
 											<td><span>搜索</span></td>
-											<td><input></td>
-											<td><input></td>
-											<td><input></td>
-											<td><input></td>
-												</tr>
-												<tr>
-													<td><span>#a</span></td>
-													<td><span>#a</span></td>
-													<td><span>#a</span></td>
-													<td><span>#a</span></td>
-													<td><span>#a</span></td>
-													<td><a href="#detail" class="btn btn-primary">详情</a></td>
-													<td><span>#a</span></td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
+											<td><input name="name" value="<%=search.name%>"></td>
+											<td><input name="code" value="<%=search.code%>"></td>
+											<td><input name="purpose" value="<%=search.purpose%>"></td>
+											<td><input name="unit"  value="<%=search.unit%>"></td>
+											<td><input name="dutyofficer"  value="<%=search.dutyofficer%>"></td>
+										</tr>
+										<%assetList.each(function (asset) {%>
+										<tr>
+											<td><span><%=asset.get('id')%></span></td>
+											<td><span><%=asset.get('name')%></span></td>
+											<td><span><%=asset.get('code')%></span></td>
+											<td><span><%=asset.get('purpose')%></span></td>
+											<td><span><%=asset.get('unit')%></span></td>
+											<td><span><%=asset.get('dutyofficer')%></span></td>
+											<td><a href="#detail?<%=asset.get('id')%>" class="href">详情</a></td>
+											<td><span>#a</span></td>
+										</tr>
+										<%})%>
+									</tbody>
+								</table>
+							</div>
 							<nav class="pagination-nav">
 							  	<ul class="pagination">
-							    	<li>
-							      		<a href="#" aria-label="Previous">
+							  		<%var dis=search.page<=1?'disabled':''%>
+							    	<li class="<%=dis%>" name="prev">
+							      		<a aria-label="Previous" >
 							        		<span aria-hidden="true">&laquo;</span>
 							      		</a>
 							    	</li>
-							    	<li><a href="#">1</a></li>
-							    	<li><a href="#">2</a></li>
-							    	<li><a href="#">3</a></li>
-							    	<li><a href="#">4</a></li>
-							    	<li><a href="#">5</a></li>
-							    	<li>
-								      	<a href="#" aria-label="Next">
+							    	<%var offset=search.page-2>0?search.page-2:1;
+							    	var end=assetList.length<15?search.page:offset+4;
+							    	if(assetList.length<15&&end<=5) offset=1;
+							    	%>
+							    	<%for(var i=offset;i<=end;i++){%>
+							    		<li class="<%=search.page==i?'active':''%>"><a><%=i%></a></li>
+							    	<%}%>
+							  		<%dis=assetList.length<15?'disabled':''%>
+							    	<li name="next" class="<%=dis%>">
+								      	<a aria-label="Next" >
 									        <span aria-hidden="true">&raquo;</span>
 								      	</a>
 							    	</li>
@@ -86,62 +100,199 @@
 						</div>
 					</script>
 					<script type="text/template" id="asset-detail-temp">
-						<div class="asset-detail">
+						<div class="asset-detail asset-wrapper">
 							<a href="#" class="btn btn-success"><返回</a>
-							<a href="#edit" class="btn btn-default">修改</a>
+							<a href="#edit?<%=asset.id%>" class="btn btn-default">修改</a>
 							<div class="form-horizontal">
 							  	<div class="form-group">
-							    	<label class="col-sm-4 control-label">资产序号</label>
-							      	<label class="col-sm-8 control-label label-content">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</label>
+							    	<label class="col-sm-4 control-label">资产名</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.name%></label>
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-4 control-label">资产序号</label>
-							      	<label class="col-sm-8 control-label label-content">xxxxx</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.code%></label>
 							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">资产类型</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.type%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">所属单位</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.unit%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">制造商</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.manufacturer%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">资产用途</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.purpose%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">资产责任人</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.dutyofficer%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">购入时间</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.purchaseTime%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">上架时间</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.applytime%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">管理IP地址</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.ipAddress%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">宿主机</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.host%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">机房</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.serverRoom%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">机架号</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.bracketId%></label>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-4 control-label">机位</label>
+							      	<label class="col-sm-8 control-label label-content"><%=asset.placement%></label>
+							  	</div>
+							  	<%_.each(asset.properties,function (p) {%>
+								  	<div class="form-group">
+								    	<label class="col-sm-4 control-label"><%=p.name%></label>
+								      	<label class="col-sm-8 control-label label-content"><%=p.value%></label>
+								  	</div>
+							  	<%})%>
 							  	<div class="form-group">
 							    	<label class="col-sm-4 control-label">操作</label>
 							    	<div class="col-sm-8 control-label label-content">
-							    		<a class="badge">操作A</a>
-							    		<a class="badge">操作A</a>
-							    		<a class="badge">操作A</a>
+							  			<%_.each(asset.typeDetail.operations,function (op) {%>
+							    			<a class="badge"><%=op.name%></a>
+							    		<%})%>
 							    	</div>
 							  	</div>
 							</div>
 						</div>
 					</script>
 					<script type="text/template" id="asset-edit-temp">
-						<div class="asset-detail">
+						<div class="asset-edit asset-wrapper">
 							<a href="#" class="btn btn-success"><返回</a>
 							<div class="form-horizontal">
 							  	<div class="form-group">
-							    	<label class="col-sm-2 control-label">资产序号</label>
-							      	<div class="col-sm-8">
-										<input class="form-control">
+							    	<label class="col-sm-3 control-label">资产名</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.name%>" name="name">
 							      	</div>
 							  	</div>
 							  	<div class="form-group">
-							    	<label class="col-sm-2 control-label">资产序号</label>
-							      	<div class="col-sm-8">
-										<input class="form-control">
+							    	<label class="col-sm-3 control-label">资产序号</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.code%>" name="code">
 							      	</div>
 							  	</div>
 							  	<div class="form-group">
-							    	<label class="col-sm-2 control-label">单位</label>
-							      	<div class="col-sm-8">
-							    		<button class="btn btn-default"  data-toggle="modal" data-target="#unit-modal">选择单位</button>
+							    	<label class="col-sm-3 control-label">制造商</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.manufacturer%>" name="manufacturer">
 							      	</div>
 							  	</div>
 							  	<div class="form-group">
-							    	<label class="col-sm-2 control-label">操作</label>
-							    	<div class="col-sm-8 control-label label-content">
-							    		<a class="badge">操作A</a>
-							    		<a class="badge">操作A</a>
-							    		<a class="badge">操作A</a>
+							    	<label class="col-sm-3 control-label">资产用途</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.purpose%>" name="purpose">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">资产责任人</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.dutyofficer%>" name="dutyofficer">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">购入时间</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.purchaseTime%>" name="purchaseTime">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">上架时间</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.applytime%>" name="applytime">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">管理IP地址</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.ipAddress%>" name="ipAddress">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">宿主机</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.host%>" name="host">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">机房</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.serverRoom%>" name="serverRoom">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">机架号</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.bracketId%>" name="bracketId">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">机位</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.placement%>" name="placement">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">资产类型</label>
+							      	<div class="col-sm-6">
+							      		<select class="form-control">
+							      			<%typeList.each(function (type) {
+							      				if(type.get('id')==asset.typeDetail.id){%>
+													<option value="<%=type.get('id')%>" selected="selected"><%=type.get('name')%></option>
+							      				<%}else{%>
+							      					<option value="<%=type.get('id')%>"><%=type.get('name')%></option>
+							      				<%}%>
+							      			<%})%>
+							      		</select>
+							      	</div>
+							  	</div>
+							  	<%_.each(asset.properties,function (p) {%>
+								  	<div class="form-group">
+								    	<label class="col-sm-3 control-label"><%=p.name%></label>
+								      	<div class="col-sm-6">
+											<input class="form-control" value="<%=p.value%>" name="<%=p.name%>">
+								      	</div>
+								  	</div>
+							  	<%})%>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">单位</label>
+							      	<div class="col-sm-6">
+							      		<label><%=asset.unit%></label>
+							    		<button class="btn btn-default" data-toggle="modal" data-target="#unit-modal">选择单位</button>
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">操作</label>
+							    	<div class="col-sm-6 control-label label-content">
+							  			<%_.each(asset.typeDetail.operations,function (op) {%>
+							    			<a class="badge"><%=op.name%></a>
+							    		<%})%>
 							    	</div>
 							  	</div>
 							  	<div class="form-group">
-							    	<div class="col-sm-offset-2 col-sm-2">
-							    		<button class="btn btn-default">保存</button>
+							    	<div class="col-sm-offset-3 col-sm-2">
+							    		<button class="btn btn-default" id="save">保存</button>
 							    	</div>
 							  	</div>
 							</div>

@@ -215,3 +215,10 @@ body::-webkit-scrollbar {
 	color: #fff;
 	border-color:#fff;
 }
+.href{
+	text-decoration: underline;
+}
+.href:hover{
+	text-decoration: underline;
+	color: #ccc;
+}

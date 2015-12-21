@@ -2,22 +2,22 @@ define(['jquery','underscore','backbone','model'],function ($,_,Backbone,MyModel
 	var Asset=MyModel.extend({
 		defaults:{
 			id:null,
-			name:'',
-			code:'',
 			unitId:null,
 			typeId:null,
+			name:'',
 			unit:'',
 			type:'',
+			code:'',
 			manufacturer:'',
 			purpose:'',
 			dutyofficer:'',
 			ipAddress:'',
 			purchaseTime:'',
-			applytime:'',
+			applyTime:'',
 			host:'',
 			serverRoom:'',
 			bracketId:'',
-			typeDetail:null,
+			typeDetail:{},
 			properties:[]
 		},
 		urlRoot:'/cmdbAPI/asset'

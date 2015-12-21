@@ -13,7 +13,7 @@
 }
 .manage-table {
 	overflow-y: auto;
-	height: 590px;
+	min-height: 560px;
 	display: block;
 }
 .pagination {
@@ -24,18 +24,9 @@
 	float: right;
 }
 .table>tbody>tr>td {
-	padding: 8px;
+	padding: 5px;
 }
-@media screen and (max-height:650px) {
-	.manage-table{
-		overflow-y: auto;
-		height: 490px;
-	}
-	.table>tbody>tr>td {
-		padding: 5px;
-	}
-}
-.asset-detail{
+.asset-wrapper{
 	padding: 40px 240px;
 	height: 100%;
 }
@@ -45,4 +36,8 @@
 	background-color: #155AEC;
 	border-radius: 3px;
 	padding: 4px 10px;
+}
+.asset-detail .form-group{
+	margin-bottom: 10px;
+	/*border-bottom: 1px solid #fff;*/
 }

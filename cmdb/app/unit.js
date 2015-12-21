@@ -13,11 +13,12 @@ require.config({
 		AssetTypeList:'model/AssetTypeList',
 		Asset:'model/Asset',
 		AssetList:'model/AssetList',
+		AssetView:'AssetView'
 	}
 })
 
-define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList','AssetTypeList','Asset','AssetList'],
-	function ($,_,Backbone,cookie,bootstrap,Unit,UnitList,AssetTypeList,Asset,AssetList) {
+define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList','AssetTypeList','Asset','AssetList','AssetView'],
+	function ($,_,Backbone,cookie,bootstrap,Unit,UnitList,AssetTypeList,Asset,AssetList,AssetView) {
 
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(0)).addClass('active');
@@ -35,8 +36,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			this.unitList.on('reset',this.render,this);
 			var self=this;
 			this.unitList.fetch({reset: true}).done(function () {
-				console.log(self.unitList);
-				UnitRouter.detailView=new UnitDetailView(self.unitList.at(0).get('id'));
+				var uid=$.cookie('unitChoose');
+				if(uid)
+					UnitRouter.detailView=new UnitDetailView(uid);
+				else
+					UnitRouter.detailView=new UnitDetailView(self.unitList.at(0).get('id'));
 			});
 		},
 		/*
@@ -75,6 +79,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			})
 			this.$el.empty();
 			this.$el.append(this.template({trees:this.tree.children,parent:0}));
+			var uid=$.cookie('unitChoose');
+			if(uid)
+				$('.unit-li>a[uid='+uid+']').addClass('choose');
+			else
+				$($('.unit-li>a').get(0)).addClass('choose');
 		},
 		toggle:function () {
 			var parent=$(event.target).closest('.unit-li');
@@ -85,6 +94,8 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 				parent.addClass('active');
 		},
 		choose:function () {
+			var uid=$(event.target).attr('uid');
+			$.cookie('unitChoose',uid);
 			$('.unit-li>a.choose').removeClass('choose');
 			$(event.target).closest('a').addClass('choose');
 		}
@@ -98,7 +109,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			this.unitDetail.on('change',this.render,this);
 			var self=this;
 			this.unitDetail.fetch({wait:true}).done(function () {
-				UnitRouter.assetView=new AssetView(self.unitDetail);
+				UnitRouter.assetView=new UnitAssetView(self.unitDetail);
 				UnitRouter.editView=new UnitEditView(self.unitDetail);
 			})
 		},
@@ -252,7 +263,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 	*				search:保存用于搜索的关键字。unitDetail改变，会改变它的unitId。
 	*					  （初始化他的typeId和unitId，否则为null，不能成功fetch）
 	*/
-	var AssetView=Backbone.View.extend({
+	var UnitAssetView=AssetView.extend({
 		events:{
 			'change #asset select':'bindType',
 			'change #asset input':'bindValue',
@@ -279,17 +290,6 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 
 			this.doFetch();
 		},
-		bindType:function () {
-			this.search.model.type=$(event.target).val();
-			this.search.model.page=1;
-			this.search.trigger('change');
-		},
-		bindValue:function () {
-			var name=$(event.target).attr('name');
-			this.search.model[name]=$(event.target).val();
-			this.search.model.page=1;
-			this.search.trigger('change');
-		},
 		doChange:function () {
 			this.search.model.unit=this.unitDetail.get('id');
 			this.search.model.page=1;
@@ -308,22 +308,6 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 				assetList:this.assetList,
 				unit:this.unitDetail
 			}));
-		},
-		page:function () {
-			var dom=$(event.target).closest('li');
-			var name=$(dom).attr('name')
-			if(!name){
-				var p=$(dom.children('a')).html();
-				this.search.model.page=parseInt(p);
-			}else if(name=='prev'){
-				if(this.search.model.page>1)
-					this.search.model.page--;
-				else return;
-			}else{
-				if(!dom.hasClass('disabled'))
-					this.search.model.page++;
-			}
-			this.search.trigger('change');
 		}
 	})
 

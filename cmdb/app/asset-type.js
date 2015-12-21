@@ -11,12 +11,12 @@ require.config({
 		AssetTypeList:'model/AssetTypeList',
 		Operation:'model/Operation',
 		OperationList:'model/OperationList',
-		AssetProperty:'model/AssetProperty'
+		AssetTypeProperty:'model/AssetTypeProperty'
 	}
 })
 
-define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','Operation','OperationList','AssetProperty','bootstrap'],
-	function ($,_,Backbone,cookie,AssetType,AssetTypeList,Operation,OperationList,AssetProperty,bootstrap) {
+define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','Operation','OperationList','AssetTypeProperty','bootstrap'],
+	function ($,_,Backbone,cookie,AssetType,AssetTypeList,Operation,OperationList,AssetTypeProperty,bootstrap) {
 
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(3)).addClass('active');
@@ -184,7 +184,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 			if(!this.checkExtend(name,code))
 				return;
 
-			var property=new AssetProperty({name:name,code:code,type:this.assetType.get('id')});
+			var property=new AssetTypeProperty({name:name,code:code,type:this.assetType.get('id')});
 			var self=this;
 			property.save().done(function () {
 				self.assetType.get('properties').push(property.toJSON());
@@ -216,7 +216,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 			if(!this.checkExtend(name,code,id))
 				return;
 
-			var property=new AssetProperty({name:name,code:code,id:id});
+			var property=new AssetTypeProperty({name:name,code:code,id:id});
 			var self=this;
 			property.save().done(function () {
 				_.each(self.assetType.get('properties'),function (data) {
