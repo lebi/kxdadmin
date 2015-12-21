@@ -222,8 +222,6 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 		bindProperty:function () {
 			var name=$(event.target).attr('name');
 			this.propertyTemp[name]=$(event.target).val();
-			// console.log(this.detailTemp);
-			// console.log(this.propertyTemp);
 		},
 		/*
 		*   @Usage: 将propertyTemp添加到detailTemp中。并将propertyTemp重置。
@@ -251,9 +249,14 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 		*/
 		save:function () {
 			var self=this;
+			var dom=$(event.target);
 			this.detailTemp.save().done(function () {
 				self.detail.set(self.detailTemp.toJSON());
 				UnitRouter.navView.unitList.fetch({reset: true});
+				$(dom).after(" <span id='save-hint'> <i class='icon-ok-sign'></i> 保存成功</span>");
+				setTimeout(function () {
+					$('#save-hint').remove();
+				},1500);
 			})
 		}
 	})

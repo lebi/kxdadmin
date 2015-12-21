@@ -279,7 +279,7 @@
 							    	<label class="col-sm-3 control-label">单位</label>
 							      	<div class="col-sm-6">
 							      		<label><%=asset.unit%></label>
-							    		<button class="btn btn-default" data-toggle="modal" data-target="#unit-modal">选择单位</button>
+							    		<button class="btn btn-default" id="unit">选择单位</button>
 							      	</div>
 							  	</div>
 							  	<div class="form-group">
@@ -298,6 +298,129 @@
 							</div>
 						</div>
 					</script>
+					<script type="text/template" id="asset-add-temp">
+						<div class="asset-add asset-wrapper">
+							<a href="#" class="btn btn-success"><返回</a>
+							<div class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">资产名</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.name%>" name="name">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">资产序号</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.code%>" name="code">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">制造商</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.manufacturer%>" name="manufacturer">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">资产用途</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.purpose%>" name="purpose">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">资产责任人</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.dutyofficer%>" name="dutyofficer">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">购入时间</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.purchaseTime%>" name="purchaseTime">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">上架时间</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.applytime%>" name="applytime">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">管理IP地址</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.ipAddress%>" name="ipAddress">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">宿主机</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.host%>" name="host">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">机房</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.serverRoom%>" name="serverRoom">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">机架号</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.bracketId%>" name="bracketId">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">机位</label>
+							      	<div class="col-sm-6">
+										<input class="form-control" value="<%=asset.placement%>" name="placement">
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">资产类型</label>
+							      	<div class="col-sm-6">
+							      		<select class="form-control">
+							      			<option value="0">选择类型</option>
+							      			<%typeList.each(function (type) {
+							      				if(type.get('id')==asset.typeDetail.id){%>
+													<option value="<%=type.get('id')%>" selected="selected"><%=type.get('name')%></option>
+							      				<%}else{%>
+							      					<option value="<%=type.get('id')%>"><%=type.get('name')%></option>
+							      				<%}%>
+							      			<%})%>
+							      		</select>
+							      	</div>
+							  	</div>
+							  	<%_.each(asset.properties,function (p) {%>
+								  	<div class="form-group">
+								    	<label class="col-sm-3 control-label"><%=p.name%></label>
+								      	<div class="col-sm-6">
+											<input class="form-control" value="<%=p.value%>" name="<%=p.name%>">
+								      	</div>
+								  	</div>
+							  	<%})%>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">单位</label>
+							      	<div class="col-sm-6">
+							      		<label><%=asset.unit%></label>
+							    		<button class="btn btn-default" id="unit">选择单位</button>
+							      	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">操作</label>
+							    	<div class="col-sm-6 control-label label-content">
+							  			<%_.each(asset.typeDetail.operations,function (op) {%>
+							    			<a class="badge"><%=op.name%></a>
+							    		<%})%>
+							    	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<div class="col-sm-offset-3 col-sm-2">
+							    		<button class="btn btn-default" id="save">保存</button>
+							    	</div>
+							  	</div>
+							</div>
+						</div>
+					</script>
+
 				</div>
 			</div>
 		</div>
@@ -309,24 +432,44 @@
 		        <h4 class="modal-title">Modal title</h4>
 		      </div>
 		      <div class="modal-body">
-		        <p>One fine body&hellip;</p>
+		      	<div class="unit-tree"></div>
+		      		<script type="text/javascript">
+						function parse (tree) {
+							var template=_.template($('#unit-nav-temp').html());
+							return template({trees:tree.children,parent:tree.id});
+						}
+					</script>
+					<script type="text/template" id="unit-nav-temp">
+						<%_.each(trees,function (tree) {%>
+							<ul >
+								<li class='unit-li active'>
+								<%if(tree.children.length>0){%>
+									<a class="parent" uid="<%=tree.id%>">
+										<i class="tree-icon">
+											<i class="icon-caret-down"></i>
+											<i class="icon-caret-right"></i>
+										</i>
+										<span><%=tree.name%></span>
+									</a>
+								<%}else{%>
+									<a class="children" uid="<%=tree.id%>">
+										<span><%=tree.name%></span>
+									</a>
+								<%}%>
+								<%=parse(tree)%>
+								</li>
+							</ul>
+						<%})%>
+					</script>
 		      </div>
 		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		        <button type="button" class="btn btn-primary">Save changes</button>
+		        <button type="button" class="btn btn-default" data-dismiss="modal"><span>关闭</span></button>
+		        <button type="button" class="btn btn-primary" id="unit-choose">选择</button>
 		      </div>
 		    </div><!-- /.modal-content -->
 		  </div><!-- /.modal-dialog -->
 		</div><!-- /.modal -->
 
-		<script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
-		<script type="text/javascript" src="../lib/bootstrap.min.js"></script>
 		<script type="text/javascript" src="require.js" data-main="app/asset.js"></script>
-
-		<script type="text/javascript">
-			$('.nav-menu').load('nav.html',function () {
-				$($('.nav-menu a').get(1)).addClass('active');
-			});
-		</script>
 	</body>
 </html>

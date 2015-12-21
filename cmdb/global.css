@@ -90,7 +90,7 @@ body::-webkit-scrollbar {
 	background-color: transparent;
 	color: #fff;
 }
-.modal span{
+.modal span,.modal a{
 	color: #333;
 }
 .modal .form-control{

@@ -6,6 +6,7 @@ define(['backbone'],function(Backbone){
 				Backbone.Model.prototype.set.call(this,models,options);
 			else if(!models.errorMsg)
 				Backbone.Model.prototype.set.call(this,models.result,options);
+			return true;
 		}
 	})
 	return MyModel;
