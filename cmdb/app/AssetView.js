@@ -33,6 +33,15 @@ define(['AssetTypeList','Asset','AssetList'],
 					this.search.model.page++;
 			}
 			this.search.trigger('change');
+		},
+		remove:function () {
+			var aid=$(event.target).attr('aid');
+			if(confirm("确认删除资产？")){
+				var self=this;
+				this.assetList.get(aid).destroy().done(function () {
+					self.doFetch()
+				})
+			}
 		}
 	})
 	

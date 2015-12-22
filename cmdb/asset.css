@@ -39,7 +39,6 @@
 }
 .asset-detail .form-group{
 	margin-bottom: 10px;
-	/*border-bottom: 1px solid #fff;*/
 }
 .unit-tree{
 	margin: 0px 50px;
@@ -54,4 +53,16 @@
 }
 .unit-li>a.choose{
 	background-color: #CDCDCD;
+}
+.asset-detail .form-horizontal{
+	width: 550px;
+	margin: auto;
+	border: 1px solid #686868;
+}
+.asset-detail .form-horizontal>.form-group{
+	padding-bottom: 5px;
+	margin: 0px 0px 0px 0px;
+}
+.asset-detail .form-horizontal>.form-group:nth-of-type(odd){
+	background:rgba(95,95,95, 0.5);
 }

@@ -8,7 +8,6 @@
 	position: fixed;
 	height: 100%;
 	width: 200px;
-	padding: 20px 0px;
 	float: left;
 }
 .unit-nav ul{
@@ -18,6 +17,15 @@
 }
 .unit-nav a>span:hover{
 	color: #eee;
+}
+.unit-nav .add-unit{
+	padding: 5px;
+	text-align: center;
+	border-bottom: 1px solid #fff;
+	display: block;
+}
+.unit-nav .add-unit:hover{
+	background: rgba(55,55,55,0.6);
 }
 .unit-li>a:hover{
 	background: rgba(55,55,55,0.6);

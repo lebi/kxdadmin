@@ -77,7 +77,7 @@
 					</div>
 					<div class="operation-edit">
 						<script type="text/template" id="operation-detail-temp">
-							<div class="form-horizontal">
+							<div class="form-horizontal detail-wrapper">
 							  	<div class="form-group">
 							    	<label class="col-sm-offset-1 col-sm-2 control-label">操作名</label>
 							    	<label class="col-sm-9 control-label label-content"><%=operation.get('name')%></label>
@@ -115,10 +115,6 @@
 					</div>
 						<script type="text/template" id="operation-edit-temp">
 							<div class="form-horizontal edit-wrapper">
-							  	<div class="form-group">
-							  		<%var head=operation.get('id')?'修改:'+operation.get('name'):'添加操作'%>
-							    	<h4 class="col-sm-offset-2"><span><%=head%></span></h4>
-							    </div>
 							  	<div class="form-group">
 							    	<label class="col-sm-2 control-label">操作名</label>
 							    	<div class="col-sm-10">

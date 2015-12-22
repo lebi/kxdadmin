@@ -55,17 +55,21 @@
 .badge-remove:hover{
 	color: #FF0202;
 }
-a.children:hover>span{
-	color: #444;
-	font-weight: 800;
+.unit-li>a:hover{
+	background-color: #4E4E4E;
 }
-a.children.active>span{
-	color: #444;
-	font-weight: 800;
+.unit-li>a.active{
+	background-color: #4E4E4E;
 }
-.edit-wrapper{
-	/*border: solid;*/
+.detail-wrapper{
+	margin: auto;
+	border: 1px solid #686868;
 }
-/*.dropdown:hover + .children{
-	background: rgba(55,55,55,0.5);
-}*/
+.detail-wrapper>.form-group{
+	padding-top: 5px;
+	padding-bottom: 10px;
+	margin: 0px 0px 0px 0px;
+}
+.detail-wrapper>.form-group:nth-of-type(odd){
+	background:rgba(95,95,95, 0.5);
+}

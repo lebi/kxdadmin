@@ -14,7 +14,13 @@ require.config({
 		Asset:'model/Asset',
 		AssetList:'model/AssetList',
 		AssetView:'AssetView'
-	}
+	},
+	shim : {  
+    	bootstrap : {  
+        	deps : ['jquery'],  
+            exports :'bs'  
+    	}  
+    } 
 })
 
 define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList','AssetTypeList','Asset','AssetList','AssetView'],
@@ -29,7 +35,8 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 		template:_.template($('#unit-nav-temp').html()),
 		events:{
 			'click .tree-icon':'toggle',
-			'click .unit-li>a':'choose'
+			'click .unit-li>a':'choose',
+			'click .remove':'remove'
 		},
 		initialize:function () {
 			this.unitList=new UnitList();
@@ -37,6 +44,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			var self=this;
 			this.unitList.fetch({reset: true}).done(function () {
 				var uid=$.cookie('unitChoose');
+				uid=parseInt(uid);
 				if(uid)
 					UnitRouter.detailView=new UnitDetailView(uid);
 				else
@@ -77,7 +85,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 					}
 				}
 			})
-			this.$el.empty();
+			this.$el.children('ul').remove();
 			this.$el.append(this.template({trees:this.tree.children,parent:0}));
 			var uid=$.cookie('unitChoose');
 			if(uid)
@@ -98,6 +106,19 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			$.cookie('unitChoose',uid);
 			$('.unit-li>a.choose').removeClass('choose');
 			$(event.target).closest('a').addClass('choose');
+		},
+		remove:function () {
+			var uid=$(event.target).closest('a').attr('uid');
+			var self=this;
+			this.unitList.get(uid).destroy().done(function () {
+				if($.cookie('unitChoose')==uid)
+					$.cookie('unitChoose',0);
+				self.unitList.trigger('reset');
+			})
+			.fail(function(data) {
+				if(data.status==409)
+					alert("删除失败，该单位有子单位或包含子资产");
+			})
 		}
 	})
 
@@ -190,6 +211,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 		*/
 		getParent:function () {
 			var pid=this.detail.get('parent');
+			console.log(this.detail);
 			var parent=UnitRouter.navView.unitList.get(pid);
 			if(!parent){
 				parent=new Unit({id:0});
@@ -248,6 +270,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 		*			将navView.unitList更新。
 		*/
 		save:function () {
+			if(!(this.detailTemp.get('name')&&this.detailTemp.get('code'))){
+				alert('名称编码不能为空');
+				return;
+			}
+
 			var self=this;
 			var dom=$(event.target);
 			this.detailTemp.save().done(function () {
@@ -271,6 +298,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 			'change #asset select':'bindType',
 			'change #asset input':'bindValue',
 			'click .pagination a':'page',
+			'click .remove-asset':'remove'
 		},
 		el:$('.manage-wrapper'),
 		template:_.template($('#asset-temp').html()),
@@ -312,6 +340,13 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 				unit:this.unitDetail
 			}));
 		}
+		// remove:function () {
+		// 	var uid=$(event.target).attr('uid');
+		// 	var self=this;
+		// 	this.assetList.get(uid).destroy().done(function (argument) {
+		// 		self.assetList.trigger('sync');
+		// 	});
+		// }
 	})
 
 	var UnitRouter=Backbone.Router.extend({

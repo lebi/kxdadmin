@@ -13,6 +13,7 @@
 			</nav>
 			<div class="content-wrapper">
 				<nav class="unit-nav board">
+					<a class="add-unit" href="#add?0">添加单位</a>
 				</nav>
 					<script type="text/javascript">
 						function parse (tree) {
@@ -39,14 +40,14 @@
 									</a>
 								<%}%>
 									<div class="dropdown">
-										<a class="icon-cogs dropdown-toggle" data-toggle="dropdown" href="#"></a>
+										<a class="icon-cogs dropdown-toggle" data-toggle="dropdown"></a>
 										<ul class="version-dropdown dropdown-menu">
 					  						<a href="#add?<%=parent%>"><li >添加同级单位</li></a>
 					  						<a href="#add?<%=tree.id%>"><li >添加子单位</li></a>
-					  						<a href="#"><li >删除</li></a>
+					  						<a class="remove" uid="<%=tree.id%>"><li >删除</li></a>
 					  					</ul>
 					  				</div>
-										<%=parse(tree)%>
+									<%=parse(tree)%>
 								</li>
 							</ul>
 						<%})%>
@@ -103,8 +104,9 @@
 													<th><span>资产序号</span></th>
 													<th><span>资产用途</span></th>
 													<th><span>责任人</span></th>
+													<th><span>单位</span></th>
 													<th><span>详情</span></th>
-													<th><span>操作</span></th>
+													<th><span>删除</span></th>
 												</tr>
 											</thead>
 											<tbody>
@@ -116,6 +118,7 @@
 													<td><input name="dutyofficer" value="<%=search.dutyofficer%>"></td>
 													<td></td>
 													<td></td>
+													<td></td>
 												</tr>
 												<%assetList.each(function (asset) {%>
 													<tr>
@@ -124,8 +127,9 @@
 														<td><span><%=asset.get('code')%></span></td>
 														<td><span><%=asset.get('purpose')%></span></td>
 														<td><span><%=asset.get('dutyofficer')%></span></td>
-														<td></td>
-														<td></td>
+														<td><span><%=asset.get('unit')%></span></td>
+														<td><a class="href" href="asset.html#detail?<%=asset.get('id')%>">详情</a></td>
+														<td><a class="href remove-asset" aid="<%=asset.get('id')%>">删除</a></td>
 													</tr>
 												<%})%>
 											</tbody>

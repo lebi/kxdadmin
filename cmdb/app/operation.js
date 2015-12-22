@@ -25,6 +25,7 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 		template:_.template($('#operation-nav-temp').html()),
 		events:{
 			'click .unit-li>.children':'active',
+			'click .dropdown':'active',
 			'click .tree-icon':'toggle',
 			'click #type-save':'typeSave',
 			'click .type-edit':'typeEdit',
@@ -66,11 +67,11 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			this.$el.empty();
 			this.$el.append(this.template({tree:this.tree.models,types:this.typeList}));
 		},
-		// active:function () {
-		// 	$('.children.active').removeClass('active');
-		// 	var children=$(event.target).closest('.children');
-		// 	children.addClass('active');
-		// },
+		active:function () {
+			$('.operation-tree a.active').removeClass('active');
+			var children=$(event.target).closest('.unit-li').children('a');
+			children.addClass('active');
+		},
 		toggle:function () {
 			var li=$(event.target).closest('.unit-li');
 			if(li.hasClass('active'))
@@ -213,14 +214,15 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 			var self=this;
 			this.operation.save().done(function () {
 				dom.after(" <span id='save-hint'> <i class='icon-ok-sign'></i> 保存成功</span>");
-				mainView.operationList.fetch().done(function () {
-					mainView.operationList.trigger('update')
-					var id=self.operation.get('id');
-					window.location.href='#edit?'+id;
-				})
+				dom.addClass('disabled');
 
 				setTimeout(function () {
 					$('#save-hint').remove();
+					mainView.operationList.fetch().done(function () {
+						mainView.operationList.trigger('update')
+						var id=self.operation.get('id');
+						window.location.href='#edit?'+id;
+					})
 				},1000);
 			})
 		}

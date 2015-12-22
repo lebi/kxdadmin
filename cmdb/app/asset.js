@@ -28,13 +28,13 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			'change #asset select':'bindType',
 			'change #asset input':'bindValue',
 			'click .pagination a':'page',
+			'click .remove-asset':'remove'
 		},
 		el:$('.content'),
 		template:_.template($('#asset-info-temp').html()),
 		initialize:function () {
 			this.typeList=new AssetTypeList();
 			this.typeList.on('sync',this.render,this);
-			this.typeList.fetch();
 			
 			this.assetList=new AssetList();
 			this.assetList.url='/cmdbAPI/asset/listall'
@@ -45,10 +45,10 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			this.search.model={unit:'',type:0,page:1,
 					code:'',name:'',purpose:'',dutyofficer:''};
 			this.search.on('change',this.doFetch,this);
-
-			this.doFetch();
 		},
 		doFetch:function () {
+			if(this.typeList.length==0)
+				this.typeList.fetch();
 			this.assetList.fetch({data:this.search.model});
 		},
 		render:function () {
@@ -90,22 +90,23 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 		initialize:function () {
 			this.asset=new Asset();
 			this.asset.on('myupdate',this.render,this);
-			this.asset.on('sync',this.render,this);
+
+			this.typeList=new AssetTypeList();
+			this.typeList.on('sync',this.render,this);
+			this.typeList.fetch();
 		},
 		changeModel:function (id) {
-			if(id==0){
-				this.asset.trigger('myupdate');
-				return;
-			}
+			var self=this;
 			this.asset.set('id',id);
-			this.asset.fetch();
+			this.asset.fetch().done(function () {
+				self.asset.trigger('myupdate');
+			})
 		},
 		render:function () {
-			// console.log(this.asset);
 			this.$el.empty()
 			this.$el.append(this.template({
 				asset:this.asset.attributes,
-				typeList:AssetRouter.asset.typeList
+				typeList:this.typeList
 			}));
 		},
 		bindValue:function () {
@@ -152,7 +153,13 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 				alert('为选择单位和资产类型');
 				return;
 			}
-			this.asset.save();
+			var dom=$(event.target);
+			this.asset.save().done(function () {
+				$(dom).after(" <span id='save-hint'> <i class='icon-ok-sign'></i> 保存成功</span>");
+				setTimeout(function () {
+					$('#save-hint').remove();
+				},1500);
+			})
 		},
 		setAssetType:function (model,type) {
 			model.set('properties',[])
@@ -169,9 +176,9 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			model.set('typeId',type.id);
 			model.set('type',type.name);
 		},
+
 		unitShow:function () {
 			AssetRouter.unit.showView(this.asset);
-			console.log(this.asset);
 		}
 	})
 
@@ -187,6 +194,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 		initialize:function () {
 			this.asset=new Asset();
 			this.assetType=new AssetType();
+
+			this.typeList=new AssetTypeList();
+			this.typeList.on('sync',this.render,this);
+			this.typeList.fetch();
+
 		},
 		changeModel:function () {
 			this.asset=new Asset();
@@ -197,7 +209,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			this.$el.empty();
 			this.$el.append(this.template({
 				asset:this.asset.attributes,
-				typeList:AssetRouter.asset.typeList
+				typeList:this.typeList
 			}));
 		},
 		bindType:function(){
@@ -269,6 +281,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			$(event.target).closest('a').addClass('choose');
 		},
 		showView:function (model) {
+			if(model.get('unitId')){
+				this.uid=model.get('unitId');
+				$('#unit-modal .unit-li>a.choose').removeClass('choose');
+				$('#unit-modal .unit-li>a[uid='+this.uid+']').addClass('choose');
+			}
 			this.$el.modal('show');
 			this.model=model;
 		},
@@ -294,25 +311,22 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 		},
 		detail:function (id) {
 			if(!AssetRouter.detail){
-				window.location.href="#";
-				return;
+				AssetRouter.detail=new AssetDetailView();
 			}
 			AssetRouter.detail.changeModel(id);
 		},
 		info:function () {
-			AssetRouter.asset.render();
+			AssetRouter.asset.doFetch();
 		},
 		edit:function (id) {
-			if(!AssetRouter.detail){
-				window.location.href="#";
-				return;
+			if(!AssetRouter.edit){
+				AssetRouter.edit=new AssetEditView();
 			}
 			AssetRouter.edit.changeModel(id);
 		},
 		add:function () {
-			if(!AssetRouter.detail){
-				window.location.href="#";
-				return;
+			if(!AssetRouter.add){
+				AssetRouter.add=new AssetAddView();
 			}
 			AssetRouter.add.changeModel();
 		}
@@ -320,8 +334,5 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 	AssetRouter.asset=new MainAssetView();
 	var router=new AssetRouter();
 	Backbone.history.start();
-	AssetRouter.detail=new AssetDetailView();
-	AssetRouter.edit=new AssetEditView();
-	AssetRouter.add=new AssetAddView();
 	AssetRouter.unit=new UnitTreeView();
 })
