@@ -1,6 +1,6 @@
 require.config({
 	paths:{
-		jquery:'../../lib/jquery-1.11.3.min',
+		jquery:'../../lib/jquery-2.1.4.min',
 		underscore:'../../lib/underscore-min',
 		backbone:'../../lib/backbone',
 		cookie:'../../lib/jquery.cookie',
@@ -26,9 +26,9 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 	var MainAssetView=AssetView.extend({
 		events:{
 			'change #asset select':'bindType',
-			'change #asset input':'bindValue',
+			'change #asset input[bind=true]':'bindValue',
 			'click .pagination a':'page',
-			'click .remove-asset':'remove'
+			'click .remove-asset':'remove',
 		},
 		el:$('.content'),
 		template:_.template($('#asset-info-temp').html()),
@@ -58,6 +58,23 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 				search:this.search.model,
 				assetList:this.assetList
 			}));
+		},
+		upload:function () {
+			console.log($('#upload-form')[0]);
+			var formData=new FormData($('#upload-form')[0]);
+			console.log(formData);
+			$.ajax({  
+				url: '/cmdbAPI/asset/import',
+				type: 'POST',
+				data: formData,
+				contentType: false,
+				success: function (returndata) {
+					alert(returndata);
+				},
+				error: function (returndata) {
+					alert(returndata);
+				}
+			});
 		}
 	})
 

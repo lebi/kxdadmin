@@ -30,9 +30,13 @@
 							      			<%})%>
 							      		</select>
 							    	</div>
-							    	<div class="col-sm-offset-2">
+							    	<div class="col-sm-5">
 							    		<a href="asset-type.html" class="btn btn-success">类型管理</a>
 										<a href="#add" class="btn btn-success">添加资产</a>
+										<form action="/cmdbAPI/asset/import" method="post" enctype="multipart/form-data">  
+										    <input type="file" name="file" id="upload"/>
+											<input type="submit" value="upload"/>
+										</form>
 							    	</div>
 							  	</div>
 							</div>
@@ -53,11 +57,11 @@
 									<tbody>
 										<tr>
 											<td><span>搜索</span></td>
-											<td><input name="name" value="<%=search.name%>"></td>
-											<td><input name="code" value="<%=search.code%>"></td>
-											<td><input name="purpose" value="<%=search.purpose%>"></td>
-											<td><input name="unit"  value="<%=search.unit%>"></td>
-											<td><input name="dutyofficer"  value="<%=search.dutyofficer%>"></td>
+											<td><input name="name" value="<%=search.name%>" bind="true"></td>
+											<td><input name="code" value="<%=search.code%>" bind="true"></td>
+											<td><input name="purpose" value="<%=search.purpose%>" bind="true"></td>
+											<td><input name="unit"  value="<%=search.unit%>" bind="true"></td>
+											<td><input name="dutyofficer"  value="<%=search.dutyofficer%>" bind="true"></td>
 										</tr>
 										<%assetList.each(function (asset) {%>
 										<tr>
