@@ -15,6 +15,10 @@
 				<script type="text/template" id="property-temp">
 					<div class='content board'>
 	 					<a href="#edit" class="btn btn-success"> 添加资产类型 </a>
+	 					<form action="/cmdbAPI/type/import" method="POST" enctype="multipart/form-data">
+	 						<input type="file" name="file" id="upload"/>
+							<input type="submit" value="upload"/>
+	 					</form>
 						<table class="table table-striped">
 							<thead>
 								<tr>
