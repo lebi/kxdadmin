@@ -1,0 +1,350 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="css/bootstrap.min.css" rel="stylesheet" />
+		<link href="css/font-awesome.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/themes/default/style.min.css" />
+		<link href="style/index.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="warpper">
+			<div id="sidebar">
+			</div>
+			<div class="page">
+				<script type="text/template" id="dc-temp">
+					<%_.each(list,function (model) {%>
+						<li><span class="icon-building"></span><%=model.name%></li>
+					<%})%>
+				</script>
+				<ul class="page-title">
+				</ul>
+				<div>
+					<div class="page-wrapper">					
+						<div class="host">
+							<span class="host-title">ESXi</span>
+							<div class="host-header">
+								<ul class="host-option">
+									<li class="create-vm"><a>Clone</a></li><li class="create-pool">
+									<a>CreatePool</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+				<script type="text/template" id="alert-temp">
+					<% if(res.type=="success"){ %>
+						<div class="alert alert-success fade in" >
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<strong>Create <%=name%> success!</strong>
+						</div>
+					<%}else if(res.type=="error"){%>
+						<div class="alert alert-danger fade in" >
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<strong>Create <%=name%> fail!</strong>
+						</div>
+					<%}%>
+				</script>
+				<script type="text/javascript">
+					function renderPool(model,host){
+						var temp=_.template($('#pool-temp').html());
+						return temp({model:model,host:host});
+					}
+
+					function renderVM (model,host,pool) {
+						var temp=_.template($('#machine-temp').html());
+						return temp({vm:model,host:host,pool:pool});
+					}
+				</script>
+
+				<script type="text/template" id="pool-temp">
+					<%var pool=model.name%>
+					<%_.each(model.list,function (vm) {%>
+						<% var power="";
+							if(vm.poweron){
+								power="vm-poweron";
+							} %>
+							<% if(vm.type=="ResourcePool") {%>
+								<%=renderPool(vm,host)%>
+							<%}else{%>
+								<%=renderVM(vm,host,pool)%>
+							<%}%>
+						<%})%>
+				</script>
+
+				<script type="text/template" id="host-temp">
+					<div class="host-content" id="<%=model.get('name')%>">
+					<div>
+						
+					</div>
+						<%var host=model.get('name')%>
+						<% _.each(model.get('list'),function (vmodel) {%>
+						<%if(vmodel.type=="VirtualMachine"){%>
+							<%=renderVM(vmodel,host)%>
+						<%}else{%>
+							<%=renderPool(vmodel,host)%>
+						<%}%>
+						<%})%>
+					</div>
+				</script>
+
+				<!--<script type="text/template" id="host-temp">
+						<div class="host-content" id="<%=model.get('name')%>">
+							<a class="element-name" href="setting.html"><span class="icon-list"></span> <%=model.get('name')%></a>
+							<div class="check-panel">
+								<div class="panel-type">
+									<span class="icon-bar-chart">Memory</span>
+								</div>
+								<div class="panel-green"><%= model.get('memory') %></div>
+							</div>
+							<div class="check-panel">
+								<div class="panel-type">
+									<span class="icon-bar-chart">CPU</span>
+								</div>
+								<div class="panel-green"><%= model.get('cpu') %></div>
+							</div>
+							<div class="check-panel">
+								<div class="panel-type">
+									<span class="icon-bar-chart">Disk</span>
+								</div>
+								<div class="panel-green"><%= model.get('disk') %></div>
+							</div>
+							<% _.each(model.get('list'),function (vmodel) {%>
+							<%if(vmodel.type=="VirtualMachine"){%>
+								<%=renderVM(vmodel)%>
+							<%}else{%>
+								<%=renderPool(vmodel)%>
+							<%}%>
+							<%})%>
+						</div>
+				</script> -->
+				
+				<script type="text/template" id="machine-temp">								
+					<% var power="";
+						if(vm.poweron){
+							power="vm-poweron";
+						} 
+					%>
+					<div class="machine">
+						<div class="displayname">
+							<a class="vm-badge <%=power%>" href="setting.html"><span class="icon-desktop"></span> <%=vm.name%></a>
+						</div>
+						<div class="check-panel ">
+							<div class="panel-type">
+								<span class="icon-bar-chart">Memory</span>
+							</div>
+							<div class="panel-green"><%=vm.memory%></div>
+						</div>
+						<div class="check-panel ">
+							<div class="panel-type">
+								<span class="icon-bar-chart">CPU</span>
+							</div>
+							<div class="panel-green"><%=vm.cpu%></div>
+						</div>
+						<div class="check-panel">
+							<div class="panel-type">
+								<span class="icon-bar-chart">Disk</span>
+							</div>
+							<div class="panel-green"><%=vm.disk%></div>
+						</div>
+					</div>
+				</script>
+
+				<script type="text/template" id="create-temp">
+					<div class="machine" >
+						<div class="displayname">
+							<a class="vm-badge" href="setting.html"><span class="icon-desktop"></span> <%=vm.name%>(正在创建...)</a>
+						</div>
+						<div class="check-panel ">
+							<div class="panel-type">
+								<span class="icon-bar-chart">Memory</span>
+							</div>
+							<div class="panel-green"><%=vm.memory%></div>
+						</div>
+						<div class="check-panel ">
+							<div class="panel-type">
+								<span class="icon-bar-chart">CPU</span>
+							</div>
+							<div class="panel-green"><%=vm.cpu%></div>
+						</div>
+						<div class="check-panel">
+							<div class="panel-type">
+								<span class="icon-bar-chart">Disk</span>
+							</div>
+							<div class="panel-green"><%=vm.disk%></div>
+						</div>
+					</div>
+				</script>
+		</div>
+		<div class="mypop-machine mypop">
+			<ul class="mypop-ul">
+				<li class="">power on</li>
+				<li>power off</li>
+				<li>clone</li>
+			</ul>
+		</div>
+		<div class="mypop-pool mypop">
+			<ul class="mypop-ul">
+				<li class="create-pool">create pool</li>
+				<li class="create-machine" onclick="hei()">create machine</li>
+				<li class="edit-set">edit set</li>
+			</ul>
+		</div>
+		
+		<div class="modal fade" id="create-pool">
+			<div class="modal-dialog">
+				<div class="modal-content">
+		      		<div class="modal-header">
+		      			<h4 class="modal-title">Create ResourcePool</h4>
+		      		</div>
+		      		<div class="modal-body">
+  						<div class="form-group">
+	  						<p><label>名称</label></p>
+	  						<input class="form-control" name="pool-name">
+	  					</div>
+  						<div class="form-group">
+	  						<p><label>内存配置</label></p>
+	  						<label>内存预留(MB)</label>
+	  						<input class="form-control" name="memory-limit">
+	  						<label>预留类型</label>
+	  						<select class="form-control" name="memory-type">
+	  							<option>可扩展</option>
+	  							<option>不可扩展</option>
+	  						</select>
+	  					</div>
+  						<div class="form-group">
+	  						<p><label>CPU配置</label></p>
+	  						<label>CPU预留(MHz)</label>
+	  						<input class="form-control" name="cpu-limit">
+	  						<label>预留类型</label>
+	  						<select class="form-control" name="cpu-type">
+	  							<option>可扩展</option>
+	  							<option>不可扩展</option>
+	  						</select>
+	  					</div>
+			      		<div class="tree-view pool-tree-list">
+			      		</div>
+		      		</div>
+		      		<div class="modal-footer">
+		        		<button type="button" class="btn btn-primary create-pool-finish">finish</button>
+		        		<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+		      		</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="create-vm">
+		  	<div class="modal-dialog">
+			    <div class="modal-content">
+		      		<div class="modal-header">
+		      			<h4 class="modal-title">Create machine</h4>
+		      		</div>
+		      		<div class="modal-body">	      			
+		      			<div class="modal-set modal-active">
+  							<div class="form-group">
+  								<p><label>选择虚拟机名称和位置</label></p>
+  								<p><label>Template</label></p>
+  								<select class="form-control" name="template">
+  								</select>
+			      				<label>Name</label>
+			      				<input class="form-control" name="vmname">
+			      				<label>Host</label>
+			      				<div class="tree-view host-tree">
+			      				</div>
+  							</div>
+  							<div class="form-group">
+  								<p><label>虚拟机所属资源池</label></p>
+			      				<label>Pool</label>
+			      				<div class="tree-view pool-tree">
+			      					未选择主机
+			      				</div>
+			      				<label>存储文件</label>
+			      				<table class="choose-table table">
+			      					<tr name="head">
+			      						<th>名称</th><th>驱动器类型</th><th>容量</th><th>可用</th><th>类型</th><th>Thin Provision</th>
+			      					<tr>
+			      				</table>
+			      				<script type="text/template" id="store-temp">
+			      					<%_.each(list,function (store) {%>
+			      						<tr name="row">
+			      							<td><%=store.name%></td><td><%=store.volume%></td><td><%=parseInt(store.max/1024/1024/1024)%>GB</td><td><%=parseInt(store.free/1024/1024/1024)%>GB</td><td>...</td><td>...</td>
+			      						</tr>
+			      					<%})%>
+			      				</script>
+  							</div>
+		      			</div>
+		      			<div class="modal-set">
+  							<div class="form-group">
+  								<p><label>虚拟机IP</label></p>
+<!--   								<div class="checkbox">
+	  								<label>
+	  									<input type="checkbox" name="dhcp">DHCP</input>
+									</label>
+								</div> -->
+  								<label>IP</label>
+			      				<input class="form-control" name="ipaddress">
+  								<label>SubnetMask</label>
+			      				<input class="form-control" name="netmask">
+  								<label>Gateway</label>
+			      				<input class="form-control" name="gateway">
+  							</div>
+  							<div class="form-group">
+  								<label>Hostname</label>
+			      				<input class="form-control" name="hostname">
+  								<label>HostDomain</label>
+			      				<input class="form-control" name="hostdomain">
+  								<label>DNS</label>
+			      				<input class="form-control" name="dns">
+  								<label>DNSDomain</label>
+			      				<input class="form-control" name="dnsdomain">
+  							</div>
+		      			</div>
+		      			<div class="modal-set">
+  							<div class="form-group">
+  								<p><label>其他</label></p>
+  								<div class="checkbox">
+	  								<label>
+	  									<input type="checkbox" checked="checked" name="poweron">创建后打开虚拟机</input>
+									</label>
+								</div>
+								<label>网络标签</label>
+								<select class="form-control network" name="network">
+								</select>
+  							</div>
+		      			</div>
+		      		</div>
+		      		<div class="modal-footer">
+		        		<button type="button" class="btn btn-primary create-prev" disabled>prev</button>
+		        		<button type="button" class="btn btn-primary create-next">next</button>
+		        		<button type="button" class="btn btn-default" data-dismiss="modal">close</button>
+		      		</div>
+			    </div>
+			</div>
+		</div>
+
+		<div class="modal fade">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title">Modal title</h4>
+		      </div>
+		      <div class="modal-body">
+		        <p>One fine body&hellip;</p>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-primary">Save changes</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<script src="lib/jquery-1.11.3.min.js"></script>
+		<script src="lib/bootstrap.min.js"></script>
+		<script src="lib/underscore-min.js"></script>
+		<script src="lib/backbone-min.js"></script>
+		<script src="lib/jstree.min.js"></script>
+		<script src="js/index.js"></script>
+	</body>
+</html>

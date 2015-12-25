@@ -1,0 +1,70 @@
+.badge{
+	border-radius: 3;
+	font-size: 15px;
+}
+.badge-choose{
+	background-color: #66CC99;
+}
+.form-group .badge{
+	font-size: 17px;
+}
+.edit-user-form{
+	display: none;
+}
+.create-role-link{
+	padding-right: 60px;
+	font-size: 17px;
+}
+.edit-role-form{
+	display: none;
+}
+.module-list{
+	list-style-type: none;
+	padding-left: 0px;
+}
+.module-list > li > a{
+	padding: 7px 2px;
+	font-size: 16px;
+}
+.module-list > li > a:hover{
+	text-decoration: none;
+}
+.module-list .checkbox{
+	display: none;
+}
+.checkbox table >tbody>tr>td{
+	padding: 2px 8px;
+}
+.permission-name{
+	min-width: 150px;
+}
+#add-new-role{
+	background-color: #fff;
+	margin: 0px;
+	display: block;
+	color: #333;
+	margin-bottom: 10px;
+}
+.role-admin-form{
+	display: none;
+}
+.module-list td > label{
+	position: relative;
+}
+.module-list input[type=checkbox]{
+	visibility: hidden;
+}
+.module-list input + i{
+	display: inline-block;
+	width: 19px;
+	height: 19px;
+	border-radius: 50%;
+	background-color: #999;
+	position: absolute;
+	left: -3px;
+	top: 2px;
+	border: 3px solid #ddd
+}
+.module-list input[type=checkbox]:checked + i{
+	background-color: #009933;
+}

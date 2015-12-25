@@ -1,0 +1,75 @@
+				
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <!-- <div class="header"> -->
+        <ul class="component-list">
+			<li class="right-component">
+				<a href="/admin" aria-expanded="false">
+                    <i class="icon icon-wrench icon-fw"></i> 权限控制
+                </a>
+			</li><li class="prd-component">
+				<a href="/prdmonitor" aria-expanded="false">
+                    <i class="icon icon-wrench icon-fw"></i> 监控
+                </a>
+			</li><li class="vcenter-component">
+                <a href="/Vcenter" aria-expanded="false">
+                    <i class="icon icon-wrench icon-fw"></i> 虚拟机部署
+                </a>
+            </li>
+		</ul>
+		<ul class="dropdownlist">
+			<li class="dropdown dropdown-btn">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)" aria-expanded="false">
+                    <i class="icon icon-envelope icon-fw"></i> <i class="icon icon-caret-down"></i>
+                </a>
+            </li>
+			<li class="dropdown dropdown-btn">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)" aria-expanded="false">
+                    <i class="icon icon-user icon-fw"></i> <i class="icon icon-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu">
+            		<li class="update-permits"><i class="icon icon-user icon-fw "></i> 刷新权限</li>
+            		<li><i class="icon icon-user icon-fw"></i> 修改密码</li>
+            		<li class="logout"><i class="icon icon-off icon-fw"></i> 退出</li>
+            	</ul>
+            </li>
+	   </ul>
+       <script type="text/javascript">
+        var TopView=Backbone.View.extend({
+            el:$('.header'),
+            events:{
+                'click .update-permits':'updatePermits',
+                'click .logout':'logout'
+            },
+            initialize:function () {
+
+            },
+            updatePermits:function () {
+                $.getJSON('/webserviceAPI/auth/reload',function (result) {
+                    if(result.errorMsg!=null){
+                        alert(result.errorMsg);
+                        return;
+                    }
+                    _.each(result.result,function (obj) {
+                        $.cookie(obj.uri,obj.permit);
+                    })
+                    location.reload();
+                })
+            },
+            logout:function () {
+                $.getJSON('/webserviceAPI/auth/logout',function (result) {
+                    var cookies=document.cookie.split('; ');
+                    for(var i in cookies){
+                        var name=cookies[i].split('=')[0];
+                        $.cookie(decodeURIComponent(name),null);
+                    }
+                    window.location.href='/';
+                })
+            }
+        })
+        $(function () {
+            var topView=new TopView();
+        })
+       </script>
+    <!-- </div> -->

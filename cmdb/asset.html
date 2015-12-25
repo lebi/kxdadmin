@@ -14,6 +14,14 @@
 			<div class="content-wrapper">
 				<div class="content board">
 					<script type="text/template" id="asset-info-temp">
+						<%	var type=typeList.get(search.type);
+							var basic=[];
+							var extend=[];
+							if(showColumn){
+								basic=showColumn.basic?showColumn.basic.split(','):[];
+								extend=showColumn.extend?showColumn.extend.split(','):[];
+							}
+						%>
 						<div id="asset">
 							<div class="form-horizontal">
 							  	<div class="form-group">
@@ -30,13 +38,18 @@
 							      			<%})%>
 							      		</select>
 							    	</div>
-							    	<div class="col-sm-5">
-							    		<a href="asset-type.html" class="btn btn-success">类型管理</a>
-										<a href="#add" class="btn btn-success">添加资产</a>
-										<form action="/cmdbAPI/asset/import" method="post" enctype="multipart/form-data">  
-										    <input type="file" name="file" id="upload"/>
-											<input type="submit" value="upload"/>
+							    	<div class="col-sm-3">
+							    		<a href="asset-type.html" class="btn btn-default">类型管理</a>
+										<a href="#add" class="btn btn-default">添加资产</a>
+										<a class="btn btn-primary" data-toggle="modal" data-target="#select-show-modal">资产视图</a>
+							    	</div>
+							    	<div class="export">
+							    		<form action="/cmdbAPI/asset/import" method="post" enctype="multipart/form-data" id="upload">
+										    <input type="file" name="file"/>
 										</form>
+							    		<a href="#" class="btn btn-success" id="export">导出资产</a>
+							    		<a href="#" class="btn btn-success" id="import">导入资产</a>
+							    		<span class="hint">未选择文件</span>
 							    	</div>
 							  	</div>
 							</div>
@@ -44,33 +57,80 @@
 								<table class="table table-striped">
 									<thead>
 										<tr>
-											<th><span>#</span></th>
-											<th><span>资产名</span></th>
-											<th><span>资产序号</span></th>
-											<th><span>资产用途</span></th>
-											<th><span>所属单位</span></th>
-											<th><span>责任人</span></th>
-											<th><span>详情</span></th>
-											<th><span>删除</span></th>
+											<%if(basic.length==0){%>
+												<th><span>#</span></th>
+												<th><span>资产名</span></th>
+												<th><span>资产序号</span></th>
+												<th><span>资产用途</span></th>
+												<th><span>所属单位</span></th>
+												<th><span>责任人</span></th>
+												<th><span>详情</span></th>
+												<th><span>删除</span></th>
+											<%}else{%>
+												<%_.each(basic,function (b) {%>
+													<% 	var col=b;
+														if(b=="name")
+															col="资产名";
+														else if(b=="unit")
+															col="所属单位";
+														else if(b=="code")
+															col="资产序号";
+													%>
+													<th><span><%=col%></span></th>
+												<%})%>
+												<%_.each(type.get('properties'),function (p) {%>
+													<%	if(extend.indexOf(p.id.toString())>=0){%>
+														<th><span><%=p.name%></span></th>
+													<%}%>
+												<%})%>
+												<th><span>详情</span></th>
+												<th><span>删除</span></th>
+											<%}%>
 										</tr>
 									</thead>
 									<tbody>
 										<tr>
-											<td><span>搜索</span></td>
-											<td><input name="name" value="<%=search.name%>" bind="true"></td>
-											<td><input name="code" value="<%=search.code%>" bind="true"></td>
-											<td><input name="purpose" value="<%=search.purpose%>" bind="true"></td>
-											<td><input name="unit"  value="<%=search.unit%>" bind="true"></td>
-											<td><input name="dutyofficer"  value="<%=search.dutyofficer%>" bind="true"></td>
+											<%if(basic.length==0){%>
+												<td><input name="id" value="<%=search.id%>" bind="true"></td>
+												<td><input name="name" value="<%=search.name%>" bind="true"></td>
+												<td><input name="code" value="<%=search.code%>" bind="true"></td>
+												<td><input name="purpose" value="<%=search.purpose%>" bind="true"></td>
+												<td><input name="unit"  value="<%=search.unit%>" bind="true"></td>
+												<td><input name="dutyofficer"  value="<%=search.dutyofficer%>" bind="true"></td>
+											<%}else{%>
+												<%_.each(basic,function (b) {%>
+													<td><input name="<%=b%>" value="<%=search[b]%>" bind="true"></td>
+												<%})%>
+												<%_.each(type.get('properties'),function (p) {%>
+													<%	if(extend.indexOf(p.id.toString())>=0){%>
+														<td><input name="<%=p.name%>" value="<%=search[p.name]%>" bind="true"></td>
+													<%}%>
+												<%})%>
+											<%}%>
 										</tr>
 										<%assetList.each(function (asset) {%>
 										<tr>
-											<td><span><%=asset.get('id')%></span></td>
-											<td><span><%=asset.get('name')%></span></td>
-											<td><span><%=asset.get('code')%></span></td>
-											<td><span><%=asset.get('purpose')%></span></td>
-											<td><span><%=asset.get('unit')%></span></td>
-											<td><span><%=asset.get('dutyofficer')%></span></td>
+											<%if(basic.length==0){%>
+												<td><span><%=asset.get('id')%></span></td>
+												<td><span><%=asset.get('name')%></span></td>
+												<td><span><%=asset.get('code')%></span></td>
+												<td><span><%=asset.get('purpose')%></span></td>
+												<td><span><%=asset.get('unit')%></span></td>
+												<td><span><%=asset.get('dutyofficer')%></span></td>
+											<%}else{%>
+												<%_.each(basic,function (b) {%>
+													<td><span><%=asset.get(b)%></span></td>
+												<%})%>
+												<%_.each(type.get('properties'),function (p) {%>
+													<%	if(extend.indexOf(p.id.toString())>=0){
+															_.each(asset.get('properties'),function (data){
+																if(data.pid==p.id){%>
+																	<td><span><%=data.value%></span></td>
+																<%}
+															})%>
+													<%}%>
+												<%})%>
+											<%}%>
 											<td><a href="#detail?<%=asset.get('id')%>" class="href">详情</a></td>
 											<td><a href="#" class="href remove-asset" aid="<%=asset.get('id')%>">删除</a></td>
 										</tr>
@@ -101,6 +161,53 @@
 							    	</li>
 							  	</ul>
 							</nav>
+						</div>
+						<div class="modal fade" id="select-show-modal">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title">选择信息</h4>
+									</div>
+									<div class="modal-body" id="column-show">
+										<%if(type){%>
+											<h5>基础属性</h5>
+											<div class="checkbox" >
+												<div class="row">
+													<%_.each(columns,function (col) {
+														if(col=='properties'||col=='typeDetail'||col=='typeId'||col=='unitId')
+															return;
+														%>
+														<div class="col-sm-5">
+															<label>
+																<input type="checkbox" <%=basic.indexOf(col)>=0?'checked':''%> value="<%=col%>" target="basic"> <%=col%>
+															</label>
+														</div>
+													<%})%>
+												</div>
+											</div>
+											<h5>扩展属性</h5>
+											<div class="checkbox">
+												<div class="row">
+													<%_.each(type.get('properties'),function (col) {%>
+														<div class="col-sm-5">
+															<label>
+																<input type="checkbox" value="<%=col.id%>" <%=extend.indexOf(col.id.toString())>=0?'checked':''%> target="extend"> <%=col.name%>
+															</label>
+														</div>
+													<%})%>
+												</div>
+											</div>
+										<%}else{%>
+											<h5>未选择类型</h5>
+										<%}%>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-warning" data-dismiss="modal">关闭</button>
+										<button type="button" class="btn btn-success" id="column-save">保存</button>
+									</div>
+								</div>
+							</div>
 						</div>
 					</script>
 					<script type="text/template" id="asset-detail-temp">

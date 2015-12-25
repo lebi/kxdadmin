@@ -1,0 +1,189 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="css/bootstrap.min.css" rel="stylesheet" />
+		<link href="css/font-awesome.min.css" rel="stylesheet" />
+		<link href="css/kxd.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="warpper">
+			<div class="header">
+				<ul class="dropdownlist">
+					<li class="dropdown dropdown-btn">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        	<i class="icon icon-envelope icon-fw"></i> <i class="icon icon-caret-down"></i>
+                    	</a>
+            		</li>
+					<li class="dropdown dropdown-btn">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        	<i class="icon icon-user icon-fw"></i> <i class="icon icon-caret-down"></i>
+                    	</a>
+                    	<ul class="dropdown-menu">
+            				<li><i class="icon icon-user icon-fw"></i> 修改密码</li>
+            				<li><i class="icon icon-off icon-fw"></i> 退出</li>
+            			</ul>
+            		</li>
+				</ul>
+			</div>
+			<div class="sidebar">
+				<nav>
+				<div class="title">KXF</div>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+							<span class="icon-reorder"></span>
+						</button>
+					</div>
+					<div class="collapse navbar-collapse" id="navbar">
+						<ul class="sidebar-items nav">
+							<li class="active" target="kxf-encrypt">KXF加密<div class="choose" ></div></li>
+							<li target="kxf-decrypt">KXF解密<div class="choose" ></div></li>
+							<li target="kxf-hash">KXF Hash<div class="choose"></div></li>
+							<li target="kxf-scheduler">KXF Scheduler<div class="choose"></div></li>
+							<li target="export-identity">导出身份信息<div class="choose"></div></li>
+							<li target="correct-sql">产线sql订正<div class="choose"></div></li>
+						</ul>
+					</div>
+				</nav>
+			</div>
+			<div class="tool-wrapper">
+				<div class="tool" id="kxf-encrypt">
+					<div class="tool-header">
+						<span>KXF加密工具</span>
+					</div>
+					<div class="tool-content">
+						<form class="form-horizontal">
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">输入字符串</label>
+						    	<div class="col-sm-10">
+						      	<input class="form-control">
+						    	</div>
+						    	<div class="buttonlist">
+						    		<div class="control-botton control-botton-2">清空</div>
+						    		<div class="control-botton control-botton-2">加密</div>
+						    	</div>
+						  	</div>
+						</form>
+					</div>
+				</div>
+				<div class="tool" id="kxf-decrypt">
+					<div class="tool-header">
+						<span>KXF解密工具</span>
+					</div>
+					<div class="tool-content">
+						<form class="form-horizontal">
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">输入字符串</label>
+						    	<div class="col-sm-10">
+						      	<input class="form-control">
+						    	</div>
+						    	<div class="buttonlist">
+						    		<div class="control-botton control-botton-2">清空</div>
+						    		<div class="control-botton control-botton-2">解密</div>
+						    	</div>
+						  	</div>
+						</form>
+					</div>
+				</div>
+				<div class="tool" id="kxf-hash">
+					<div class="tool-header">
+						<span>KXF Hash</span>
+					</div>
+					<div class="tool-content">
+						<form class="form-horizontal">
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">输入字符串</label>
+						    	<div class="col-sm-10">
+						      	<input class="form-control">
+						    	</div>
+						    	<div class="buttonlist">
+						    		<div class="control-botton control-botton-2">清空</div>
+						    		<div class="control-botton control-botton-2">加密</div>
+						    	</div>
+						  	</div>
+						</form>
+					</div>
+				</div>
+				<div class="tool" id="kxf-scheduler">
+					<div class="tool-header">
+						<span>KXF Scheduler</span>
+					</div>
+					<div class="tool-content">
+						<form class="form-horizontal">
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">输入字符串</label>
+						    	<div class="col-sm-10">
+						      	<input class="form-control">
+						    	</div>
+						  	</div>
+						  	<div class="form-group">
+						    	<label class="col-sm-2 control-label">加密方式</label>
+						    	<div class="col-sm-10">
+						      	<select class="form-control">
+						      		<option>SHA1</option>
+						      		<option>AES</option>
+						      	</select>
+						    	</div>
+						  	</div>
+						  	<div class="form-group">
+						    	<div class="buttonlist">
+						    		<div class="control-botton control-botton-2">清空</div>
+						    		<div class="control-botton control-botton-2">加密</div>
+						    	</div>
+						    </div>
+						</form>
+					</div>
+				</div>
+				<div class="tool tool-big" id="export-identity">
+					<div class="tool-header">
+						<span>导出身份信息</span>
+					</div>
+					<div class="tool-content">
+						<div class="file">
+							<div class="file-input-button"><span>添加文件</span></div>
+							<div class="file-control-list">
+								<div class="file-control-button">运行</div>
+								<div class="file-control-button">取消文件</div>
+							</div>
+							<div class="file-output file-output-small">
+								<div class="before-export">
+									<span>正在导出...</span>
+								</div>
+							</div>
+							<div style="height:0px;">
+								<input type="file" class="file-input">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="tool tool-big" id="correct-sql">
+					<div class="tool-header">
+						<span>导出身份信息</span>
+					</div>
+					<div class="tool-content">
+						<div class="file">
+							<div class="file-input-button"><span>添加文件</span></div>
+							<div class="file-control-list">
+								<div class="file-control-button">运行</div>
+								<div class="file-control-button">取消文件</div>
+							</div>
+							<div class="file-output file-output-small">
+								<div class="export-table">
+									<p><span>aaaaaaaaaaaaaaaaaaaaaaaaa.csv</span><a href="#">下载</a></p>
+									<p><span>aaaaaaaaaaaaaaaaaaaaaaaaa.csv</span><a href="#">下载</a></p>
+								</div>
+							</div>
+							<div style="height:0px;">
+								<input type="file" class="file-input">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="lib/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="lib/bootstrap.min.js"></script>
+		<script type="text/javascript" src="lib/underscore-min.js"></script>
+		<script type="text/javascript" src="lib/backbone.js"></script>
+		<script type="text/javascript" src="js/common.js"></script>
+	</body>
+</html>

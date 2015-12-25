@@ -6,7 +6,6 @@ define(['backbone'],function(Backbone){
 				Backbone.Collection.prototype.set.call(this,models,options);
 			else if(!models.errorMsg)
 				Backbone.Collection.prototype.set.call(this,models.result,options);
-			return true;
 		}
 	})
 	return MyCollection;

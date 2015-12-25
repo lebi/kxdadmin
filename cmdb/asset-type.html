@@ -14,11 +14,17 @@
 			<div class='content-wrapper'>
 				<script type="text/template" id="property-temp">
 					<div class='content board'>
-	 					<a href="#edit" class="btn btn-success"> 添加资产类型 </a>
-	 					<form action="/cmdbAPI/type/import" method="POST" enctype="multipart/form-data">
-	 						<input type="file" name="file" id="upload"/>
-							<input type="submit" value="upload"/>
-	 					</form>
+						<div class="col-sm-6">
+	 						<a href="#edit" class="btn btn-default"> 添加资产类型 </a>
+	 					</div>
+						<div class="export">
+		 					<form action="/cmdbAPI/type/import" method="POST" enctype="multipart/form-data" id="upload" style="display:none">
+		 						<input type="file" name="file" id="upload"/>
+		 					</form>
+	 						<a href="#" class="btn btn-success" id="export">导出</a>
+	 						<a href="#" class="btn btn-success" id="import">导入</a>
+							<span class="hint"> 未选择文件</span>
+	 					</div>
 						<table class="table table-striped">
 							<thead>
 								<tr>

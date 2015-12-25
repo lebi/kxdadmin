@@ -3,6 +3,11 @@
 	margin-left:80px;
 	padding: 30px 30px;
 }
+.export{
+	display: inline-block;
+	width: 210px;
+	float: right;
+}
 .content::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	background-color: #555;

@@ -5,7 +5,8 @@ define(['underscore','backbone','model'],function (_,Backbone,MyModel) {
 			id:null,
 			code:null,
 			operations:[],
-			properties:[]
+			properties:[],
+			showColumn:{}
 		},
 		urlRoot:'/cmdbAPI/type'
 	})

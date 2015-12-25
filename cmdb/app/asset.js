@@ -7,18 +7,20 @@ require.config({
 		bootstrap:'../../lib/bootstrap.min',
 		model:'../../js/base-model',
 		collection:'../../js/base-collection',
+		jqueryform:'../../lib/jquery.form.min',
 		Unit:'model/Unit',
 		UnitList:'model/UnitList',
 		AssetType:'model/AssetType',
 		AssetTypeList:'model/AssetTypeList',
 		Asset:'model/Asset',
 		AssetList:'model/AssetList',
-		AssetView:'AssetView'
+		AssetView:'AssetView',
+		AssetTypeShow:'model/AssetTypeShow'
 	}
 })
 
-define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','AssetTypeList','Asset','AssetList','UnitList','AssetView'],
-	function ($,_,Backbone,cookie,bootstrap,AssetType,AssetTypeList,Asset,AssetList,UnitList,AssetView) {
+define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','AssetType','AssetTypeList','Asset','AssetList','UnitList','AssetView','AssetTypeShow'],
+	function ($,_,Backbone,cookie,bootstrap,jqueryform,AssetType,AssetTypeList,Asset,AssetList,UnitList,AssetView,AssetTypeShow) {
 
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(1)).addClass('active');
@@ -29,6 +31,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			'change #asset input[bind=true]':'bindValue',
 			'click .pagination a':'page',
 			'click .remove-asset':'remove',
+			'click #export':'export',
+			'click #import':'import',
+			'change #upload>input':'upload',
+			'change #column-show input':'showColumn',
+			'click #column-save':'columnSave'
 		},
 		el:$('.content'),
 		template:_.template($('#asset-info-temp').html()),
@@ -45,6 +52,16 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			this.search.model={unit:'',type:0,page:1,
 					code:'',name:'',purpose:'',dutyofficer:''};
 			this.search.on('change',this.doFetch,this);
+
+			this.showColumn=null;
+		},
+		bindType:function () {
+			var pid=$(event.target).val();
+			if(pid>0)
+				this.showColumn=this.typeList.get(pid).get('showColumn');
+			else
+				this.showColumn=null;
+			AssetView.prototype.bindType.call(this);
 		},
 		doFetch:function () {
 			if(this.typeList.length==0)
@@ -56,25 +73,66 @@ define(['jquery','underscore','backbone','cookie','bootstrap','AssetType','Asset
 			this.$el.append(this.template({
 				typeList:this.typeList,
 				search:this.search.model,
-				assetList:this.assetList
+				assetList:this.assetList,
+				columns:new Asset().keys(),
+				showColumn:this.showColumn
 			}));
 		},
+		export:function () {
+			window.open("/cmdbAPI/asset/export");
+		},
+		import:function () {
+			$('#upload input').click();
+		},
 		upload:function () {
-			console.log($('#upload-form')[0]);
-			var formData=new FormData($('#upload-form')[0]);
-			console.log(formData);
-			$.ajax({  
-				url: '/cmdbAPI/asset/import',
-				type: 'POST',
-				data: formData,
-				contentType: false,
-				success: function (returndata) {
-					alert(returndata);
+			if(!$('#upload input').val())
+				return;
+			$('.hint',this.$el).html(" <i class='icon-spin icon-spinner'></i>正在导入");
+			$('#upload').ajaxSubmit({
+				timeout : 60*1000,
+				success:function () {
+					$('.hint',this.$el).html(" <i class='icon-ok'></i>导入成功</span>");
+					setTimeout(function () {
+						$('.hint',this.$el).html(" 继续导入");
+					},1000)
+					$('#upload input').val('');
 				},
-				error: function (returndata) {
-					alert(returndata);
+				error:function (result) {
+					$('.hint',this.$el).html(" <i class='icon-remove-sign'></i>导入失败");
+					alert(result.responseJSON.errorMsg);
+					setTimeout(function () {
+						$('.hint',this.$el).html(" 重新选择文件");
+					},1000)
+					$('#upload input').val('');
 				}
-			});
+			})
+		},
+		showColumn:function () {
+			var target=$(event.target).attr("target");
+			var value=$(event.target).val();
+			if($(event.target).prop('checked')){
+				if(!this.showColumn)
+					this.showColumn={};
+
+				if(!this.showColumn[target])
+					this.showColumn[target]=value;
+				else
+					this.showColumn[target]+=","+value;
+			}else{
+				var arr=this.showColumn[target].split(",");
+				var newarr=_.reduce(arr,function (memo,i) {
+					if(i!=value)
+						memo.push(i);
+					return memo;
+				},[])
+				this.showColumn[target]=newarr.toString();
+			}
+		},
+		columnSave:function () {
+			if(this.showColumn){
+				var show=new AssetTypeShow(this.showColumn);
+				show.save();
+			}
 		}
 	})
 

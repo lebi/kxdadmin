@@ -1,0 +1,32 @@
+.title{
+	height: 170px;
+	background-color: #CC6633;
+	color: #eee;
+}
+.title-name{
+	height: 100%;
+	width: 50%;
+	text-align: right;
+	line-height: 170px;
+	font-size: 35px;
+	display: inline-block;
+}
+.title-detail{
+	display: inline-block;
+	padding-left: 40px;
+	vertical-align: middle;
+	margin-top: -20px;
+}
+.content{
+	margin: 0px 100px;
+}
+.content p{
+	margin-left: 30px;
+}
+.photo{
+	width: 31%;
+	margin: 0px 10px;
+	display: inline-block;
+	height: 250px;
+	background-color: #ccc;
+}

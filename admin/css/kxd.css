@@ -1,0 +1,245 @@
+body{
+	background: #EEEEEE;
+}
+.header{
+	height: 47px;
+	width: 100%;
+	top: 0px;
+	background-color: #555;
+	box-shadow: -1px -1px 1px 1px #333 inset;
+	z-index: 100;
+	position: fixed;
+	border-bottom: 7px solid #00ba8b;
+}
+.sidebar{
+	width: 250px;
+	background-color: #555;
+	height: 100%;
+	top:47px;
+	position: fixed;
+	box-shadow: -2px -1px 1px 1px #333 inset;
+}
+#navbar{
+	padding: 0px;
+	margin-top: 40px;
+}
+#navbar .active{
+	color: #fff;
+	border-bottom: 2px solid #fff;
+}
+#navbar li:hover{
+	color: #fff;
+	border-bottom: 2px solid #fff;	
+}
+#navbar li{
+	cursor: pointer;
+	color: #999;
+	font-size: 20px;
+	border-bottom: 2px solid #555;
+	padding: 5px 10px;
+	font-family: 'Microsoft YaHei'
+}
+.choose{
+	position: absolute;
+	right: 0px;
+	display: inline-block;
+	width: 0; 
+	height: 0; 
+	border-top: 10px solid transparent;
+	border-bottom: 10px solid transparent;   
+	border-right: 10px solid #555;
+}
+.active .choose{
+	border-right: 10px solid #eee;
+}
+.dropdownlist{
+	display: inline-block;
+	float: right;
+	margin-bottom: 0px;
+	height: 100%;
+}
+.dropdown-btn{
+	list-style: none;
+	display: inline-block;
+}
+.dropdown-btn >a{
+	line-height: 40px;
+	color: #fff;
+	text-decoration: none;
+	padding: 11px 14px;
+}
+.dropdown-btn >a:hover{
+	font-size: 15px;
+	background: #EEE;
+	color: #555;
+}
+.dropdown-menu{
+	min-width: 100px;
+	margin-top: 0px;
+	border-radius: 0;
+	box-shadow: none;
+	right: 0;
+	left: auto;
+	background-color: #555;
+	color: #fff;
+	border: 1px solid #555;
+	padding: 0px;
+}
+.dropdown-menu li{
+	padding: 7px 13px;
+	cursor: pointer;
+}
+.dropdown-menu li:hover{
+	background-color:#fff;
+	color: #555;
+}
+.tool-wrapper{
+	margin-left: 250px;
+}
+.tool{
+	width: 700px;
+	margin:100 auto;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.14);
+	background-color: #fff;
+	
+}
+.tool.tool-big{
+	width: 900px;
+}
+.tool-header{
+	font-size: 24px;
+	border-bottom: 1px solid #f2f2f2;
+	box-shadow: 0 1px 0px 0 rgba(0,0,0,.14);
+	padding:15 0 5 20;
+}
+.tool-content{
+	padding: 50px 20px;
+}
+.form-group .form-control{
+	border-radius: 1;
+}
+.buttonlist{
+	padding: 0px 15px;
+	float: right;
+	margin-top: 30px;
+}
+.control-botton.control-botton-2{
+	margin-left: 38px;
+	padding: 7px 110px;
+}
+
+.control-botton{
+	display: inline-block;
+	margin-left: 20px;
+	padding: 7px 67px;
+	text-align: center;
+	background-color: #555;
+	color: #fff;
+	cursor: pointer;
+	border: 2px solid #fff;
+	-webkit-transition: all .10s ease-out;
+}
+.control-botton:hover{
+	border: 2px solid #555;
+	background-color: #fff;
+	color: #555;
+}
+.file{
+	height: 170px;
+}
+.file-input-button{
+	vertical-align: middle;
+	text-align: center;
+	width: 200px;
+	float: left;
+	height: 100%;
+	background-color: #555;
+	color: #fff;
+	border: 2px solid #555;
+	display: inline-block;
+	cursor: pointer;
+}
+.file-input-button span{
+	font-size: 20px;
+	line-height: 170px;
+	font-weight: 700;
+}
+.file-input-button:hover{
+	border: 2px solid #555;
+	background-color: #fff;
+	color: #555;
+}
+.file-input[type=file]{
+	position: relative;
+	width: 200px;
+	height: 170px;
+	cursor: pointer;
+    opacity:0;
+    filter:alpha(opacity=0);
+}
+.file-control-botton{
+	display: inline-block;
+}
+.file-control-list{
+	float: left;
+	height: 100%;
+	display: inline-block;
+	margin:0px 30px;
+	vertical-align: middle;
+}
+.file-control-button{
+	margin: 20px 0px;
+	-webkit-transition: all .10s ease-out;
+	cursor: pointer;
+	padding: 15px 60px;
+	text-align: center;
+	background-color: #555;
+	color: #fff;
+	border: 2px solid #555;
+}
+.file-control-button:hover{
+	border: 2px solid #555;
+	background-color: #fff;
+	color: #555;
+}
+.file-result{
+	height: 100%;
+	display: inline-block;
+	float: left;
+	padding-top: 30px;
+	position: relative;
+}
+.file-output.file-output-small{
+	margin: 0px;
+	width: 390px;
+}
+.file-output{
+	overflow: auto;
+	float: left;
+	margin:0px 20px;
+	display: inline-block;
+	border: 2px solid #555;
+	width: 600px;
+	height: 100%;
+}
+.before-export{
+	height: 100%;
+	width: 100%;
+	background-color: #eee;
+	text-align: center;
+	font-weight: 600;
+	font-size: 20px;
+	vertical-align: middle;
+}
+.before-export span{
+	line-height: 170px;
+}
+.export-table{
+	margin: 10px 20px;
+}
+.export-table p{
+	margin-bottom: 3px;
+}
+.export-table a{
+	float: right;
+}

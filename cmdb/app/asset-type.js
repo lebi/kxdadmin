@@ -7,6 +7,7 @@ require.config({
 		bootstrap:'../../lib/bootstrap.min',
 		model:'../../js/base-model',
 		collection:'../../js/base-collection',
+		jqueryform:'../../lib/jquery.form.min',
 		AssetType:'model/AssetType',
 		AssetTypeList:'model/AssetTypeList',
 		Operation:'model/Operation',
@@ -15,14 +16,19 @@ require.config({
 	}
 })
 
-define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','Operation','OperationList','AssetTypeProperty','bootstrap'],
-	function ($,_,Backbone,cookie,AssetType,AssetTypeList,Operation,OperationList,AssetTypeProperty,bootstrap) {
+define(['jquery','underscore','backbone','cookie','jqueryform','AssetType','AssetTypeList','Operation','OperationList','AssetTypeProperty','bootstrap'],
+	function ($,_,Backbone,cookie,jqueryform,AssetType,AssetTypeList,Operation,OperationList,AssetTypeProperty,bootstrap) {
 
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(3)).addClass('active');
 	});
 
 	var AssetTypeView=Backbone.View.extend({
+		events:{
+			'click #export':'export',
+			'click #import':'import',
+			'change #upload>input':'upload'
+		},
 		template:_.template($('#property-temp').html()),
 		el:$('.content-wrapper'),
 		initialize:function () {
@@ -37,6 +43,36 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 			console.log(this.collection);
 			this.$el.empty();
 			this.$el.append(this.template({collection:this.collection}));
+		},
+		export:function () {
+			window.open("/cmdbAPI/type/export");
+		},
+		import:function () {
+			$('#upload input').click();
+		},
+		upload:function () {
+			if(!$('#upload input').val())
+				return;
+			$('.hint',this.$el).html(" <i class='icon-spin icon-spinner'></i>正在导入");
+			// $("#import").after("<span class='loading'> <i class='icon-spin icon-spinner'></i>正在导入</span>")
+			$('#upload').ajaxSubmit({
+				timeout : 60*1000,
+				success:function () {
+					$('.hint',this.$el).html(" <i class='icon-ok'></i>导入成功</span>");
+					setTimeout(function () {
+						$('.hint',this.$el).html(" 继续导入");
+					},1000)
+					$('#upload input').val('');
+				},
+				error:function (result) {
+					$('.hint',this.$el).html(" <i class='icon-remove-sign'></i>导入失败");
+					alert(result.responseJSON.errorMsg);
+					setTimeout(function () {
+						$('.hint',this.$el).html(" 重新选择文件");
+					},1000)
+					$('#upload input').val('');
+				}
+			})
 		}
 	})
 
@@ -51,7 +87,7 @@ define(['jquery','underscore','backbone','cookie','AssetType','AssetTypeList','O
 			'change input[name=type-name]':'bindName',
 			'change input[name=type-code]':'bindCode',
 			'dblclick .children':'addOp',
-			'click #save':'save'
+			'click #save':'save',
 		},
 		template:_.template($('#property-edit-temp').html()),
 		el:$('.content-wrapper'),
