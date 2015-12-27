@@ -1,6 +1,6 @@
 require.config({
 	paths:{
-		jquery:'../../lib/jquery-2.1.4.min',
+		jquery:'../../lib/jquery-1.11.3.min',
 		underscore:'../../lib/underscore-min',
 		backbone:'../../lib/backbone',
 		cookie:'../../lib/jquery.cookie',
@@ -15,20 +15,22 @@ require.config({
 		Asset:'model/Asset',
 		AssetList:'model/AssetList',
 		AssetView:'AssetView',
-		AssetTypeShow:'model/AssetTypeShow'
+		AssetTypeShow:'model/AssetTypeShow',
+		ColumnMap:'model/ColumnMap'
 	}
 })
 
-define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','AssetType','AssetTypeList','Asset','AssetList','UnitList','AssetView','AssetTypeShow'],
-	function ($,_,Backbone,cookie,bootstrap,jqueryform,AssetType,AssetTypeList,Asset,AssetList,UnitList,AssetView,AssetTypeShow) {
+define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','AssetType','AssetTypeList','Asset','AssetList','UnitList','AssetView','AssetTypeShow','ColumnMap'],
+	function ($,_,Backbone,cookie,bootstrap,jqueryform,AssetType,AssetTypeList,Asset,AssetList,UnitList,AssetView,AssetTypeShow,ColumnMap) {
 
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(1)).addClass('active');
 	});
 	var MainAssetView=AssetView.extend({
 		events:{
-			'change #asset select':'bindType',
-			'change #asset input[bind=true]':'bindValue',
+			'change #asset #type-select':'bindType',
+			'change #asset .matcher':'bindValue',
+			'change #asset #key-select':'bindKey',
 			'click .pagination a':'page',
 			'click .remove-asset':'remove',
 			'click #export':'export',
@@ -49,8 +51,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 
 			this.search={};
 			_.extend(this.search,Backbone.Events);
-			this.search.model={unit:'',type:0,page:1,
-					code:'',name:'',purpose:'',dutyofficer:''};
+			this.search.model={key:'name',type:0,page:1,matcher:'',extend:false};
 			this.search.on('change',this.doFetch,this);
 
 			this.showColumn=null;
@@ -61,12 +62,23 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				this.showColumn=this.typeList.get(pid).get('showColumn');
 			else
 				this.showColumn=null;
-			AssetView.prototype.bindType.call(this);
+			this.search.model={key:'name',type:pid,page:1,matcher:'',extend:false};
+			this.search.trigger('change');
+		},
+		bindValue:function(){
+			this.search.model.matcher=$(event.target).val();
+			this.search.trigger('change');
+		},
+		bindKey:function  (argument) {
+			this.search.model.key=$(event.target).val();
 		},
 		doFetch:function () {
+			console.log('fetch')
 			if(this.typeList.length==0)
 				this.typeList.fetch();
-			this.assetList.fetch({data:this.search.model});
+			this.assetList.fetch({
+				data:this.search.model
+			});
 		},
 		render:function () {
 			this.$el.empty()
@@ -74,8 +86,9 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				typeList:this.typeList,
 				search:this.search.model,
 				assetList:this.assetList,
-				columns:new Asset().keys(),
-				showColumn:this.showColumn
+				showColumn:this.showColumn,
+				columnMap:ColumnMap.map,
+				columns:_.keys(ColumnMap.priority)
 			}));
 		},
 		export:function () {
@@ -107,17 +120,38 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				}
 			})
 		},
+		/*
+		*	@Usage: 当选择展示的列改变时触发。
+		*			target:根据改变的扩展熟悉还是基础属性。
+		*			this.showColumn[target]:显示的属性集合字符串，由逗号分割。
+		*/
 		showColumn:function () {
 			var target=$(event.target).attr("target");
 			var value=$(event.target).val();
 			if($(event.target).prop('checked')){
 				if(!this.showColumn)
-					this.showColumn={};
+					this.showColumn={typeId:this.search.model.type};
 
 				if(!this.showColumn[target])
 					this.showColumn[target]=value;
-				else
-					this.showColumn[target]+=","+value;
+				else{
+					var arr=this.showColumn[target].split(',');
+					//p:这个属性的优先级，由ColumnMap.priority决定。
+					//需要判断p是否存在（即是否是基础属性）。
+					//根据优先级将p插入到列的集合中。
+					var p=ColumnMap.priority[value];
+					if(p){
+						for(var i=0;i<=arr.length;i++){
+							if(i==arr.length||!ColumnMap.priority[arr[i]]||p<ColumnMap.priority[arr[i]]){
+								arr.splice(i,0,value);
+								break;
+							}
+						}
+						this.showColumn[target]=arr.toString();
+					}else{
+						this.showColumn[target]+=","+value;
+					}
+				}			
 			}else{
 				var arr=this.showColumn[target].split(",");
 				var newarr=_.reduce(arr,function (memo,i) {
@@ -128,10 +162,18 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				this.showColumn[target]=newarr.toString();
 			}
 		},
+		/*
+		*	@Usage: 当选择保存展示的列时触发。
+		*/
 		columnSave:function () {
+			var self=this;
 			if(this.showColumn){
 				var show=new AssetTypeShow(this.showColumn);
-				show.save();
+				show.save().done(function () {
+					$('#select-show-modal').modal('hide');
+					$('.modal-backdrop').remove();
+					self.assetList.trigger('sync');
+				});
 			}
 		}
 	})
@@ -251,7 +293,6 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 			model.set('typeId',type.id);
 			model.set('type',type.name);
 		},
-
 		unitShow:function () {
 			AssetRouter.unit.showView(this.asset);
 		}
@@ -382,7 +423,8 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 			'':'info',
 			'detail':'detail',
 			'edit':'edit',
-			'add':'add'
+			'add':'add',
+			'export':'export'
 		},
 		detail:function (id) {
 			if(!AssetRouter.detail){
@@ -404,6 +446,8 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				AssetRouter.add=new AssetAddView();
 			}
 			AssetRouter.add.changeModel();
+		},
+		export:function () {
 		}
 	})
 	AssetRouter.asset=new MainAssetView();

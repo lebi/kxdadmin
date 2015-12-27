@@ -27,9 +27,9 @@
 							  	<div class="form-group">
 							    	<label class="col-sm-1 control-label">资产类型</label>
 							    	<div class="col-sm-5">
-							      		<select class="form-control">
+							      		<select class="form-control" id="type-select">
 							      			<option value="0">所有类型</option>
-							      			<%typeList.each(function (type) {
+							      			<%	typeList.each(function (type) {
 							      				if(type.get('id')==search.type){%>
 							      					<option value="<%=type.get('id')%>" selected="selected"><%=type.get('name')%></option>
 							      				<%}else{%>
@@ -41,7 +41,7 @@
 							    	<div class="col-sm-3">
 							    		<a href="asset-type.html" class="btn btn-default">类型管理</a>
 										<a href="#add" class="btn btn-default">添加资产</a>
-										<a class="btn btn-primary" data-toggle="modal" data-target="#select-show-modal">资产视图</a>
+										<a class="btn btn-warning" data-toggle="modal" data-target="#select-show-modal">资产视图</a>
 							    	</div>
 							    	<div class="export">
 							    		<form action="/cmdbAPI/asset/import" method="post" enctype="multipart/form-data" id="upload">
@@ -50,6 +50,35 @@
 							    		<a href="#" class="btn btn-success" id="export">导出资产</a>
 							    		<a href="#" class="btn btn-success" id="import">导入资产</a>
 							    		<span class="hint">未选择文件</span>
+							    	</div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-1 control-label">搜索</label>
+							    	<div class="col-sm-5">
+							    		<input class="form-control matcher" value="<%=search.matcher%>">
+							    	</div>
+							    	<div class="col-sm-3">
+							    		<select class="form-control" id="key-select">
+							    			<%_.each(columns,function (col) {
+							      				if(col==search.key){%>
+							    					<option value="<%=col%>" selected='selected'><%=columnMap[col]%></option>
+							    				<%}else{%>
+							    					<option value="<%=col%>"><%=columnMap[col]%></option>
+							    				<%}%>
+							    			<%})%>
+						    				<%if(search.type!=0){
+						    					_.each(typeList.get(search.type).get('properties'),function (p) {%>
+								      				<%if(p.name==search.key){%>
+								    					<option value="<%=p.name%>" selected='selected'><%=p.name%></option>
+								    				<%}else{%>
+								    					<option value="<%=p.name%>"><%=p.name%></option>
+								    				<%}%>
+						    				<%	})
+						    				}%>
+							    		</select>
+							    	</div>
+							    	<div class="col-sm-2">
+							    		<a href="#" class="btn btn-warning">搜索</a>
 							    	</div>
 							  	</div>
 							</div>
@@ -68,14 +97,7 @@
 												<th><span>删除</span></th>
 											<%}else{%>
 												<%_.each(basic,function (b) {%>
-													<% 	var col=b;
-														if(b=="name")
-															col="资产名";
-														else if(b=="unit")
-															col="所属单位";
-														else if(b=="code")
-															col="资产序号";
-													%>
+													<% 	var col=columnMap[b]?columnMap[b]:b;%>
 													<th><span><%=col%></span></th>
 												<%})%>
 												<%_.each(type.get('properties'),function (p) {%>
@@ -89,7 +111,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr>
+										<!--<tr>
 											<%if(basic.length==0){%>
 												<td><input name="id" value="<%=search.id%>" bind="true"></td>
 												<td><input name="name" value="<%=search.name%>" bind="true"></td>
@@ -107,7 +129,7 @@
 													<%}%>
 												<%})%>
 											<%}%>
-										</tr>
+										</tr>-->
 										<%assetList.each(function (asset) {%>
 										<tr>
 											<%if(basic.length==0){%>
@@ -174,10 +196,7 @@
 											<h5>基础属性</h5>
 											<div class="checkbox" >
 												<div class="row">
-													<%_.each(columns,function (col) {
-														if(col=='properties'||col=='typeDetail'||col=='typeId'||col=='unitId')
-															return;
-														%>
+													<%_.each(columns,function (col) {%>
 														<div class="col-sm-5">
 															<label>
 																<input type="checkbox" <%=basic.indexOf(col)>=0?'checked':''%> value="<%=col%>" target="basic"> <%=col%>
