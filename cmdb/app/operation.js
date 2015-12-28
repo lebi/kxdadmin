@@ -225,6 +225,13 @@ define(['jquery','underscore','backbone','cookie','Operation','OperationList','b
 					})
 				},1000);
 			})
+			.fail(function () {
+				dom.after(" <span id='save-hint' class='fail'> <i class='icon-remove'></i> 保存失败</span>");
+				setTimeout(function () {
+					$('#save-hint').remove();
+				},1500);
+				
+			})
 		}
 	})
 

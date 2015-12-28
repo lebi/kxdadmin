@@ -4,14 +4,26 @@ define(['AssetTypeList','Asset','AssetList'],
 		initialize:function (unitDetail) {
 		},
 		bindType:function () {
-			this.search.model.type=$(event.target).val();
+			var pid=$(event.target).val();
+			if(pid>0)
+				this.showColumn=this.typeList.get(pid).get('showColumn');
+			else
+				this.showColumn=null;
+			this.search.model.key='name';
+			this.search.model.type=pid;
 			this.search.model.page=1;
+			this.search.model.matcher='';
+			this.search.model.extend=false;
 			this.search.trigger('change');
 		},
-		bindValue:function () {
-			var name=$(event.target).attr('name');
-			this.search.model[name]=$(event.target).val();
-			this.search.model.page=1;
+		bindValue:function(){
+			this.search.model.matcher=$(event.target).val();
+			this.search.trigger('change');
+		},
+		bindKey:function  (argument) {
+			var extend=parseInt($(event.target).children('option:selected').attr('extend'));
+			this.search.model.extend=extend?true:false;
+			this.search.model.key=$(event.target).val();
 			this.search.trigger('change');
 		},
 		doFetch:function () {

@@ -3,6 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link href="../css/bootstrap.min.css" rel="stylesheet" />
 		<link href="../css/font-awesome.min.css" rel="stylesheet" />
+		<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 		<link href="asset.css" rel="stylesheet" />
 	</head>
 	<body>
@@ -59,26 +60,22 @@
 							    	</div>
 							    	<div class="col-sm-3">
 							    		<select class="form-control" id="key-select">
-							    			<%_.each(columns,function (col) {
-							      				if(col==search.key){%>
-							    					<option value="<%=col%>" selected='selected'><%=columnMap[col]%></option>
-							    				<%}else{%>
-							    					<option value="<%=col%>"><%=columnMap[col]%></option>
-							    				<%}%>
+							    			<%_.each(columns,function (col) {%>
+							    				<%if(col=='type') return;%>
+							    				<% var select='';
+							      				if(col==search.key)
+							      					select='selected';%>
+							    				<option value="<%=col%>" <%=select%> extend='0'><%=columnMap[col]%></option>
 							    			<%})%>
-						    				<%if(search.type!=0){
-						    					_.each(typeList.get(search.type).get('properties'),function (p) {%>
-								      				<%if(p.name==search.key){%>
-								    					<option value="<%=p.name%>" selected='selected'><%=p.name%></option>
-								    				<%}else{%>
-								    					<option value="<%=p.name%>"><%=p.name%></option>
-								    				<%}%>
-						    				<%	})
-						    				}%>
+						    				<%if(search.type!=0){ %>
+						    					<%_.each(typeList.get(search.type).get('properties'),function (p) {%>
+								    				<% var select='';
+								      				if(p.name==search.key)
+								      					select='selected';%>
+									    			<option value="<%=p.name%>" <%=select%> extend='1'><%=p.name%></option>
+						    				<%	})%>
+						    				<%}%>
 							    		</select>
-							    	</div>
-							    	<div class="col-sm-2">
-							    		<a href="#" class="btn btn-warning">搜索</a>
 							    	</div>
 							  	</div>
 							</div>
@@ -86,15 +83,10 @@
 								<table class="table table-striped">
 									<thead>
 										<tr>
-											<%if(basic.length==0){%>
-												<th><span>#</span></th>
-												<th><span>资产名</span></th>
-												<th><span>资产序号</span></th>
-												<th><span>资产用途</span></th>
-												<th><span>所属单位</span></th>
-												<th><span>责任人</span></th>
-												<th><span>详情</span></th>
-												<th><span>删除</span></th>
+											<%if(basic.length==0&&extend.length==0){%>
+												<%_.each(defaults,function (col) {%>
+													<th><span><%=columnMap[col]%></span></th>
+												<%})%>
 											<%}else{%>
 												<%_.each(basic,function (b) {%>
 													<% 	var col=columnMap[b]?columnMap[b]:b;%>
@@ -105,40 +97,18 @@
 														<th><span><%=p.name%></span></th>
 													<%}%>
 												<%})%>
+											<%}%>
 												<th><span>详情</span></th>
 												<th><span>删除</span></th>
-											<%}%>
 										</tr>
 									</thead>
 									<tbody>
-										<!--<tr>
-											<%if(basic.length==0){%>
-												<td><input name="id" value="<%=search.id%>" bind="true"></td>
-												<td><input name="name" value="<%=search.name%>" bind="true"></td>
-												<td><input name="code" value="<%=search.code%>" bind="true"></td>
-												<td><input name="purpose" value="<%=search.purpose%>" bind="true"></td>
-												<td><input name="unit"  value="<%=search.unit%>" bind="true"></td>
-												<td><input name="dutyofficer"  value="<%=search.dutyofficer%>" bind="true"></td>
-											<%}else{%>
-												<%_.each(basic,function (b) {%>
-													<td><input name="<%=b%>" value="<%=search[b]%>" bind="true"></td>
-												<%})%>
-												<%_.each(type.get('properties'),function (p) {%>
-													<%	if(extend.indexOf(p.id.toString())>=0){%>
-														<td><input name="<%=p.name%>" value="<%=search[p.name]%>" bind="true"></td>
-													<%}%>
-												<%})%>
-											<%}%>
-										</tr>-->
 										<%assetList.each(function (asset) {%>
 										<tr>
-											<%if(basic.length==0){%>
-												<td><span><%=asset.get('id')%></span></td>
-												<td><span><%=asset.get('name')%></span></td>
-												<td><span><%=asset.get('code')%></span></td>
-												<td><span><%=asset.get('purpose')%></span></td>
-												<td><span><%=asset.get('unit')%></span></td>
-												<td><span><%=asset.get('dutyofficer')%></span></td>
+											<%if(basic.length==0&&extend.length==0){%>
+												<%_.each(defaults,function (col) {%>
+													<td><span><%=asset.get(col)%></span></td>
+												<%})%>
 											<%}else{%>
 												<%_.each(basic,function (b) {%>
 													<td><span><%=asset.get(b)%></span></td>
@@ -357,15 +327,15 @@
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-3 control-label">购入时间</label>
-							      	<div class="col-sm-6">
-										<input class="form-control" value="<%=asset.purchaseTime%>" name="purchaseTime">
-							      	</div>
+							    	<div class="col-sm-6">
+							    		<input size="16" readonly class="form_datetime form-control" name="purchaseTime" value="<%=asset.purchaseTime%>">
+							    	</div>
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-3 control-label">上架时间</label>
-							      	<div class="col-sm-6">
-										<input class="form-control" value="<%=asset.applytime%>" name="applytime">
-							      	</div>
+							    	<div class="col-sm-6">
+							    		<input size="16" readonly class="form_datetime form-control" name="applyTime" value="<%=asset.applyTime%>">
+							    	</div>
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-3 control-label">管理IP地址</label>
@@ -479,15 +449,15 @@
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-3 control-label">购入时间</label>
-							      	<div class="col-sm-6">
-										<input class="form-control" value="<%=asset.purchaseTime%>" name="purchaseTime">
-							      	</div>
+							    	<div class="col-sm-6">
+							    		<input size="16" readonly class="form_datetime form-control" name="purchaseTime" value="<%=asset.purchaseTime%>">
+							    	</div>
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-3 control-label">上架时间</label>
-							      	<div class="col-sm-6">
-										<input class="form-control" value="<%=asset.applytime%>" name="applytime">
-							      	</div>
+							    	<div class="col-sm-6">
+							    		<input size="16" readonly class="form_datetime form-control" name="applyTime" value="<%=asset.applyTime%>">
+							    	</div>
 							  	</div>
 							  	<div class="form-group">
 							    	<label class="col-sm-3 control-label">管理IP地址</label>
@@ -543,7 +513,7 @@
 							    	</div>
 							  	</div>
 							  	<div class="form-group">
-							    	<div class="col-sm-offset-3 col-sm-2">
+							    	<div class="col-sm-offset-3 col-sm-5">
 							    		<button class="btn btn-default" id="save">保存</button>
 							    	</div>
 							  	</div>

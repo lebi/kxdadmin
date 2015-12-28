@@ -150,7 +150,7 @@ body::-webkit-scrollbar {
 	float: right;
 	padding-right: 10px;
 }
-.dropdown-menu{
+.unit-li .dropdown-menu{
 	background: rgba(85,85,85,0.8);
 	min-width: 120px;
 }
@@ -221,4 +221,13 @@ body::-webkit-scrollbar {
 .href:hover{
 	text-decoration: underline;
 	color: #ccc;
+}
+#save-hint.fail{
+	color: red;
+}
+.datetimepicker table{
+	font-size: 14px;
+}
+.datetimepicker span{
+	color: #555;
 }

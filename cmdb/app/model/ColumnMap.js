@@ -5,12 +5,10 @@
 define([],function () {
 	var map={
 		id:'#',
-		unitId:'单位ID',
-		typeId:'类型ID',
 		name:'资产名',
+		code:'序号',
 		unit:'所属单位',
 		type:'类型',
-		code:'编号',
 		manufacturer:'生产商',
 		purpose:'用途',
 		dutyofficer:'负责人',
@@ -25,9 +23,8 @@ define([],function () {
 	var priority={
 		id:1,
 		name:2,
-		unit:4,
-		type:5,
 		code:3,
+		unit:4,
 		manufacturer:8,
 		purpose:9,
 		dutyofficer:10,
@@ -38,8 +35,19 @@ define([],function () {
 		serverRoom:15,
 		bracketId:16
 	}
+
+	var defaults={
+		id:1,
+		name:1,
+		code:1,
+		unit:1,
+		dutyofficer:1,
+		purpose:1,
+		type:1
+	}
 	return {
 		map:map,
-		priority:priority
+		priority:priority,
+		defaults:defaults
 	}
 })

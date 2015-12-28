@@ -9,6 +9,7 @@
 	height: 100%;
 	width: 200px;
 	float: left;
+	padding-top: 10px;
 }
 .unit-nav ul{
 	padding-left: 10px;
@@ -88,4 +89,7 @@
 	padding: 40px 0px;
 	max-width: 750px;
 	margin: auto;
+}
+.form-group {
+	margin-bottom: 5px;
 }

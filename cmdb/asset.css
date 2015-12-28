@@ -81,3 +81,6 @@ h5{
 	width: 275px;
 	float: right;
 }
+.input-group-addon{
+	background-color: transparent;
+}

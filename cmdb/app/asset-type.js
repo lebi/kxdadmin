@@ -33,13 +33,17 @@ define(['jquery','underscore','backbone','cookie','jqueryform','AssetType','Asse
 		el:$('.content-wrapper'),
 		initialize:function () {
 			this.collection=new AssetTypeList();
-			this.collection.on('sync',this.render,this);
-			this.collection.fetch();
+			this.collection.on('read',this.render,this);
+			var list=this.collection;
+			this.collection.fetch().done(function () {
+				list.trigger('read');
+			});
 
 			this.operations=new OperationList();
 			this.operations.fetch();
 		},
 		render:function () {
+			console.log('render');
 			console.log(this.collection);
 			this.$el.empty();
 			this.$el.append(this.template({collection:this.collection}));
@@ -161,14 +165,24 @@ define(['jquery','underscore','backbone','cookie','jqueryform','AssetType','Asse
 			var dom=$(event.target);
 			var flag=this.checkTypeId();
 			var self=this;
-			this.assetType.save().done(function () {
+			this.assetType.save()
+			.done(function () {
 				$(dom).after(" <span id='save-hint'> <i class='icon-ok-sign'></i> 保存成功</span>");
-				if(!flag)
+				if(!flag){
 					assetView.collection.add(self.assetType);
+					console.log('add');
+				}
+				console.log('success');	
 				setTimeout(function () {
 					$('#save-hint').remove();
 				},1000);
-			});
+			})
+			.fail(function () {
+				$(dom).after(" <span id='save-hint' class='fail'> <i class='icon-remove'></i> 保存失败</span>");
+				setTimeout(function () {
+					$('#save-hint').remove();
+				},1000);
+			})
 		},
 		checkExtend:function (name,code,id) {
 			if(name==''||code==''){
@@ -265,6 +279,9 @@ define(['jquery','underscore','backbone','cookie','jqueryform','AssetType','Asse
 				$('.modal-backdrop').remove();
 				$('#edit-modal').modal('hide');
 			})
+			.fail(function () {
+				alert('保存失败，检查属性编码');
+			})
 		},
 		addOp:function () {
 			if(!this.checkTypeId()){
@@ -331,8 +348,6 @@ define(['jquery','underscore','backbone','cookie','jqueryform','AssetType','Asse
 				window.location.href="#";
 				return;
 			}
-				
-
 			if(!edit)
 				edit=new AssetEditView();
 			

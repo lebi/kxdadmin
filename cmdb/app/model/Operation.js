@@ -7,7 +7,8 @@ define(['jquery','underscore','backbone','model'],function ($,_,Backbone,MyModel
 			typeId:null,
 			id:null,
 			definition:'',
-			description:''
+			description:'',
+			code:''
 		},
 		urlRoot:'/cmdbAPI/ops'
 	})

@@ -16,12 +16,23 @@ require.config({
 		AssetList:'model/AssetList',
 		AssetView:'AssetView',
 		AssetTypeShow:'model/AssetTypeShow',
-		ColumnMap:'model/ColumnMap'
-	}
+		ColumnMap:'model/ColumnMap',
+		TimePicker:'../../lib/bootstrap-datetimepicker'
+	},
+	shim : {  
+    	bootstrap : {  
+        	deps : ['jquery'],  
+            exports :'bs'  
+    	},
+    	TimePicker:{
+        	deps : ['bootstrap'],  
+            exports :'$.fn.datepicker'
+    	}  
+    } 
 })
 
-define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','AssetType','AssetTypeList','Asset','AssetList','UnitList','AssetView','AssetTypeShow','ColumnMap'],
-	function ($,_,Backbone,cookie,bootstrap,jqueryform,AssetType,AssetTypeList,Asset,AssetList,UnitList,AssetView,AssetTypeShow,ColumnMap) {
+define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','AssetType','AssetTypeList','Asset','AssetList','UnitList','AssetView','AssetTypeShow','ColumnMap','TimePicker'],
+	function ($,_,Backbone,cookie,bootstrap,jqueryform,AssetType,AssetTypeList,Asset,AssetList,UnitList,AssetView,AssetTypeShow,ColumnMap,TimePicker) {
 
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(1)).addClass('active');
@@ -56,30 +67,21 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 
 			this.showColumn=null;
 		},
-		bindType:function () {
-			var pid=$(event.target).val();
-			if(pid>0)
-				this.showColumn=this.typeList.get(pid).get('showColumn');
-			else
-				this.showColumn=null;
-			this.search.model={key:'name',type:pid,page:1,matcher:'',extend:false};
-			this.search.trigger('change');
-		},
-		bindValue:function(){
-			this.search.model.matcher=$(event.target).val();
-			this.search.trigger('change');
-		},
-		bindKey:function  (argument) {
-			this.search.model.key=$(event.target).val();
-		},
 		doFetch:function () {
 			console.log('fetch')
 			if(this.typeList.length==0)
 				this.typeList.fetch();
-			this.assetList.fetch({
-				data:this.search.model
-			});
+			this.assetList.fetch({data:this.search.model});
 		},
+		/*
+		*	@typeList:资产类型列表。
+		*	@search:搜索的参数。选择的资产类型，页码，选择搜索的列，搜索关键字。
+		*	@assetList:匹配到的资产列表。
+		*	@showColumn:选择的资产类型要显示哪些列。
+		*	@columnMap:资产类型某个属性的中文映射，便于显示。
+		*	@columns:资产需要展示的基础属性。
+		*	@defaults:当资产类型没有配置需要展示的列时，默认显示的列。
+		*/
 		render:function () {
 			this.$el.empty()
 			this.$el.append(this.template({
@@ -88,7 +90,8 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				assetList:this.assetList,
 				showColumn:this.showColumn,
 				columnMap:ColumnMap.map,
-				columns:_.keys(ColumnMap.priority)
+				columns:_.keys(ColumnMap.priority),
+				defaults:_.keys(ColumnMap.defaults)
 			}));
 		},
 		export:function () {
@@ -169,10 +172,12 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 			var self=this;
 			if(this.showColumn){
 				var show=new AssetTypeShow(this.showColumn);
+				console.log(show);
 				show.save().done(function () {
 					$('#select-show-modal').modal('hide');
 					$('.modal-backdrop').remove();
-					self.assetList.trigger('sync');
+					self.showColumn=show.toJSON();
+					self.typeList.fetch();
 				});
 			}
 		}
@@ -225,8 +230,26 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				asset:this.asset.attributes,
 				typeList:this.typeList
 			}));
+			$('.datetimepicker').remove();
+			$(".form_datetime").datetimepicker({
+	        	format: "yyyy-mm-dd",
+	        	autoclose:true,
+	        	startView: 4, 
+	        	minView: 2,
+	        });
+
 		},
+		/*
+		*	当使用timepicker选择日期时，event是点击事件。
+		*/
 		bindValue:function () {
+			if(event.type=='click'){
+				var apply=$('input[name=applyTime]',this.$el).val();
+				var purchase=$('input[name=purchaseTime]',this.$el).val()
+				this.asset.set('applyTime',apply?apply:null);
+				this.asset.set('purchaseTime',purchase?purchase:null);
+				return;
+			}
 			var name=$(event.target).attr('name');
 			var value=$(event.target).val();
 			var keys=this.asset.keys();
@@ -240,7 +263,6 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 						extend[i].value=value;
 				}
 			}
-			console.log(this.asset);
 		},
 		bindType:function () {
 			var tid=$(event.target).val();
@@ -327,6 +349,13 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				asset:this.asset.attributes,
 				typeList:this.typeList
 			}));
+			$('.datetimepicker').remove();
+			$(".form_datetime").datetimepicker({
+	        	format: "yyyy-mm-dd",
+	        	autoclose:true,
+	        	startView: 4, 
+	        	minView: 2,
+	        });
 		},
 		bindType:function(){
 			var tid=$(event.target).val();
@@ -392,7 +421,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','jqueryform','Asse
 				parent.addClass('active');
 		},
 		choose:function () {
-			this.uid=parseInt($(event.target).attr('uid'));
+			this.uid=parseInt($(event.target).closest('a').attr('uid'));
 			$('.unit-li>a.choose').removeClass('choose');
 			$(event.target).closest('a').addClass('choose');
 		},

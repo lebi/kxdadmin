@@ -13,19 +13,24 @@ require.config({
 		AssetTypeList:'model/AssetTypeList',
 		Asset:'model/Asset',
 		AssetList:'model/AssetList',
-		AssetView:'AssetView'
+		AssetView:'AssetView',
+		ColumnMap:'model/ColumnMap',
+		TimePicker:'../../lib/bootstrap-datetimepicker.min'
 	},
 	shim : {  
     	bootstrap : {  
         	deps : ['jquery'],  
             exports :'bs'  
-    	}  
+    	},
+    	TimePicker : {  
+        	deps : ['bootstrap'],  
+            exports :'bs'
+    	}
     } 
 })
 
-define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList','AssetTypeList','Asset','AssetList','AssetView'],
-	function ($,_,Backbone,cookie,bootstrap,Unit,UnitList,AssetTypeList,Asset,AssetList,AssetView) {
-
+define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList','AssetTypeList','Asset','AssetList','AssetView','ColumnMap'],
+	function ($,_,Backbone,cookie,bootstrap,Unit,UnitList,AssetTypeList,Asset,AssetList,AssetView,ColumnMap) {
 	$('.nav-menu').load('nav.html',function () {
 		$($('.nav-menu a').get(0)).addClass('active');
 	});
@@ -295,10 +300,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 	*/
 	var UnitAssetView=AssetView.extend({
 		events:{
-			'change #asset select':'bindType',
-			'change #asset input':'bindValue',
 			'click .pagination a':'page',
-			'click .remove-asset':'remove'
+			'click .remove-asset':'remove',
+			'change #asset #type-select':'bindType',
+			'change #asset .matcher':'bindValue',
+			'change #asset #key-select':'bindKey',
 		},
 		el:$('.manage-wrapper'),
 		template:_.template($('#asset-temp').html()),
@@ -315,10 +321,10 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 
 			this.search={};
 			_.extend(this.search,Backbone.Events);
-			this.search.model={unit:unitDetail.get('id'),type:0,page:1,
-					code:'',name:'',purpose:'',dutyofficer:''};
+			this.search.model={key:'name',type:0,page:1,matcher:'',extend:false,unit:unitDetail.get('id')};
 			this.search.on('change',this.doFetch,this);
 
+			this.showColumn=null;
 			this.doFetch();
 		},
 		doChange:function () {
@@ -337,7 +343,11 @@ define(['jquery','underscore','backbone','cookie','bootstrap','Unit','UnitList',
 				typeList:this.typeList,
 				search:this.search.model,
 				assetList:this.assetList,
-				unit:this.unitDetail
+				unit:this.unitDetail,
+				showColumn:this.showColumn,
+				columnMap:ColumnMap.map,
+				columns:_.keys(ColumnMap.priority),
+				defaults:_.keys(ColumnMap.defaults)
 			}));
 		}
 		// remove:function () {
