@@ -1,0 +1,303 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="../css/bootstrap.min.css" rel="stylesheet" />
+		<link href="../css/font-awesome.min.css" rel="stylesheet" />
+		<link href="unit.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="background">
+		</div>
+		<div class="wrapper">
+			<nav class='nav-menu board'>
+			</nav>
+			<div class="content-wrapper">
+				<nav class="unit-nav board">
+				</nav>
+					<script type="text/javascript">
+						function parse (tree) {
+							var template=_.template($('#unit-nav-temp').html());
+							return template({trees:tree.children,parent:tree.id});
+						}
+					</script>
+
+					<script type="text/template" id="unit-nav-temp">
+						<%_.each(trees,function (tree) {%>
+							<ul>
+								<li class='unit-li active'>
+								<%if(tree.children.length>0){%>
+									<a href="#detail?<%=tree.id%>" class="parent" uid="<%=tree.id%>">
+										<i class="tree-icon">
+											<i class="icon-caret-down"></i>
+											<i class="icon-caret-right"></i>
+										</i>
+										<span><%=tree.name%></span>
+									</a>
+								<%}else{%>
+									<a href="#detail?<%=tree.id%>" class="children" uid="<%=tree.id%>">
+										<span><%=tree.name%></span>
+									</a>
+								<%}%>
+									<div class="dropdown">
+										<a class="icon-cogs dropdown-toggle" data-toggle="dropdown"></a>
+										<ul class="version-dropdown dropdown-menu">
+					  						<a href="#add?<%=parent%>"><li >添加同级单位</li></a>
+					  						<a href="#add?<%=tree.id%>"><li >添加子单位</li></a>
+					  						<a class="remove" uid="<%=tree.id%>"><li >删除</li></a>
+					  					</ul>
+					  				</div>
+									<%=parse(tree)%>
+								</li>
+							</ul>
+						<%})%>
+					</script>
+				<div class="unit-content">
+					<div class="detail-wrapper">
+					</div>
+					<script type="text/template" id="unit-detail-temp">
+						<div class="unit-detail board">
+							<div class="col-lg-10">
+								<div class="col-md-4"><span>单位名：<%=detail.get('name')%></span></div>
+								<div class="col-md-4"><span>单位编码：<%=detail.get('code')%></span></div>
+								<div class="col-md-4"><span>联系电话：<%=detail.get('phone')%></span></div>
+								<div class="col-md-4"><span>单位负责人：<%=detail.get('dutyofficer')%></span></div>
+								<%_.each(detail.get('extend'),function (data) {%>
+									<div class="col-md-4"><span><%=data.name%>：<%=data.value%></span></div>
+								<%})%>
+							</div>
+							<div class="col-lg-1 col-sm-12">
+								<a href="#edit?<%=detail.get('id')%>" class="btn btn-success">编辑信息</a>
+							</div>
+						</div>
+					</script>
+					<div class="manage-tab board">
+						<a href="#asset" manage='asset' class="active">资产管理</a><a href="#edit" manage='unit'>单位管理</a>
+					</div>
+					<div class="manage-content board">
+						<div class="manage-wrapper">
+ 							<script type="text/template" id="asset-temp">
+								<%	var type=typeList.get(search.type);
+									var basic=[];
+									var extend=[];
+									if(showColumn){
+										basic=showColumn.basic?showColumn.basic.split(','):[];
+										extend=showColumn.extend?showColumn.extend.split(','):[];
+									}
+								%>
+								<div id="asset">
+									<div class="form-horizontal">
+									  	<div class="form-group">
+									    	<label class="col-sm-2 control-label">资产类型</label>
+									    	<div class="col-sm-5">
+									      		<select class="form-control" id="type-select">
+									      			<option value="0">所有类型</option>
+									      			<%typeList.each(function (type) {
+									      				if(type.get('id')==search.type){%>
+									      					<option value="<%=type.get('id')%>" selected="selected"><%=type.get('name')%></option>
+									      				<%}else{%>
+									      					<option value="<%=type.get('id')%>"><%=type.get('name')%></option>
+									      				<%}%>
+									      			<%})%>
+									      		</select>
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+									    	<label class="col-sm-2 control-label">搜索</label>
+									    	<div class="col-sm-5">
+									    		<input class="form-control matcher" value="<%=search.matcher%>">
+									    	</div>
+									    	<div class="col-sm-3">
+									    		<select class="form-control" id="key-select">
+									    			<%_.each(columns,function (col) {%>
+									    				<% if(col=='unit') return;
+									    				var select='';
+									      				if(col==search.key)
+									      					select='selected';%>
+									    				<option value="<%=col%>" <%=select%> extend='0'><%=columnMap[col]%></option>
+									    			<%})%>
+								    				<%if(search.type!=0){ %>
+								    					<%_.each(typeList.get(search.type).get('properties'),function (p) {%>
+										    				<% var select='';
+										      				if(p.name==search.key)
+										      					select='selected';%>
+											    			<option value="<%=p.name%>" <%=select%> extend='1'><%=p.name%></option>
+								    				<%	})%>
+								    				<%}%>
+									    		</select>
+							    			</div>
+							  			</div>
+									</div>
+									<div class="manage-table">
+										<table class="table table-striped">
+											<thead>
+												<tr>
+													<%if(basic.length==0){%>
+														<%_.each(defaults,function (col) {%>
+															<th><span><%=columnMap[col]%></span></th>
+														<%})%>
+													<%}else{%>
+														<%_.each(basic,function (b) {%>
+															<% 	var col=columnMap[b]?columnMap[b]:b;%>
+															<th><span><%=col%></span></th>
+														<%})%>
+														<%_.each(type.get('properties'),function (p) {%>
+															<%	if(extend.indexOf(p.id.toString())>=0){%>
+																<th><span><%=p.name%></span></th>
+															<%}%>
+														<%})%>
+													<%}%>
+														<th><span>详情</span></th>
+														<th><span>删除</span></th>
+												</tr>
+											</thead>
+											<tbody>
+												<%assetList.each(function (asset) {%>
+													<tr>
+														<%if(basic.length==0){%>
+															<%_.each(defaults,function (col) {%>
+																<td><span><%=asset.get(col)%></span></td>
+															<%})%>
+														<%}else{%>
+															<%_.each(basic,function (b) {%>
+																<td><span><%=asset.get(b)%></span></td>
+															<%})%>
+															<%_.each(type.get('properties'),function (p) {%>
+																<%	if(extend.indexOf(p.id.toString())>=0){
+																		_.each(asset.get('properties'),function (data){
+																			if(data.pid==p.id){%>
+																				<td><span><%=data.value%></span></td>
+																			<%}
+																		})%>
+																<%}%>
+															<%})%>
+														<%}%>
+														<td><a class="href" href="asset.html#detail?<%=asset.get('id')%>">详情</a></td>
+														<td><a class="href remove-asset" aid="<%=asset.get('id')%>">删除</a></td>
+													</tr>
+												<%})%>
+											</tbody>
+										</table>
+									</div>
+									<nav class="pagination-nav">
+									  	<ul class="pagination">
+									  		<%var dis=search.page<=1?'disabled':''%>
+									    	<li class="<%=dis%>" name="prev">
+									      		<a aria-label="Previous" >
+									        		<span aria-hidden="true">&laquo;</span>
+									      		</a>
+									    	</li>
+									    	<%var offset=search.page-2>0?search.page-2:1;
+									    	var end=assetList.length<15?search.page:offset+4;
+									    	if(assetList.length<15&&end<=5) offset=1;
+									    	%>
+									    	<%for(var i=offset;i<=end;i++){%>
+									    		<li class="<%=search.page==i?'active':''%>"><a><%=i%></a></li>
+									    	<%}%>
+									  		<%dis=assetList.length<15?'disabled':''%>
+									    	<li name="next" class="<%=dis%>">
+										      	<a aria-label="Next" >
+											        <span aria-hidden="true">&raquo;</span>
+										      	</a>
+									    	</li>
+									  	</ul>
+									</nav>
+								</div>
+							</script>
+
+ 							<script type="text/template" id="unit-edit-temp">
+	 							<div class="unit-manage">
+									<div class="form-horizontal">
+									  	<div class="form-group">
+									    	<label class="col-sm-2 control-label">单位编码</label>
+									    	<div class="col-sm-10">
+									    	  	<input class="form-control" value="<%=detail.get('code')%>" name="code">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">单位名称</label>
+										    <div class="col-sm-10">
+											    <input class="form-control" value="<%=detail.get('name')%>" name="name">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">上级单位</label>
+										    <label class="col-sm-10 control-label label-content"><%=parent.get('name')%></label>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">上级单位ID</label>
+										    <label class="col-sm-10 control-label label-content"><%=parent.get('id')%></label>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">单位负责人</label>
+										    <div class="col-sm-10">
+											    <input class="form-control" value="<%=detail.get('dutyofficer')%>" name="dutyofficer">
+									    	</div>
+									  	</div>
+									  	<div class="form-group">
+										    <label class="col-sm-2 control-label">联系电话</label>
+										    <div class="col-sm-10">
+											    <input class="form-control" value="<%=detail.get('phone')%>" name="phone">
+									    	</div>
+									  	</div>
+									  	<%_.each(detail.get('extend'),function (ext) {%>
+										  	<div class="form-group">
+											    <label class="col-sm-2 control-label"><%=ext.name%></label>
+											    <div class="col-sm-10">
+												    <input class="form-control" value="<%=ext.value%>" name="<%=ext.name%>">
+										    	</div>
+										  	</div>
+									  	<%})%>
+									  	<div class="form-group">
+									    	<div class="col-sm-offset-2 col-sm-10">
+									    		<button type="button" class="btn btn-success" data-toggle="modal" data-target="#property-modal">添加新属性</button>
+									    	  	<button class="btn btn-default" id="save">保存</button>
+									    	</div>
+									  	</div>
+									</div>
+								</div>
+									<div class="modal fade" id="property-modal">
+									  	<div class="modal-dialog">
+										    <div class="modal-content">
+										      	<div class="modal-header">
+										        	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										        	<h4 class="modal-title">单位添加属性</h4>
+										      	</div>
+										      	<div class="modal-body">
+													<div class="form-horizontal">
+														<div class="form-group">
+															<label class="col-sm-2 control-label">属性名</label>
+															<div class="col-sm-10">
+																<input class="form-control" name="name" value="<%=this.propertyTemp.name%>">
+															</div>
+														</div>
+														<div class="form-group">
+															<label class="col-sm-2 control-label">属性说明</label>
+															<div class="col-sm-10">
+																<input class="form-control" name="description" value="<%=this.propertyTemp.description%>">
+															</div>
+														</div>
+														<div class="form-group">
+															<label class="col-sm-2 control-label">属性代码</label>
+															<div class="col-sm-10">
+																<input class="form-control" name="code" value="<%=this.propertyTemp.code%>">
+															</div>
+														</div>
+													</div>
+										      	</div>
+										      	<div class="modal-footer">
+										        	<button type="button" class="btn btn-warning" data-dismiss="modal">关闭</button>
+										        	<button type="button" class="btn btn-success" id="add-property">添加</button>
+										      	</div>
+										    </div>
+									 	</div>
+									</div>
+								</script>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="require.js" data-main="app/unitApp.js"></script>
+	</body>
+</html>

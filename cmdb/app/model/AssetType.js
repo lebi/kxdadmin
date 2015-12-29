@@ -1,4 +1,4 @@
-define(['underscore','backbone','model'],function (_,Backbone,MyModel) {
+define(['model'],function (MyModel) {
 	var AssetType=MyModel.extend({
 		defaults:{
 			name:null,
