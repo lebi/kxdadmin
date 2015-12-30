@@ -48,6 +48,7 @@ define(['jquery','underscore','backbone','Unit','UnitDetailView','UnitAssetView'
 			}
 			editView.setDetail(new Unit({parent:id}));
 		},
+		//将detail和assetView，editView绑定，detail改变，相应的assetView和editView都会改变。
 		detail:function  (id) {
 			if(!detailView){
 				if(!id){

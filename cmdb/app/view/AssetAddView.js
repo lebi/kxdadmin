@@ -1,5 +1,5 @@
-define(['jquery','underscore','backbone','AssetTypeList','Asset','AssetRouter','AssetType','AssetEditView'],
-	function ($,_,Backbone,AssetTypeList,Asset,AssetRouter,AssetType,AssetEditView) {
+define(['jquery','underscore','backbone','AssetTypeList','Asset','AssetType','AssetEditView'],
+	function ($,_,Backbone,AssetTypeList,Asset,AssetType,AssetEditView) {
 
 	/*
 	*	添加资产，编辑信息。
@@ -20,7 +20,6 @@ define(['jquery','underscore','backbone','AssetTypeList','Asset','AssetRouter','
 			this.typeList=new AssetTypeList();
 			this.typeList.on('sync',this.render,this);
 			this.typeList.fetch();
-
 		},
 		//由router调用，选择添加资产，创建新的资产模型
 		changeModel:function () {

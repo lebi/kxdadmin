@@ -7,26 +7,26 @@ define(['jquery','underscore','backbone','TypeEditView','TypeMainView'],
 			'edit':'edit'
 		},
 		view:function () {
-			if(assetView)
-				assetView.render();
+			if(typeView)
+				typeView.render();
 			else
-				assetView=new TypeMainView();
+				typeView=new TypeMainView();
 		},
 		edit:function (id) {
-			if(!assetView){
+			if(!typeView){
 				window.location.href="#";
 				return;
 			}
 			if(!edit)
-				edit=new TypeEditView(assetView.operations,assetView.collection);
+				edit=new TypeEditView(typeView.operations,typeView.collection);
 			
 			if(id)
-				edit.createView(assetView.collection.get(id));
+				edit.createView(typeView.collection.get(id));
 			else
 				edit.createView();
 		}
 	})
-	var assetView;
+	var typeView;
 	var edit;
 	return TypeRouter;
 })

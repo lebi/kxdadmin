@@ -16,6 +16,7 @@ define(['jquery','underscore','backbone','Asset'],
 			this.asset.fetch();
 		},
 		render:function () {
+			console.log('detail');
 			this.$el.empty()
 			this.$el.append(this.template({asset:this.asset.attributes}));
 		}

@@ -6,33 +6,35 @@ define(['jquery','underscore','backbone','MainAssetView','AssetDetailView','Unit
 			'detail':'detail',
 			'edit':'edit',
 			'add':'add',
-			'export':'export'
 		},
 		detail:function (id) {
-			if(!AssetRouter.detail){
-				AssetRouter.detail=new AssetDetailView();
+			if(!detail){
+				detail=new AssetDetailView();
 			}
-			AssetRouter.detail.changeModel(id);
+			detail.changeModel(id);
 		},
 		info:function () {
-			AssetRouter.asset.doFetch();
+			asset.doFetch();
 		},
 		edit:function (id) {
-			if(!AssetRouter.edit){
-				AssetRouter.edit=new AssetEditView();
+			if(!edit){
+				edit=new AssetEditView();
+				edit.setUnit(unit);
 			}
-			AssetRouter.edit.changeModel(id);
+			edit.changeModel(id);
 		},
 		add:function () {
-			if(!AssetRouter.add){
-				AssetRouter.add=new AssetAddView();
+			if(!add){
+				add=new AssetAddView();
+				add.setUnit(unit);
 			}
-			AssetRouter.add.changeModel();
-		},
-		export:function () {
+			add.changeModel();
 		}
 	})
-	AssetRouter.asset=new MainAssetView();
-	AssetRouter.unit=new UnitTreeView();
+	var asset=new MainAssetView();
+	var unit=new UnitTreeView();
+	var detail;
+	var add;
+	var edit;
 	return AssetRouter;
 })

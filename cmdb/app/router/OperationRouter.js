@@ -11,27 +11,27 @@ define(['jquery','underscore','backbone','OperationDetailView','OperationEditVie
 				window.location.href="#";
 				return;
 			}
-			if(!OperationRouter.detail)
-				OperationRouter.detail=new OperationDetailView();
-			OperationRouter.detail.refreshView(mainView.operationList.get(id),mainView);
+			if(!detail)
+				detail=new OperationDetailView();
+			detail.refreshView(mainView.operationList.get(id),mainView);
 		},
 		edit:function (id) {
 			if(!mainView){
 				window.location.href="#";
 				return;
 			}
-			if(!OperationRouter.edit)
-				OperationRouter.edit=new OperationEditView();
-			OperationRouter.edit.refreshView(mainView.operationList.get(id).clone(),mainView);
+			if(!edit)
+				edit=new OperationEditView();
+			edit.refreshView(mainView.operationList.get(id).clone(),mainView);
 		},
 		add:function (id) {
 			if(!mainView){
 				window.location.href="#";
 				return;
 			}
-			if(!OperationRouter.edit)
-				OperationRouter.edit=new OperationEditView();
-			OperationRouter.edit.refreshView(new Operation({typeId:id}),mainView);
+			if(!edit)
+				edit=new OperationEditView();
+			edit.refreshView(new Operation({typeId:id}),mainView);
 		}
 	})
 	var mainView=new OperationNavView()

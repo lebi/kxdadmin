@@ -1,6 +1,5 @@
-define(['require','jquery','underscore','backbone','AssetTypeList','Asset','AssetRouter','TimePicker'],
-	function (require,$,_,Backbone,AssetTypeList,Asset,AssetRouter,TimePicker) {
-		// console.log(new AssetRouter.AssetRouter());
+define(['require','jquery','underscore','backbone','AssetTypeList','Asset','TimePicker'],
+	function (require,$,_,Backbone,AssetTypeList,Asset,TimePicker) {
 	/*
 	*	编辑资产信息，可以选择单位和资产类型。
 	*/
@@ -25,6 +24,9 @@ define(['require','jquery','underscore','backbone','AssetTypeList','Asset','Asse
 			this.typeList.on('sync',this.render,this);
 			this.typeList.fetch();
 		},
+		setUnit:function (unitView) {
+			this.unitView=unitView;
+		},
 		//由router调用，当选择的资产改变时，更新资产模型
 		changeModel:function (id) {
 			var self=this;
@@ -34,7 +36,6 @@ define(['require','jquery','underscore','backbone','AssetTypeList','Asset','Asse
 			})
 		},
 		render:function () {
-			console.log(this.asset);
 			this.$el.empty()
 			this.$el.append(this.template({
 				asset:this.asset.attributes,
@@ -130,7 +131,7 @@ define(['require','jquery','underscore','backbone','AssetTypeList','Asset','Asse
 			model.set('type',type.name);
 		},
 		unitShow:function () {
-			require('AssetRouter').unit.showView(this.asset);
+			this.unitView.showView(this.asset);
 		}
 	})
 	return AssetEditView;
