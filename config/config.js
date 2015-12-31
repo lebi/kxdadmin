@@ -228,7 +228,7 @@ var BodyView=Backbone.View.extend({
 				stack.push(file);
 			}
 		})
-		console.log(this.fileList);
+		// console.log(this.fileList);
 		var temp=_.template($('#dir-list-temp').html());
 		$('#file-list').append(temp({dirs:this.fileList.at(0).get('children'),active:this.active,deep:0}));
 		$('#file-list').children('.dir-list').addClass('product-list');
@@ -285,7 +285,7 @@ var BodyView=Backbone.View.extend({
 	},
 	toggle:function () {
 		var target=$(event.target);
-		console.log(target);
+		// console.log(target);
 		if(!target.hasClass('dir-caret'))
 			return;
 		var product=$(event.target).closest('.dir');
@@ -550,8 +550,10 @@ BodyView.rightNav=null;
 *	@tips: 		if fetch log not found. this is new create file.
 */
 var RightNavView=Backbone.View.extend({
-
-	initialize:function (path,revision) {
+	el:$('.right-nav'),
+	initialize:function () {
+	},
+	createView:function (path,revision) {
 		this.path=path;
 		this.logList=new LogEntryCollection();
 		this.logList.on('myevent',this.render,this);
@@ -566,11 +568,11 @@ var RightNavView=Backbone.View.extend({
 	render:function () {
 		$('.right-nav').empty();
 		$('.right-nav').append(this.template({logList:this.logList}));
-		this.$el=$('.version-list');
 		this.delegateEvents();
 		this.hasCache();
 	},
 	chooseVersion:function () {
+		console.log('a');
 		var version=$(event.target);
 		var li=version.closest('.version-list>li');
 		if(li.hasClass('active'))return;
@@ -595,50 +597,43 @@ var RightNavView=Backbone.View.extend({
 
 var ComponentNavView=RightNavView.extend({
 	events:{
-		'click .version-item':'chooseVersion'
+		'click #comp-nav .version-item':'chooseVersion'
 	},
 	template:_.template($('#component-nav-temp').html()),
 	renderVersion:function (){
 		var id=$('.version-list>.active').attr('revision');
-			//console.log('render version');
+		//console.log('render version');
 		var revision=this.logList.get(id)
 		if(BodyView.wrapper)
 			BodyView.wrapper.remove();
 		BodyView.wrapper=new ComponentView(revision,this.path);
 	},
 	hasCache:function () {
-		// DBManager.manager.getAmbiguous(this.path+'.*',function (result) {
-		// 	if(result){
-		// 		this.chooseEdit();
-		// 	}else{
-		// $('.new-cache').addClass('hide');
 		$($('.version-item').get(0)).addClass('active');
 		this.renderVersion();
-		// 	}
-		// },this);
 	},
 })
 
 var FileNavView=RightNavView.extend({
 	events:{
-		'click .version-item':'chooseVersion',
-		'click .file-edit':'editRevision',
-		'click .new-cache':'chooseEdit',
-		'click .file-diff':'fileDiff',
-		'click .file-copy':'fileCopy'
+		'click #file-nav .version-item':'chooseVersion',
+		'click #file-nav .file-edit':'editRevision',
+		'click #file-nav .new-cache':'chooseEdit',
+		'click #file-nav .file-diff':'fileDiff',
+		'click #file-nav .file-copy':'fileCopy'
 	},
 	template:_.template($('#file-nav-temp').html()),
 	renderVersion:function () {
 		var id=$('.version-list>.active').attr('revision');
 		var revision=this.logList.get(id)
-		if(BodyView.wrapper)
-			BodyView.wrapper.remove();
-		BodyView.wrapper=new ReaderView(revision,this.path);
+		// if(BodyView.wrapper)
+		// 	BodyView.wrapper.remove();
+		readView.createView(revision,this.path);
 	},
 	edit:function () {
-		if(BodyView.wrapper)
-			BodyView.wrapper.remove();
-		BodyView.wrapper=new EditorView(this.path);
+		// if(BodyView.wrapper)
+		// 	BodyView.wrapper.remove();
+		editView.createView(this.path);
 	},
 	editRevision:function () {
 		var revision=$(event.target).closest('.version-item').attr('revision');
@@ -652,17 +647,6 @@ var FileNavView=RightNavView.extend({
 	*/
 	editRevisionAPI:function (path,revision) {
 		var self=this;
-// 		Backbone.ajax({
-// 			type:'POST',
-// 			data:{path:path},
-// 			url:'/svnserviceAPI/file/lock',
-// 			success:function(data){
-// else{
-// 					alert('file is locked');
-// 				}
-// 			}
-// 		})
-		// if(data.result){
 		$.getJSON('/svnserviceAPI/file',{path:path,v:revision},function (data) {
 			if(!data.errorMsg)
 				DBManager.manager.getOne(path,function (result) {
@@ -729,6 +713,7 @@ var FileNavView=RightNavView.extend({
 })
 
 var WrapperView=Backbone.View.extend({
+	el:$('.page-wrapper'),
 	changeMode:function () {
 		var mode=$('.file-type select').val();
 		switch (mode){
@@ -784,6 +769,7 @@ var WrapperView=Backbone.View.extend({
 
 // el:$('.edit-board')
 var ReaderView=WrapperView.extend({
+	template:_.template($('#reader-temp').html()),
 	events:{
 		'change .file-type select':'changeMode',
 		'click .edit-file':'editFile',
@@ -795,7 +781,9 @@ var ReaderView=WrapperView.extend({
 		'click #replace-all':'replaceAll',
 		'click #search-all':'searchAll'
 	},
-	initialize:function(revision,path){
+	initialize:function(){
+	},
+	createView:function (revision,path) {
 		this.revision=revision;
 		this.path=path;
 		this.detail=new FileDetail({path:this.path,revision:this.revision.get('revision'),comment:this.revision.get('message')});
@@ -803,33 +791,31 @@ var ReaderView=WrapperView.extend({
 		this.detail.fetch({data:{path:this.path,v:this.revision.get('revision')}});
 	},
 	render:function () {
-		$('.page-wrapper').empty();
-		var temp=_.template($('#reader-temp').html());
-		$('.page-wrapper').append(temp({detail:this.detail}));
+		this.$el.empty();
+		this.$el.append(this.template({detail:this.detail}));
 		this.editor = ace.edit("reader")
 	    this.editor.setTheme('ace/theme/vibrant_ink')
 	    this.editor.setReadOnly(true);
 	    var XMLMode = require("ace/mode/xml").Mode;
 	    this.editor.session.setMode(new XMLMode());
 	    this.editor.setShowPrintMargin(false)
-		this.$el=$('.edit-board');
-		this.delegateEvents();
 		this.fitFileType(this.path);
 
 	},
 	editFile:function () {
-		BodyView.rightNav.editRevisionAPI(this.path,this.revision.get('revision'));
+		fileRightNav.editRevisionAPI(this.path,this.revision.get('revision'));
 	},
 	copyFile:function(){
-		BodyView.rightNav.fileCopyAPI(this.path,this.revision.get('revision'));
+		fileRightNav.fileCopyAPI(this.path,this.revision.get('revision'));
 	},
 	diffFile:function(){
-		BodyView.rightNav.fileDiffAPI(this.path,this.revision.get('revision'));
+		fileRightNav.fileDiffAPI(this.path,this.revision.get('revision'));
 	},
 })
 
 //$el:$('.edit-board')
 var EditorView=WrapperView.extend({
+	template:_.template($('#editor-temp').html()),
 	events:{
 		'click .commit':'commit',
 		'change .file-type select':'changeMode',
@@ -841,22 +827,22 @@ var EditorView=WrapperView.extend({
 		'click #search-all':'searchAll',
 		'click .cancel':'cancel'
 	},
-	initialize:function(path){
+	initialize:function(){
+	},
+	createView:function (path) {
 		this.path=path;
 		DBManager.manager.getOne(this.path,this.render,this)
 	},
 	render:function (data) {
 		this.data=data;
-		$('.page-wrapper').empty();
-		var temp=_.template($('#editor-temp').html());
-		$('.page-wrapper').append(temp({data:data}));
+		this.$el.empty();
+		this.$el.append(this.template({data:data}));
+
     	this.editor = ace.edit("editor")
     	this.editor.setTheme('ace/theme/vibrant_ink')
     	var XMLMode = require("ace/mode/xml").Mode;
     	this.editor.session.setMode(new XMLMode());
     	this.editor.setShowPrintMargin(false)
-		this.$el=$('.edit-board');
-		this.delegateEvents();
 	},
 	saveCache:function () {
 		this.data.date=new Date().getTime();
@@ -885,17 +871,20 @@ var EditorView=WrapperView.extend({
 				window.location.href="#dir/"+self.path.parent();
 				// BodyView.rightNav=new ComponentNavView(self.path.parent());
 			}else{
-				BodyView.rightNav=new FileNavView(self.path);
+				fileRightNav.createView(self.path);
 			}
 		});
 	}
 })
 
 var DiffView=WrapperView.extend({
+	template:_.template($('#diff-temp').html()),
 	events:{
 		'change .file-type select':'changeMode'
 	},
-	initialize:function (fileA,rA,fileB,rB) {
+	initialize:function () {
+	},
+	createView:function (fileA,rA,fileB,rB) {
 		this.model=new DiffEntry({fileA:fileA,rA:rA,fileB:fileB,rB:rB});
 		this.model.on('change',this.render,this);
 		this.model.save().fail(function(data){
@@ -905,21 +894,21 @@ var DiffView=WrapperView.extend({
 	},
 	render:function () {
 		//console.log(this.model);
-		var temp=_.template($('#diff-temp').html());
-		$('.page-wrapper').append(temp({detail:this.model}));
+		this.$el.empty()
+		this.$el.append(this.template({detail:this.model}));
 		this.editor = ace.edit("diff")
 	    this.editor.setTheme('ace/theme/vibrant_ink')
 	    this.editor.setReadOnly(true);
 	    var XMLMode = require("ace/mode/perl").Mode;
 	    this.editor.session.setMode(new XMLMode());
 	    this.editor.setShowPrintMargin(false)
-		this.$el=$('.diff-board');
-		this.delegateEvents();
 	}
 })
 
 //$el:$('.component-content')
 var ComponentView=Backbone.View.extend({
+	el:$('.page-wrapper'),
+	template:_.template($('#component-temp').html()),
 	initialize:function(revision,path){
 		//console.log('comp view')
 		if(!revision)return;
@@ -931,14 +920,16 @@ var ComponentView=Backbone.View.extend({
 		this.fileList.fetch({data:{v:revision.get('revision'),path:this.path}});
 	},
 	render:function () {
-		var temp=_.template($('#component-temp').html());
-		$('.page-wrapper').append(temp({fileList:this.fileList,path:this.path}));
+		this.$el.empty();
+		$('.page-wrapper').append(this.template({fileList:this.fileList,path:this.path}));
 		this.$el=$('#component-file-list');
 		this.delegateEvents();
 	}
 })
 
 var ComponentChangeView=Backbone.View.extend({
+	el:$('.page-wrapper'),
+	template:_.template($('#component-change-temp').html()),
 	events:{
 		'click .commit':'commitChanges',
 		'click .cancel':'deleteChange',
@@ -956,8 +947,8 @@ var ComponentChangeView=Backbone.View.extend({
 		},this)
 	},
 	render:function () {
-		var temp=_.template($('#component-change-temp').html());
-		$('.page-wrapper').append(temp({fileList:this.fileList}));
+		this.$el.empty();
+		$('.page-wrapper').append(this.template({fileList:this.fileList}));
 		this.$el=$('#component-change-list');
 		this.delegateEvents();
 	},
@@ -1126,7 +1117,7 @@ var AppRouter=Backbone.Router.extend({
 		}
 		if(!v)
 			v=$.cookie('working-revision');
-		BodyView.rightNav=new FileNavView(path,v);
+		fileRightNav.createView(path,v);
 	},
 	showComponentNav:function (path,v) {
 		if(BodyView.body)
@@ -1136,7 +1127,7 @@ var AppRouter=Backbone.Router.extend({
 		}
 		if(!v)
 			v=$.cookie('working-revision');
-		BodyView.rightNav=new ComponentNavView(path,v);
+		compRightNav.createView(path,v);
 	},
 	showDiffFile:function (path) {
 		var arr=path.split('&');
@@ -1153,10 +1144,10 @@ var AppRouter=Backbone.Router.extend({
 			alert('版本输入错误');
 			return;
 		}
-		if(BodyView.wrapper){
-			BodyView.wrapper.remove();
-		}
-		BodyView.wrapper=new DiffView(map['fileA'],map['rA'],map['fileB'],map['rB']);
+		// if(BodyView.wrapper){
+		// 	BodyView.wrapper.remove();
+		// }
+		diffView.createView(map['fileA'],map['rA'],map['fileB'],map['rB']);
 	},
 	commitAll:function () {
 		if(BodyView.wrapper){
@@ -1165,9 +1156,7 @@ var AppRouter=Backbone.Router.extend({
 			
 		if(BodyView.rightNav)
 			BodyView.rightNav.remove();
-		// console.log(BodyView.wrapper);
 		BodyView.wrapper=new ComponentChangeView();
-		// console.log(BodyView.wrapper);
 		if(BodyView.rightNav){
 			BodyView.rightNav.remove();
 		}
@@ -1183,3 +1172,8 @@ var AppRouter=Backbone.Router.extend({
 			BodyView.rightNav=new ConflictNavView();
 	}
 })
+var fileRightNav=new FileNavView();
+var compRightNav=new ComponentNavView();
+var readView=new ReaderView();
+var editView=new EditorView();
+var diffView=new DiffView();
