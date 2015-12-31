@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Free Bootstrap Admin Template : Dream</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet" />
+        <link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+        <link href="../css/font-awesome.min.css" rel="stylesheet" />
+        <link href="css/report.css" rel="stylesheet" />
+    </head>
+    <body>
+    	<div id="wrapper">
+            <div id="warpper-top">
+            </div>
+	        <div id="page-wrapper">
+	            <div class="page-container">
+	            	<div class="input-form">
+	            		<form class="form-horizontal">
+				           <div class="form-group col-sm-4">
+			                	<label class="col-xs-5 control-label">开始时间</label>
+			                	<div class="input-group date form_datetime col-xs-7">
+				                    <input class="form-control" size="16" type="text" readonly name="start">
+									<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+			                	</div>
+								<input type="hidden" id="dtp_input1" value="" /><br/>
+			            	</div>
+				           <div class="form-group col-sm-4">
+			                	<label class="col-xs-5 control-label">结束时间</label>
+			                	<div class="input-group date form_datetime col-xs-7">
+				                    <input class="form-control" size="16" type="text" readonly name="end">
+									<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+			                	</div>
+								<input type="hidden" id="dtp_input1" value="" /><br/>
+			            	</div>
+			            	<div class="form-group col-sm-4">
+	            				<label class="col-xs-5 control-label">选择类型</label>
+	            				<div class="col-xs-7">
+	            					<select class="form-control" name="count">
+	            						<option>top5</option>
+	            						<option>top10</option>
+	            						<option>top20</option>
+	            					</select>
+	            				</div>
+	            			</div>
+	            			<div class="form-group col-sm-1">
+	            				<button class="btn btn-primary" type="button" id="create-button">生成报表</button>
+							</div>
+						</form>
+	            	</div>
+	
+		            <div class="init-report col-sm-8 col-sm-offset-2">
+ 						<h2>请选择时段</h2>
+	            	</div>
+	            	<div class="service-report col-sm-8 col-sm-offset-2 report">
+	            	</div>
+	            	<script type="text/template" id="service-report-temp">
+	            		<table class="table table-bordered">
+							<h3 class="report-header">Service top alert report
+							<% if(result.length==0) { %>
+								(No Alert in this Period)
+		            		<%}%>
+							</h3>
+	            			<tbody class="service-table">
+	            				<tr><th>#</th><th>主机</th><th>服务名</th><th>alert</th><th>warning</th><th>critical</th><th>unknown</th><th>all</th></tr>
+	            			<%var i=1;%>
+	            			<% _.each(result,function (reportList) {
+		            			var alert=0;var warning=0;var critical=0;var unknown=0;var all=0;var common=0;var other=0;
+		            			_.each(reportList,function  (report) {
+		            				console.log(report);
+		            				if(report.state==0) common+=report.num;
+		            				else if(report.state==1) warning+=report.num;
+		            				else if(report.state==2) critical+=report.num;
+		            				else if(report.state==3) unknown+=report.num;
+		            				else other+=report.num;
+		            			})
+		            			var hostname=reportList[0].hostname;
+		            			var name=reportList[0].name;
+		            			alert=warning+critical+unknown+other;
+		            			all=common+alert+other; %>
+		            			<tr projectid="<%=reportList[0].id%>">
+			            			<td><%=i++%></td><td><%=hostname%></td><td><a name="service-detail"><%=name%></a></td><td><a name="alert-drilldown-chart"><%=alert%></a></td>
+			            			<td><%=warning%></td><td><%=critical%></td><td><%=unknown%></td><td><%=all%></td>
+		            			</tr>
+		            		<%})%>
+	            			</tbody>
+	            		</table>
+	            		<div id="service-chart"></div>
+	            	</script>
+	            	<div class="service-warning-report col-sm-8 col-sm-offset-2 report">
+	            	</div>
+	            	<div class="service-critical-report col-sm-8 col-sm-offset-2 report">
+	            	</div>
+	            	<div class="service-unknown-report col-sm-8 col-sm-offset-2 report">
+	            	</div>
+	            	<script type="text/template" id="alert-report-temp">
+	            		<h3 class="report-header">Service - Top by <%=type%></h3>
+	            		<div class="col-sm-6">
+	            			<table class="table table-bordered">
+		            			<tbody class="service-table">
+		            				<tr><th>主机</th><th>服务名</th><th><%=type%></th>
+		            				<%_.each(result,function (report) {%>
+			            				<tr projectid="<%=report.id%>">
+			            					<td><%=report.get('hostname')%></td>
+			            					<td><a name="service-detail"><%=report.get('name')%></a></td>
+			            					<td><%=report.get('num')%></td>
+			            				</tr>
+		            				<% }) %>
+	            				</tbody>
+	            			</table>
+	            		</div>
+	            		<% var padding=0;
+	            			if(result.length>15) padding=80;
+	            			else if(result.length>10) padding=40;
+	            		 %>
+	            		<div class="col-sm-6" id="<%=type%>-pie" style="padding-top:<%=padding%>px;"></div>
+	            	</script>
+
+	            	<div class="host-report col-sm-8 col-sm-offset-2 report">
+	            	</div>
+	            	<script type="text/template" id="host-report-temp">
+	            		<table class="table table-bordered">
+							<h3 class="report-header">主机报警报表
+							<% if(result.length==0) { %>
+								(该时段无报警)
+		            		<%}%>
+							</h3>
+	            			<tbody class="host-table">
+	            				<tr><th>主机</th><th>all</th><th>common</th><th>alert</th><th>warning</th><th>critical</th><th>unknown</th><th>all</th></tr>
+	            			<% _.each(result.models,function (reportList) {
+		            			var alert=0;var warning=0;var critical=0;var unknown=0;var all=0;var common=0;var other=0;
+		            			_.each(reportList,function  (report) {
+		            				if(report.state==0) common=report.num;
+		            				else if(report.state==1) warning=report.num;
+		            				else if(report.state==2) critical=report.num;
+		            				else if(report.state==3) unknown=report.num;
+		            				else other=report.num;
+		            			})
+		            			var hostname=reportList[0].hostname;
+		            			alert=warning+critical+unknown+other;
+		            			all=common+alert+other; %>
+		            			<tr>
+			            			<td><%=hostname%></td><td><%=all%></td><td><%=common%></td>
+			            			<td><%=alert%></td><td><%=warning%></td><td><%=critical%></td><td><%=unknown%></td><td><%=all%></td>
+		            			</tr>
+		            		<%})%>
+	            			</tbody>
+	            		</table>
+	            		<div id="host-chart"></div>
+	            	</script>
+	            </div>
+	        </div>
+        </div>        
+		<script type="text/javascript" src="require.js" data-main="app/reportApp.js"></script>
+    </body>
+</html>

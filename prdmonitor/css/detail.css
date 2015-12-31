@@ -1,0 +1,234 @@
+body {
+    font-family: arial;
+}
+
+body a{
+    cursor: pointer;
+}
+
+#wrapper {
+	height: auto;
+    width: 100%;
+    background:#09192A;
+}
+
+#page-wrapper{
+    min-height: 600px;
+    padding: 0px 15px;
+    background:#E5EBF2;
+}
+
+#page-inner {
+    width:100%;
+    margin:0px 20px 10px 0px;
+    background-color:transparent;
+    padding:0px;
+}
+.page-container{
+	display: table;
+	width: 100%;
+	padding-bottom: 50px;
+}
+
+ @media(min-width:1024px) {
+     #page-wrapper{
+        padding: 0px;
+        min-height: 800px;
+		margin-right: 30px;
+        margin-left: 30px;
+    }
+}
+
+.page-title{
+	width: 100%;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-bottom: 5px;
+	color: #000;
+	padding-left: 40px;
+}
+
+.page-title strong{
+	padding-right: 30px;
+	font-size: 20px;
+}
+
+.page-title >span {
+	padding-right: 30px;
+	font-size: 15px;
+}
+
+.page-button{
+	width: 100%;
+	padding-left: 0px;
+	margin: 0px;
+	background-color: #fff;
+	display: inline-block;
+	border-bottom: 3px solid #555555;
+}
+.page-button .view-button{
+	padding: 15px 70px 15px 70px;
+	width:auto;
+	margin: auto;
+	float: left;
+	list-style-type: none;
+	cursor: pointer;
+}
+.page-button .view-button:hover{
+	background-color: #225081;
+	color: #fff;
+}
+.page-button .active{
+	background-color: #225081;
+	color: #fff;
+}
+
+.view-button > span{
+	font-size: 15px;
+	font-weight:600;
+}
+.page-block{
+	border-radius: 10px;
+	background-color: #fff;
+	margin-top: 25px;
+	padding: 40px 20px;
+	    -webkit-box-shadow: 5px 5px 5px #9E9E9E;  
+    -moz-box-shadow: 3px 3px 3px #9E9E9E;  
+    box-shadow: 3px 3px 3px #9E9E9E;
+
+}
+
+.page-detail label{
+	width: 200px;
+}
+.page-detail .badge{
+	border-radius: 2px;
+}
+
+.page-detail .ok{
+	background-color: green;
+}
+
+.page-detail .warning{
+	background-color: #EEB422;
+}
+
+.page-detail .critical{
+	background-color: red;
+}
+
+.page-detail .unknown{
+	background-color: #777;
+}
+
+
+.alert-history .time-title{
+	margin-top: 20px ;
+	margin-bottom: 40px;
+	padding: 0px 40px;
+	width: 100%;
+}
+
+.alert-history .time-title .icon{
+	font-size: 50px;
+	cursor: pointer;
+}
+
+.alert-history .time-title .icon:hover{
+	color: #225081;
+}
+
+.alert-history hr{
+	margin: 0px;
+	color: #000;
+	border-top: 1px solid #000;
+}
+
+.alert-history p{
+	margin: 0px;
+}
+
+.page-trends{
+	min-height: 300px;
+}
+
+#detail-chart{
+	min-height: 200px;
+	padding-top: 20px;
+}
+
+.page-report > table > tbody > tr > td{
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.page-report .serviceok{
+	background-color: #cce8cc;
+}
+.page-report .servicewarning{
+	background-color: #feffc1;
+}
+
+.notification-history .time-title{
+	margin-top: 20px ;
+	margin-bottom: 40px;
+	padding: 0px 40px;
+	width: 100%;
+}
+
+.notification-history .time-title .icon{
+	font-size: 50px;
+	cursor: pointer;
+}
+
+.notification-history .time-title .icon:hover{
+	color: #225081;
+}
+
+.notification-history hr{
+	margin: 0px;
+	color: #000;
+	border-top: 1px solid #000;
+}
+.notification-history p{
+	margin: 0px;
+}
+
+.service-status tbody> .critical{
+	background-color: #ffdddd;
+}
+
+.service-status tbody> .unknown{
+	background-color: #ffddaa;
+}
+
+.service-status tbody> .ok{
+	background-color: #cce8cc;
+}
+.service-status tbody> .warning{
+	background-color: #feffc1;
+}
+
+.service-status td> .critical{
+	background-color: red;
+}
+
+.service-status td> .ok{
+	background-color: green;
+}
+.service-status td> .warning{
+	background-color: #EEB422;
+}
+
+.service-status >table>tbody>tr>td{
+	border-bottom: 2px solid #fff;
+	padding: 6px;
+}
+
+.service-status >table{
+	margin-bottom: 0px;
+}
+
+.waiting{
+	cursor: wait;
+}

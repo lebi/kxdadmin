@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Free Bootstrap Admin Template : Dream</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../css/font-awesome.min.css" rel="stylesheet" />
+    <link href="css/reg-set.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="warpper-top">
+        </div>
+        <div id="page-wrapper">
+            <div class="page-container">
+                <div class="col-md-3 col-sm-offset-1 side-select">
+                    <div class="host-select select">
+                        <h3>主机列表</h3>
+                        <select class="form-control" size="20" id="fetchList">
+                        </select>
+                    </div>
+                    <div class="service-select select">
+                        <h3>服务列表</h3>
+                        <form class="form-horizontal" style="padding-right:20px" id="service-search">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"style="padding:5px 0px">搜索</label>
+                                <div class="col-sm-10 content-text">
+                                    <input class="form-control">
+                                </div>
+                            </div>
+                        </form>
+                        <select class="form-control" size="20" id="suitList">
+                        </select>
+                    </div>
+                    </div>
+                <div class="setting-list col-md-7">
+                    <h2>请选择要修改的内容</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+                    <script type="text/template" id="service-temp">
+                        <div class="service" id="service<%=reg.get('objectId')%>">
+                            <div class="reg-header">
+                                <span><strong>主机:</strong><%=reg.get('host')%></span>
+                                <span><strong>服务:</strong><%=reg.get('service')%></span><a class='edit-reg'><i class="icon-edit"></i>修改</a>
+                            </div>
+                            <div class="content">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">类型</label>
+                                        <div class="col-sm-10 content-text">
+                                            <% if(reg.get('dataType')==0) {%>
+                                            perfdata
+                                            <% }else {%>
+                                            output
+                                            <%}%>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">输出</label>
+                                        <div class="col-sm-10 content-text">
+                                            <% if(reg.get('dataType')==0) {%>
+                                                <%=reg.get('perfdata')%>
+                                            <% }else {%>
+                                                <%=reg.get('output')%>
+                                            <%}%>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">参数</label>
+                                        <div class="col-sm-8 content-text">
+                                            <% if(reg.get('parameters')!=null){
+                                                var paramList=reg.get('parameters').split(';');
+                                                var ruleList=new Array();
+                                                if(reg.get('parametersCal')!=null)
+                                                    ruleList=reg.get('parametersCal').split(';');
+                                                for(var i=1;i<=paramList.length;i++){%>
+                                                    <span><%=paramList[i-1]%>:<%=ruleList[i-1]%> ;</span>
+                                                <%}
+                                            }%>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">正则表达式</label>
+                                        <div class="col-sm-8 content-text"><%=reg.get('reg')%></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">匹配输出</label>
+                                        <div class="col-sm-8 content-text output" name="output">
+                                            <% var data;
+                                            if(reg.get('dataType')==0)
+                                                data=reg.get('perfdata');
+                                            else
+                                                data=reg.get('output');
+                                            var paramList=new Array();
+                                            var ruleList=new Array();
+
+                                            if(reg.get('parameters')!=null)
+                                                paramList=reg.get('parameters').split(';');
+                                            if(reg.get('parametersCal')!=null)
+                                                ruleList=reg.get('parametersCal').split(';');
+
+                                            for(var i=0;i<paramList.length;i++){
+                                                var exp=new RegExp(reg.get('reg'));
+                                                %>
+                                                <span><%=paramList[i]%>=<%=exp.calculate(data,ruleList[i])%> ;</span>
+                                            <%}%>
+                                        </div>
+                                    </div>                           
+                                </form>
+                            </div>
+                        </div>
+                    </script>
+                    <script type="text/template" id="edit-temp">
+                        <div class="service-edit service" id="service<%=reg.get('objectId')%>">
+                            <div class="reg-header">
+                                <span><strong>主机:</strong><%=reg.get('host')%> </span>
+                                <span><strong>服务:</strong><%=reg.get('service')%></span><a class='cancel-reg'><i class="icon-reply"></i>返回</a>
+                            </div>
+                            <div class="content">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">类型</label>
+                                        <div class="col-sm-10 content-text">
+                                            <label class="radio-inline col-sm-2" style="padding-top:0px">
+                                                <input type="radio"  name="datatype" value="0" 
+                                                <% if(reg.get('dataType')==0){%>checked
+                                                <%}%>
+                                                > perdata
+                                            </label>
+                                            <label class="radio-inline col-sm-2" style="padding-top:0px">
+                                                <input type="radio"  name="datatype" value="1"
+                                                <% if(reg.get('dataType')==1){%>checked
+                                                <%}%>
+                                                > output
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">输出</label>
+                                        <div class="col-sm-10 content-text outputdata">
+                                            <% if(reg.get('dataType')==0) {%>
+                                                <%=reg.get('perfdata')%>
+                                            <% }else {%>
+                                                <%=reg.get('output')%>
+                                            <%}%>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">参数</label>
+                                        <div class="col-sm-3 param-input">
+                                            <% if(reg.get('parameters')!=null)
+                                                    var paramList=reg.get('parameters').split(';');
+                                                else
+                                                    var paramList=new Array();
+                                                for(var i=0;i<paramList.length;i++){%>
+                                                    <input class="form-control content-input" name="param" value="<%=paramList[i]%>">
+                                            <%} if(paramList.length==0){%>
+                                                    <input class="form-control content-input" name="param">
+                                            <%}%>
+                                        </div>
+                                        <label class="col-sm-1 control-label">$N</label>
+                                        <div class="col-sm-3 paramCal-input">
+                                            <% if(reg.get('parametersCal')!=null)
+                                                    var ruleList=reg.get('parametersCal').split(';');
+                                                else
+                                                    var ruleList=new Array();
+                                                for(var i=0;i<paramList.length;i++){
+                                            %>
+                                                <input class="form-control content-input" name="paramCal" value="<%=ruleList[i]%>">
+                                            <%} if(paramList.length==0){%>
+                                                <input class="form-control content-input" name="paramCal">
+                                            <%}%>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <a class="add-param"><i class="icon-plus-sign "></i>添加参数</a>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">正则表达式</label>
+                                        <div class="col-sm-7">
+                                            <input class="form-control" name="regexp" value="<%=reg.get('reg')%>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">匹配输出</label>
+                                        <span class="col-sm-7 content-text output" name="output"></span>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-primary save-reg" type="button">保存更改</button>
+                                        </div>
+                                    </div>                           
+                                </form>
+                            </div>
+                        </div>
+                    </script>
+
+
+        <script type="text/javascript" src="require.js" data-main="app/regApp.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Free Bootstrap Admin Template : Dream</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet" />
+        <link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+        <link href="../css/font-awesome.min.css" rel="stylesheet" />
+        <link href="css/drilldown.css" rel="stylesheet" />
+    </head>
+    <body>      
+        <div id="wrapper">
+            <div id="warpper-top">
+            </div>
+            <div id="page-wrapper">
+                    <div class="input-form">
+                        <form class="form-horizontal">
+                           <div class="form-header col-sm-5">
+                           </div>
+                           <div class="form-group col-sm-3">
+                                <label class="col-xs-5 control-label">开始时间</label>
+                                <div class="input-group date form_datetime col-xs-7">
+                                    <input class="form-control" size="16" type="text" readonly name="start">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                                <input type="hidden" id="dtp_input1" value="" /><br/>
+                            </div>
+                           <div class="form-group col-sm-3">
+                                <label class="col-xs-5 control-label">结束时间</label>
+                                <div class="input-group date form_datetime col-xs-7">
+                                    <input class="form-control" size="16" type="text" readonly name="end">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                                <input type="hidden" id="dtp_input1" value="" /><br/>
+                            </div>
+                            <div class="form-group col-sm-1"  style="margin-left:20px;">
+                                <button class="btn btn-primary" type="button" id="create-button">生成报表</button>
+                            </div>
+                        </form>
+                    </div>
+                <div id="drilldown-chart"></div>
+            </div>
+        </div>
+        <script src="../lib/jquery-1.11.3.js"></script>
+        <script src="../lib/bootstrap.min.js"></script>
+        <script src="../lib/underscore-min.js"></script>
+        <script src="../lib/backbone-min.js"></script>
+        <script src="../lib/highcharts.js"></script>
+        <script src="../lib/jquery.cookie.js"></script>
+        <script src="../lib/bootstrap-datetimepicker.min.js"></script>
+        <script src="../lib/bootstrap-datetimepicker.fr.js"></script>
+        <script src="../lib/highchart/data.js"></script>
+        <script src="../lib/highchart/drilldown.js"></script>
+        <script src="js/date.js"></script>
+        <script src="js/drilldown.js"></script>
+    </body>
+</html>
