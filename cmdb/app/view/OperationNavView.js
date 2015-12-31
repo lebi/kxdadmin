@@ -22,21 +22,18 @@ define(['jquery','underscore','backbone','Operation','OperationList','OperationT
 			this.tree.models={};
 			this.tree.on("update",this.render,this);
 
-			this.operationList.on("update",this.parseTree,this);
-			this.typeList.on("update",this.parseTree,this);
+			this.operationList.on("sync",this.parseTree,this);
+			this.typeList.on("sync",this.parseTree,this);
 
-			this.operationList.fetch();
-			this.typeList.fetch();
+			this.operationList.fetch({reset:true});
+			this.typeList.fetch({reset:true});
 		},
 		parseTree:function () {
-			if(this.typeList.length==0)return;
-			
 			var self=this;
 			this.typeList.each(function (type) {
 				self.tree.models[type.get('id')]=new Array();
 			})
 			this.operationList.each(function (op) {
-				// console.log(op.get('type'));
 				self.tree.models[op.get('typeId')].push(op);
 			})
 			this.tree.trigger('update');
@@ -62,7 +59,7 @@ define(['jquery','underscore','backbone','Operation','OperationList','OperationT
 			var self=this;
 			this.modalType.save().done(function () {
 				self.typeList.fetch().done(function () {
-					self.typeList.trigger('update');
+					self.typeList.trigger('reset');
 				})
 				$('.modal-backdrop').remove();
 			})

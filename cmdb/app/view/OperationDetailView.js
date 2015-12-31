@@ -8,8 +8,6 @@ define(['require','jquery','underscore','backbone','OperationRouter'],
 		el:$('.operation-edit'),
 		template:_.template($('#operation-detail-temp').html()),
 		initialize:function () {
-			// this.operation=operation;
-			// this.render();
 		},
 		refreshView:function (operation,mainView) {
 			this.mainView=mainView;
@@ -25,6 +23,7 @@ define(['require','jquery','underscore','backbone','OperationRouter'],
 			var self=this;
 			this.operation.destroy({wait: true})
 			.done(function () {
+				self.mainView.operationList.trigger('sync');
 				self.$el.empty();
 				window.location.href="#";
 			})

@@ -83,7 +83,7 @@ define(['require','jquery','underscore','backbone','OperationRouter'],
 						var id=self.operation.get('id');
 						window.location.href='#edit?'+id;
 					})
-				},1000);
+				},500);
 			})
 			.fail(function () {
 				dom.after(" <span id='save-hint' class='fail'> <i class='icon-remove'></i> 保存失败</span>");
