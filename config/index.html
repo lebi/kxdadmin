@@ -4,16 +4,12 @@
 		<link href="../css/bootstrap.min.css" rel="stylesheet" />
 		<link href="../css/font-awesome.min.css" rel="stylesheet" />
 		<link href="css/config.css" rel="stylesheet" />
-		<script type="text/javascript" src="head.min.js"></script>
-		<script type="text/javascript">
-			head.load('../lib/jquery-1.11.3.min.js','../lib/bootstrap.min.js','../lib/jquery.cookie.js',
-				'../lib/underscore-min.js','../lib/backbone.js','tool.js','../js/setup.js','ace/ace.js',
-				'ace/theme-vibrant_ink.js','ace/mode-coffee.js','ace/mode-xml.js','ace/mode-perl.js','config.js');
-
-		</script>
+    	<link href="../top.css" rel="stylesheet" />
 	</head>
 	<body>
-		<div class="wrapper">
+	    <div class="header">
+	    </div>
+		<div class="wrapper" style="margin-top:47px">
 			<div class="left-nav">
 				<div class="operation">
 					<a href="javascript:void(0)" id="add-product"><i class="icon-plus-sign"></i> 添加产品</a>
@@ -166,7 +162,7 @@
 			<div class="page-wrapper">
 			</div>
 			<script type="text/template" id="reader-temp">
-				<div class="edit-board reader-board">
+				<div class="edit-board reader-board" id="reader-board">
 					<div class="form-horizontal">
 					  	<div class="form-group">
 					    	<label class="col-sm-1 control-label">搜索</label>
@@ -195,7 +191,7 @@
 				</div>
 			</script>
 			<script type="text/template" id="editor-temp">
-				<div class="edit-board">
+				<div class="edit-board" id="editor-board">
 					<div class="form-horizontal">
 						<div class="form-group">
 						    <label class="col-sm-1 control-label">搜索</label>
@@ -233,7 +229,7 @@
 				</div>
 			</script>
 			<script type="text/template" id="diff-temp">
-				<div class="diff-board">
+				<div class="diff-board" id="diff-board">
 					<h4>DIFF</h4>
 					<a href="#file/<%=detail.get('fileA')%>"><b>@file:<%=detail.get('fileA')%></b></a>
 					<span><b>@revision:<%=detail.get('rA')==0?'HEAD':detail.get('rA')%></b></span>
@@ -340,7 +336,7 @@
 
 
 			<script type="text/template" id="conflict-editor-temp">
-				<div class="edit-board">
+				<div class="edit-board" id="conflict-board">
 					<div class="form-horizontal">
 						<div class="form-group">
 						    <label class="col-sm-1 control-label">搜索</label>
@@ -483,30 +479,6 @@
 		    	</div>
 		  	</div>
 		</div>
-		<!-- // <script type="text/javascript" src="require.js" data-main="main.js"></script> -->
-<!--		<script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
- 		// <script type="text/javascript" src="../lib/jquery-1.11.3.min.js"></script>
-		// <script type="text/javascript" src="../lib/bootstrap.min.js"></script>
-		// <script type="text/javascript" src="../lib/jquery.cookie.js"></script>
-		// <script type="text/javascript" src="../lib/underscore-min.js"></script>
-		// <script type="text/javascript" src="../lib/backbone.js"></script>
-		// <script type="text/javascript" src="../js/setup.js"></script>
-		// <script type="text/javascript" src="tool.js"></script>
-		// <script type="text/javascript" src="ace/ace.js"></script>
-		// <script type="text/javascript" src="ace/theme-vibrant_ink.js"></script>
-		// <script type="text/javascript" src="ace/mode-coffee.js"></script>
-		// <script type="text/javascript" src="ace/mode-xml.js"></script>
-		// <script type="text/javascript" src="ace/mode-javascript.js"></script>
-		// <script type="text/javascript" src="config.js" ></script> -->
-		<script type="text/javascript">
-			head.ready(function () {
-				DBManager.manager.init(function() {
-						var app_router = new AppRouter();
-						Backbone.history.start();
-					BodyView.body=new BodyView(function () {
-					});
-				});
-			});
-		</script>
+		<script type="text/javascript" src="require.js" data-main="app.js"></script>
 	</body>
 </html>

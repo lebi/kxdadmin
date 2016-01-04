@@ -539,9 +539,6 @@ var BodyView=Backbone.View.extend({
 
 	}
 })
-BodyView.body=null;
-BodyView.wrapper=null;
-BodyView.rightNav=null;
 
 /*	@params: 	logList:the logs of the folder or file.trigger myevent after set.
 *
@@ -553,7 +550,9 @@ var RightNavView=Backbone.View.extend({
 	el:$('.right-nav'),
 	initialize:function () {
 	},
-	createView:function (path,revision) {
+	createView:function (path,revision,bodyView) {
+		if(bodyView)
+			this.bodyView=bodyView;
 		this.path=path;
 		this.logList=new LogEntryCollection();
 		this.logList.on('myevent',this.render,this);
@@ -566,22 +565,17 @@ var RightNavView=Backbone.View.extend({
 		})
 	},
 	render:function () {
-		$('.right-nav').empty();
-		$('.right-nav').append(this.template({logList:this.logList}));
-		this.delegateEvents();
+		this.$el.empty();
+		this.$el.append(this.template({logList:this.logList}));
 		this.hasCache();
 	},
 	chooseVersion:function () {
-		console.log('a');
 		var version=$(event.target);
 		var li=version.closest('.version-list>li');
 		if(li.hasClass('active'))return;
 		if (!version.hasClass('setting')&&version.closest('.version-dropdown').length==0) {
 			$('.version-list>.active').removeClass('active');
 			li.addClass('active');
-			if(BodyView.wrapper)
-				BodyView.wrapper.remove();
-
 			this.renderVersion();
 		};
 	},
@@ -600,18 +594,18 @@ var ComponentNavView=RightNavView.extend({
 		'click #comp-nav .version-item':'chooseVersion'
 	},
 	template:_.template($('#component-nav-temp').html()),
+	setup:function (compView) {
+		this.compView=compView;
+	},
 	renderVersion:function (){
 		var id=$('.version-list>.active').attr('revision');
-		//console.log('render version');
 		var revision=this.logList.get(id)
-		if(BodyView.wrapper)
-			BodyView.wrapper.remove();
-		BodyView.wrapper=new ComponentView(revision,this.path);
+		this.compView.createView(revision,this.path);
 	},
 	hasCache:function () {
 		$($('.version-item').get(0)).addClass('active');
 		this.renderVersion();
-	},
+	}
 })
 
 var FileNavView=RightNavView.extend({
@@ -623,27 +617,32 @@ var FileNavView=RightNavView.extend({
 		'click #file-nav .file-copy':'fileCopy'
 	},
 	template:_.template($('#file-nav-temp').html()),
+	//设置readView和editView的值，防止循环依赖
+	setup:function (readView,editView) {
+		this.readView=readView;
+		this.editView=editView;
+	},
 	renderVersion:function () {
 		var id=$('.version-list>.active').attr('revision');
 		var revision=this.logList.get(id)
-		// if(BodyView.wrapper)
-		// 	BodyView.wrapper.remove();
-		readView.createView(revision,this.path);
+		this.readView.createView(revision,this.path);
 	},
 	edit:function () {
-		// if(BodyView.wrapper)
-		// 	BodyView.wrapper.remove();
-		editView.createView(this.path);
+		this.editView.createView(this.path);
 	},
 	editRevision:function () {
 		var revision=$(event.target).closest('.version-item').attr('revision');
 		this.editRevisionAPI(this.path,revision);
 	},
-	/*	@tips: 		when user choose to edit file on readview,call this function.
-	*				if the file does not exsits in HEAD revision, the action is add.
-	*				so it's necessary to check body's fileList to determine whether add or udpate.
-	*
-	*	@lock: 		when user choose to edit this file. The file will lock on the SVN.Commit or undo will unlock the file.
+	/*	@tips: 		当用户选择编辑文件时。
+	*				首先获取文件内容，判断该文件在本地是否已更改
+	*				若存在：
+	*					用户确认继续，需要保证文件action属性和原先一致，再将原先的更改覆盖。
+	*				若不存在：
+	*					判断该文件在fileList中是否已存在:
+	*						若不存在，将文件添加到fileList，使action为add。
+	*						若已存在，action为update。
+	*					再添加文件。
 	*/
 	editRevisionAPI:function (path,revision) {
 		var self=this;
@@ -660,9 +659,9 @@ var FileNavView=RightNavView.extend({
 							file.action='add';
 						DBManager.manager.update(file,self.chooseEdit,self);
 					}else{
-						if(!BodyView.body.fileList.get(path)){
+						if(!self.bodyView.fileList.get(path)){
 							file.action='add';
-							BodyView.body.fileList.addUnique({path:path,kind:1,name:path.split('/').peek()});
+							self.bodyView.fileList.addUnique({path:path,kind:1,name:path.split('/').peek()});
 						}
 						DBManager.manager.addExist(file,self.chooseEdit,self);
 					}
@@ -702,20 +701,27 @@ var FileNavView=RightNavView.extend({
 	fileCopyAPI:function(path,revision){
 		var back=path+'.bak';
 		$.getJSON('/svnserviceAPI/file',{path:path,v:revision},function (data) {
-			if(BodyView.body.addToList(back,1)){
+			if(self.bodyView.addToList(back,1)){
 				var file={path:back,date:new Date().getTime(),content:data.result.content,kind:1,action:'add'};
 				DBManager.manager.addExist(file,function () {
 					window.location.href='#file/'+back;
 				});
 			}
 		})
+	},
+	fileDeleteAPI:function(path){
+		this.bodyView.fileList.removeUnique(path);
 	}
 })
 
 var WrapperView=Backbone.View.extend({
 	el:$('.page-wrapper'),
+	initialize:function (obj) {
+		this.fileRightNav=obj.nav;
+	},
 	changeMode:function () {
 		var mode=$('.file-type select').val();
+		// console.log(this);
 		switch (mode){
 			case 'ini':
 	    		var coffeeMode = require("ace/mode/coffee").Mode;
@@ -771,17 +777,15 @@ var WrapperView=Backbone.View.extend({
 var ReaderView=WrapperView.extend({
 	template:_.template($('#reader-temp').html()),
 	events:{
-		'change .file-type select':'changeMode',
-		'click .edit-file':'editFile',
-		'click .copy-file':'copyFile',
-		'click .diff-file':'diffFile',
-		'click #search':'search',
-		'keypress input[name=search]':'keypressSearch',
-		'click #replace':'replace',
-		'click #replace-all':'replaceAll',
-		'click #search-all':'searchAll'
-	},
-	initialize:function(){
+		'change #reader-board .file-type select':'changeMode',
+		'click #reader-board .edit-file':'editFile',
+		'click #reader-board .copy-file':'copyFile',
+		'click #reader-board .diff-file':'diffFile',
+		'click #reader-board #search':'search',
+		'keypress #reader-board input[name=search]':'keypressSearch',
+		'click #reader-board #replace':'replace',
+		'click #reader-board #replace-all':'replaceAll',
+		'click #reader-board #search-all':'searchAll'
 	},
 	createView:function (revision,path) {
 		this.revision=revision;
@@ -791,6 +795,7 @@ var ReaderView=WrapperView.extend({
 		this.detail.fetch({data:{path:this.path,v:this.revision.get('revision')}});
 	},
 	render:function () {
+		// console.log('read');
 		this.$el.empty();
 		this.$el.append(this.template({detail:this.detail}));
 		this.editor = ace.edit("reader")
@@ -803,13 +808,13 @@ var ReaderView=WrapperView.extend({
 
 	},
 	editFile:function () {
-		fileRightNav.editRevisionAPI(this.path,this.revision.get('revision'));
+		this.fileRightNav.editRevisionAPI(this.path,this.revision.get('revision'));
 	},
 	copyFile:function(){
-		fileRightNav.fileCopyAPI(this.path,this.revision.get('revision'));
+		this.fileRightNav.fileCopyAPI(this.path,this.revision.get('revision'));
 	},
 	diffFile:function(){
-		fileRightNav.fileDiffAPI(this.path,this.revision.get('revision'));
+		this.fileRightNav.fileDiffAPI(this.path,this.revision.get('revision'));
 	},
 })
 
@@ -817,23 +822,22 @@ var ReaderView=WrapperView.extend({
 var EditorView=WrapperView.extend({
 	template:_.template($('#editor-temp').html()),
 	events:{
-		'click .commit':'commit',
-		'change .file-type select':'changeMode',
-		'click .save':'saveCache',
-		'click #search':'search',
-		'keypress input[name=search]':'keypressSearch',
-		'click #replace':'replace',
-		'click #replace-all':'replaceAll',
-		'click #search-all':'searchAll',
-		'click .cancel':'cancel'
-	},
-	initialize:function(){
+		'click #editor-board .commit':'commit',
+		'change #editor-board .file-type select':'changeMode',
+		'click #editor-board .save':'saveCache',
+		'click #editor-board #search':'search',
+		'keypress #editor-board input[name=search]':'keypressSearch',
+		'click #editor-board #replace':'replace',
+		'click #editor-board #replace-all':'replaceAll',
+		'click #editor-board #search-all':'searchAll',
+		'click #editor-board .cancel':'cancel'
 	},
 	createView:function (path) {
 		this.path=path;
 		DBManager.manager.getOne(this.path,this.render,this)
 	},
 	render:function (data) {
+		console.log('edit');
 		this.data=data;
 		this.$el.empty();
 		this.$el.append(this.template({data:data}));
@@ -863,15 +867,11 @@ var EditorView=WrapperView.extend({
 	cancel:function () {
 		var self=this;
 		DBManager.manager.delete(this.path,function () {
-			if(BodyView.rightNav)
-				BodyView.rightNav.remove();
-			
 			if(self.data.action=='add'){
-				BodyView.body.fileList.removeUnique(self.path);
+				self.fileRightNav.fileDeleteAPI(self.path);
 				window.location.href="#dir/"+self.path.parent();
-				// BodyView.rightNav=new ComponentNavView(self.path.parent());
 			}else{
-				fileRightNav.createView(self.path);
+				self.fileRightNav.createView(self.path);
 			}
 		});
 	}
@@ -880,7 +880,7 @@ var EditorView=WrapperView.extend({
 var DiffView=WrapperView.extend({
 	template:_.template($('#diff-temp').html()),
 	events:{
-		'change .file-type select':'changeMode'
+		'change #diff-board .file-type select':'changeMode'
 	},
 	initialize:function () {
 	},
@@ -893,7 +893,7 @@ var DiffView=WrapperView.extend({
 		})
 	},
 	render:function () {
-		//console.log(this.model);
+		console.log('diff');
 		this.$el.empty()
 		this.$el.append(this.template({detail:this.model}));
 		this.editor = ace.edit("diff")
@@ -909,8 +909,9 @@ var DiffView=WrapperView.extend({
 var ComponentView=Backbone.View.extend({
 	el:$('.page-wrapper'),
 	template:_.template($('#component-temp').html()),
-	initialize:function(revision,path){
-		//console.log('comp view')
+	initialize:function(){
+	},
+	createView:function (revision,path) {
 		if(!revision)return;
 		this.revision=revision;
 		this.path=path;
@@ -922,8 +923,6 @@ var ComponentView=Backbone.View.extend({
 	render:function () {
 		this.$el.empty();
 		$('.page-wrapper').append(this.template({fileList:this.fileList,path:this.path}));
-		this.$el=$('#component-file-list');
-		this.delegateEvents();
 	}
 })
 
@@ -931,13 +930,16 @@ var ComponentChangeView=Backbone.View.extend({
 	el:$('.page-wrapper'),
 	template:_.template($('#component-change-temp').html()),
 	events:{
-		'click .commit':'commitChanges',
-		'click .cancel':'deleteChange',
-		'change .checkbox input':'checkChange'
+		'click #component-change-list .commit':'commitChanges',
+		'click #component-change-list .cancel':'deleteChange',
+		'change #component-change-list .checkbox input':'checkChange'
 	},
 	initialize:function () {
 		this.map={};		//restore check map
 		this.fileList;		//restore all changes in indexDB
+	},
+	createView:function (bodyView) {
+		this.bodyView=bodyView;
 		DBManager.manager.getAmbiguous('.*',function (result) {
 			this.fileList=result;
 			this.render();
@@ -948,9 +950,7 @@ var ComponentChangeView=Backbone.View.extend({
 	},
 	render:function () {
 		this.$el.empty();
-		$('.page-wrapper').append(this.template({fileList:this.fileList}));
-		this.$el=$('#component-change-list');
-		this.delegateEvents();
+		this.$el.append(this.template({fileList:this.fileList}));
 	},
 	commitChanges:function () {
 		var list=new Array();
@@ -1001,12 +1001,13 @@ var ComponentChangeView=Backbone.View.extend({
 		var action=li.attr('action');
 		var kind=li.attr('kind');
 		var path=li.attr('path');
+		var self=this;
 		DBManager.manager.delete(path,function () {
 			li.remove();
 			if(action=='add'){
-				BodyView.body.fileList.removeUnique(path);
+				self.bodyView.fileList.removeUnique(path);
 			}else if(action=='delete'){
-				BodyView.body.fileList.addUnique({path:path,kind:kind,name:path.split('/').peek()});
+				self.bodyView.fileList.addUnique({path:path,kind:kind,name:path.split('/').peek()});
 			}
 		});
 	},
@@ -1021,9 +1022,15 @@ var ComponentChangeView=Backbone.View.extend({
 })
 
 var ConflictNavView=Backbone.View.extend({
+	el:$('.right-nav'),
 	template:_.template($('#conflict-temp').html()),
 	initialize:function(){
 		this.conflictList=new ConflictList({revision:$.cookie('working-revision')});
+	},
+	//获取文件冲突，先获取本地更改，将本地更改文件列表和本地版本和服务器比较，获取发生冲突的文件列表.
+	createView:function () {
+		this.$el.empty();
+		this.$el.append('<div class="conflict-hint"><span>正在检查冲突</span></div>')
 		var self=this;
 		DBManager.manager.getAmbiguous('.*',function (result) {
 			var arr=new Array()
@@ -1038,43 +1045,42 @@ var ConflictNavView=Backbone.View.extend({
 		},this);
 	},
 	render:function(data){
-		$('.right-nav').empty();
-		$('.right-nav').append(this.template({fileList:data.result}));
-		this.$el=$('.version-list');
-		this.delegateEvents();
+		this.$el.empty();
+		this.$el.append(this.template({fileList:data.result}));
 	}
 })
 
 var ConflictEditView=WrapperView.extend({
+	el:$('.page-wrapper'),
 	events:{
-		'change .file-type select':'changeMode',
-		'click #search':'search',
-		'keypress input[name=search]':'keypressSearch',
-		'click #replace':'replace',
-		'click #replace-all':'replaceAll',
-		'click #search-all':'searchAll',
-		'click .resolve':'resolve'
+		'change #conflict-board .file-type select':'changeMode',
+		'click #conflict-board #search':'search',
+		'keypress #conflict-board input[name=search]':'keypressSearch',
+		'click #conflict-board #replace':'replace',
+		'click #conflict-board #replace-all':'replaceAll',
+		'click #conflict-board #search-all':'searchAll',
+		'click #conflict-board .resolve':'resolve'
 	},
 	template:_.template($('#conflict-editor-temp').html()),
-	initialize:function(path){
+	initialize:function(obj){
+		this.conflictRightNav=obj.nav;
+	},
+	createView:function (path) {
 		this.path=path;
 		DBManager.manager.getOne(this.path,this.render,this)
 	},
 	render:function (data) {
-
 		this.data=data;
-		$('.page-wrapper').empty();
+		this.$el.empty();
 		var detail=new FileConflict({path:data.path,content:data.content,action:data.action,resolve:data.resolve});
 		var self=this;
 		detail.save().done(function(result){
-			$('.page-wrapper').append(self.template({data:data,result:result.result}));
+			self.$el.append(self.template({data:data,result:result.result}));
 	    	self.editor = ace.edit("conflict")
 	    	self.editor.setTheme('ace/theme/vibrant_ink')
 	    	var XMLMode = require("ace/mode/xml").Mode;
 	    	self.editor.session.setMode(new XMLMode());
 	    	self.editor.setShowPrintMargin(false)
-			self.$el=$('.edit-board');
-			self.delegateEvents();
 		})
 	},
 	/*
@@ -1088,14 +1094,13 @@ var ConflictEditView=WrapperView.extend({
 		var doing="<span class='save-doing'><i class='icon-refresh'/> 正在保存</span>";
 		var success="<span class='save-success'><i class='icon-ok-sign'/> 已保存</span>";
 		var fail="<span class='save-fail'><i class='icon-warning-sign'/> 保存失败</span>";
+		var self=this;
 		DBManager.manager.update(this.data,function () {
 			$('.save-message').html(success);
 			setTimeout(function () {
 				$('.save-message').html('');
 			},1000)
-			if(BodyView.rightNav)
-				BodyView.rightNav.remove();
-			BodyView.rightNav=new ConflictNavView();
+			self.conflictRightNav.createView();
 		});
 		$('.save-message').html(doing);
 	}
@@ -1110,21 +1115,13 @@ var AppRouter=Backbone.Router.extend({
 		'conflict/*path':'showConflict'
 	},
 	showFileNav:function (path,v) {
-		if(BodyView.body)
-			BodyView.body.activeByPath(path);
-		if(BodyView.rightNav){
-			BodyView.rightNav.remove();
-		}
+		bodyView.activeByPath(path);
 		if(!v)
 			v=$.cookie('working-revision');
-		fileRightNav.createView(path,v);
+		fileRightNav.createView(path,v,bodyView);
 	},
 	showComponentNav:function (path,v) {
-		if(BodyView.body)
-			BodyView.body.activeByPath(path);
-		if(BodyView.rightNav){
-			BodyView.rightNav.remove();
-		}
+		bodyView.activeByPath(path);
 		if(!v)
 			v=$.cookie('working-revision');
 		compRightNav.createView(path,v);
@@ -1144,36 +1141,29 @@ var AppRouter=Backbone.Router.extend({
 			alert('版本输入错误');
 			return;
 		}
-		// if(BodyView.wrapper){
-		// 	BodyView.wrapper.remove();
-		// }
 		diffView.createView(map['fileA'],map['rA'],map['fileB'],map['rB']);
 	},
 	commitAll:function () {
-		if(BodyView.wrapper){
-			BodyView.wrapper.remove();
-		}
-			
-		if(BodyView.rightNav)
-			BodyView.rightNav.remove();
-		BodyView.wrapper=new ComponentChangeView();
-		if(BodyView.rightNav){
-			BodyView.rightNav.remove();
-		}
-		BodyView.rightNav=new ConflictNavView();
+		changeView.createView(bodyView)
+		conflictRightNav.createView();
 	},
 	showConflict:function(path){
-		if(BodyView.wrapper){
-			BodyView.wrapper.remove();
-		}
-		BodyView.wrapper=new ConflictEditView(path);
-
-		if(!BodyView.rightNav)
-			BodyView.rightNav=new ConflictNavView();
+		conflictEdit.createView(path);
+		conflictRightNav.createView();
 	}
 })
+
+var bodyView=new BodyView()
 var fileRightNav=new FileNavView();
 var compRightNav=new ComponentNavView();
-var readView=new ReaderView();
-var editView=new EditorView();
+var conflictRightNav=new ConflictNavView();
+
+var readView=new ReaderView({nav:fileRightNav});
+var editView=new EditorView({nav:fileRightNav});
+fileRightNav.setup(readView,editView);
 var diffView=new DiffView();
+var compView=new ComponentView();
+compRightNav.setup(compView);
+
+var changeView=new ComponentChangeView();
+var conflictEdit=new ConflictEditView(conflictRightNav);
