@@ -1,6 +1,11 @@
+/*
+*	@author:Huangyan
+*	@Date:2016.1.4
+*/
 define(['jquery','underscore','backbone','ChangeList'],
 	function ($,_,Backbone,ChangeList) {
 
+	//显示本地已更改的文件列表
 	var ComponentChangeView=Backbone.View.extend({
 		el:$('.page-wrapper'),
 		template:_.template($('#component-change-temp').html()),
@@ -52,7 +57,7 @@ define(['jquery','underscore','backbone','ChangeList'],
 					alert('存在冲突，请解决');
 					return;
 				}
-
+				//提交选中的文件
 				for(var i in self.map){
 					if(self.map[i]){
 						DBManager.manager.delete(i,function () {
@@ -71,6 +76,8 @@ define(['jquery','underscore','backbone','ChangeList'],
 			})
 			$('.save-message',this.$el).html("<span class='save-doing'><i class='icon-refresh'/> 正在提交</span>");
 		},
+		//当删除某更改时，若原action是add，需要将文件从文件树中删除。
+		//				若action是delete，需要将文件添加到文件树中。
 		deleteChange:function () {
 			var li=$(event.target).closest('li');
 			var action=li.attr('action');

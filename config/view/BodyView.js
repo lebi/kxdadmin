@@ -1,5 +1,11 @@
+/*
+*	@author:Huangyan
+*	@Date:2016.1.4
+*/
 define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 	function ($,_,Backbone,cookie,DirEntryCollection) {
+
+	//显示文件树
 	var BodyView=Backbone.View.extend({
 		el:$('body'),
 		events:{
@@ -18,7 +24,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 			'keyup #diff-modal input[name=revisionA]':'showFileInfoA',
 			'keyup #diff-modal input[name=revisionB]':'showFileInfoB'
 		},
-		initialize:function (callback) {
+		initialize:function () {
 			this.fileList=new DirEntryCollection();
 			var self=this;
 			this.active={};
@@ -30,12 +36,8 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 			this.fileList.fetch({data:{v:this.revision}}).done(function () {
 				self.alterFileList();
 			});
-			if(callback)
-				callback();
 		},
-		/* 	@description: 	check exist local cache file.
-					if exist new file, add to list.
-					if exist delete file, remove from list.
+		/* 	先检查本地更改，将本地添加的文件添加到树list中，将本地删除的文件从树中删除。
 		*/
 		alterFileList:function () {
 			DBManager.manager.getAll(function (result) {
@@ -75,7 +77,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 					stack.push(file);
 				}
 			})
-			// console.log(this.fileList);
+			
 			var temp=_.template($('#dir-list-temp').html());
 			$('#file-list').append(temp({dirs:this.fileList.at(0).get('children'),active:this.active,deep:0}));
 			$('#file-list').children('.dir-list').addClass('product-list');
