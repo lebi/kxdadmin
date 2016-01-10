@@ -122,17 +122,23 @@
 
         manager.update=function (file,success,obj) {
             if(_check(file)){
-                var transaction=manager.db.transaction(['fileStore'],'readwrite');
-                var objectstore=transaction.objectStore('fileStore');
-                var request=objectstore.put(file);
-                request.onerror=function (event) {
-                    console.log('update error');
-                    console.log(request);
-                }
-                request.onsuccess=function (event) {
-                    if(success)
-                        success.call(obj);
-                }
+                manager.getOne(file.path,function (data) {
+                    for(var i in file){
+                        data[i]=file[i]
+                    }
+
+                    var transaction=manager.db.transaction(['fileStore'],'readwrite');
+                    var objectstore=transaction.objectStore('fileStore');
+                    var request=objectstore.put(data);
+                    request.onerror=function (event) {
+                        console.log('update error');
+                        console.log(request);
+                    }
+                    request.onsuccess=function (event) {
+                        if(success)
+                            success.call(obj);
+                    }
+                })
             }
         }
 
@@ -166,10 +172,7 @@
 
         */
         function _check(file) {
-            if(isNaN(file.resolve))
-                file.resolve=0;
             if(file.path&&file.action&&file.date&&!isNaN(file.kind))return true;
-            console.log(file);
             throw Error('file format error');
         }
 

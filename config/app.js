@@ -6,8 +6,8 @@ require.config({
 		cookie:'../lib/jquery.cookie',
 		bootstrap:'../lib/bootstrap.min',
 		tool:'tool',
-		model:'../../js/base-model',
-		collection:'../../js/base-collection',
+		model:'../js/base-model',
+		collection:'../js/base-collection',
 		theme:'ace/theme-vibrant_ink',
 		ace:'ace-no/ace',
 		IndexDB:'IndexDB',
@@ -75,6 +75,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','tool','IndexDB',
 			'conflict/*path':'showConflict'
 		},
 		showFileNav:function (path,v) {
+			console.log(path);
 			bodyView.activeByPath(path);
 			if(!v)
 				v=$.cookie('working-revision');
@@ -109,7 +110,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','tool','IndexDB',
 		},
 		showConflict:function(path){
 			conflictEdit.createView(path);
-			conflictRightNav.createView();
+			// conflictRightNav.createView();
 		}
 	})
 
@@ -126,5 +127,5 @@ require(['jquery','underscore','backbone','bootstrap','cookie','tool','IndexDB',
 	compRightNav.setup(compView);
 
 	var changeView=new ComponentChangeView();
-	var conflictEdit=new ConflictEditView(conflictRightNav);
+	var conflictEdit=new ConflictEditView({nav:conflictRightNav});
 })

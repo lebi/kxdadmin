@@ -1,5 +1,5 @@
-define(['jquery','underscore','backbone','WrapperView'],
-	function ($,_,Backbone,WrapperView) {
+define(['jquery','cookie','underscore','backbone','WrapperView'],
+	function ($,cookie,_,Backbone,WrapperView) {
 
 	var EditorView=WrapperView.extend({
 		template:_.template($('#editor-temp').html()),
@@ -33,6 +33,7 @@ define(['jquery','underscore','backbone','WrapperView'],
 			this.data.date=new Date().getTime();
 			this.data.content=this.editor.session.getDocument().getValue();
 			this.data.comment=$('.comment-field textarea').val();
+			this.data.revision=$.cookie('working-revision');
 
 			var doing="<span class='save-doing'><i class='icon-refresh'/> 正在保存</span>";
 			var success="<span class='save-success'><i class='icon-ok-sign'/> 已保存</span>";

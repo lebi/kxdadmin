@@ -1,11 +1,5 @@
-/*
-*	@author:Huangyan
-*	@Date:2016.1.4
-*/
 define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 	function ($,_,Backbone,cookie,DirEntryCollection) {
-
-	//显示文件树
 	var BodyView=Backbone.View.extend({
 		el:$('body'),
 		events:{
@@ -24,20 +18,24 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 			'keyup #diff-modal input[name=revisionA]':'showFileInfoA',
 			'keyup #diff-modal input[name=revisionB]':'showFileInfoB'
 		},
-		initialize:function () {
+		initialize:function (callback) {
 			this.fileList=new DirEntryCollection();
 			var self=this;
 			this.active={};
 			this.fileList.on('myevent',this.renderFileList,this);
 			this.revision=$.cookie('working-revision');
-			if(!this.revision)
+			if(!this.revision||isNaN(this.revision))
 				this.revision=0;
 
 			this.fileList.fetch({data:{v:this.revision}}).done(function () {
 				self.alterFileList();
 			});
+			if(callback)
+				callback();
 		},
-		/* 	先检查本地更改，将本地添加的文件添加到树list中，将本地删除的文件从树中删除。
+		/* 	@description: 	check exist local cache file.
+					if exist new file, add to list.
+					if exist delete file, remove from list.
 		*/
 		alterFileList:function () {
 			DBManager.manager.getAll(function (result) {
@@ -65,7 +63,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 			this.fileList.each(function (file) {
 				while(stack.length!=0){
 					var str=stack.peek().get('path');
-					if(str)
+					if(!str.endWith("/"))
 						str+="/";
 					if(file.get('path').startWith(str)){
 						stack.peek().get('children').push(file);
@@ -77,7 +75,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 					stack.push(file);
 				}
 			})
-			
+			// console.log(this.fileList);
 			var temp=_.template($('#dir-list-temp').html());
 			$('#file-list').append(temp({dirs:this.fileList.at(0).get('children'),active:this.active,deep:0}));
 			$('#file-list').children('.dir-list').addClass('product-list');
@@ -98,7 +96,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 
 			var kind=type=='file'?1:0;
 			if(this.addToList(path,kind)){
-				DBManager.manager.addExist({path:path,kind:kind,date:new Date().getTime(),action:'add'},function () {
+				DBManager.manager.addExist({path:path,kind:kind,date:new Date().getTime(),action:'add',revision:$.cookie('working-revision')},function () {
 					$('#add-product-modal').modal('hide');
 				},this);
 			}
@@ -224,7 +222,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 			var file=$(event.target).closest('.content');
 			var path=this.findPath(file);
 			var model=this.fileList.get(path);
-			var obj={path:path,action:'delete',kind:model.get('kind'),date:new Date().getTime()};
+			var obj={path:path,action:'delete',kind:model.get('kind'),date:new Date().getTime(),revision:$.cookie('working-revision')};
 
 			this.deleteCache(obj,function () {
 				this.fileList.remove(path);
@@ -325,21 +323,25 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 				return;
 			}
 			var it=this.findByPath(origin);
-			var orifile={path:origin,action:'delete',date:new Date().getTime(),kind:1};
-			var newfile={path:path,action:'add',date:new Date().getTime(),kind:1};
+			var orifile={path:origin,action:'delete',date:new Date().getTime(),kind:1,revision:$.cookie('working-revision')};
+			var newfile={path:path,action:'add',date:new Date().getTime(),kind:1,revision:$.cookie('working-revision')};
 			var self=this;
 			DBManager.manager.getOne(origin,function (result) {
-				if(!result){
+				//原文件不在缓存中，将原文件删除
+				if(!result)
 					DBManager.manager.add(orifile);
-				} else if(result.action=='add')
+				//原文件在缓存中，但是是新添加的文件，直接删除缓存文件（不需要告诉svn）
+				else if(result.action=='add')
 					DBManager.manager.delete(orifile.path);
-				else DBManager.manager.addExist(orifile);
+				//原文件不是add，那么该文件存在缓存中，也存在文件列表中，将删除操作添加到缓存
+				else 
+					DBManager.manager.addExist(orifile);
 				this.fileList.remove(origin);
 				it.remove();
 				$('#rename-modal').modal('hide');
-
-
+				
 				if(!result||result.content==null){
+					//文件不在缓存中，需要从svn读取文件内容并存在缓存中
 					$.getJSON('/svnserviceAPI/file',{path:origin,v:$.cookie('working-revision')},function (data) {
 						if(data.errorMsg)return;
 						newfile.content=data.result.content;
@@ -347,6 +349,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 						self.addToList(path,1);
 					})
 				}else {
+					//文件存在缓存中，直接将缓存内容读出
 					newfile.content=result.content;
 					DBManager.manager.addExist(newfile);
 					self.addToList(path,1);

@@ -17,6 +17,13 @@ a:focus{
 	color: #fff;
 	text-decoration: none;
 }
+.content-wrapper{
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+.wrapper{
+	margin-top: 47px;
+}
 .nav-icon{
 	font-size: 30px;
 }
@@ -138,14 +145,14 @@ body::-webkit-scrollbar {
 	display: inherit;
 	margin-top: -22;
 }
-.dropdown>a:hover{
+.line-dropdown>a:hover{
 	color: #333;
 }
-.dropdown:hover{
+.line-dropdown:hover{
 	display: inherit;
 	margin-top: -22;
 }
-.dropdown{
+.line-dropdown{
 	display: none;
 	float: right;
 	padding-right: 10px;

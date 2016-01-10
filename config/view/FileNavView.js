@@ -1,5 +1,5 @@
-define(['jquery','underscore','backbone','RightNavView'],
-	function ($,_,Backbone,RightNavView) {
+define(['jquery','cookie','underscore','backbone','RightNavView'],
+	function ($,cookie,_,Backbone,RightNavView) {
 
 	var FileNavView=RightNavView.extend({
 		events:{
@@ -44,7 +44,7 @@ define(['jquery','underscore','backbone','RightNavView'],
 					DBManager.manager.getOne(path,function (result) {
 						var file={path:path,date:new Date().getTime(),kind:1,
 							action:'update',content:data.result.content,
-							comment:data.result.comment};
+							comment:data.result.comment,revision:$.cookie('working-revision')};
 						if(result){
 							if(!confirm('存在未提交，是否覆盖？'))
 								return;
@@ -95,7 +95,7 @@ define(['jquery','underscore','backbone','RightNavView'],
 			var back=path+'.bak';
 			$.getJSON('/svnserviceAPI/file',{path:path,v:revision},function (data) {
 				if(self.bodyView.addToList(back,1)){
-					var file={path:back,date:new Date().getTime(),content:data.result.content,kind:1,action:'add'};
+					var file={path:back,date:new Date().getTime(),content:data.result.content,kind:1,action:'add',revision:$.cookie('working-revision')};
 					DBManager.manager.addExist(file,function () {
 						window.location.href='#file/'+back;
 					});

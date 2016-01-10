@@ -1,5 +1,5 @@
-define(['jquery','underscore','backbone','WrapperView','FileConflict'],
-	function ($,_,Backbone,WrapperView,FileConflict) {
+define(['jquery','cookie','underscore','backbone','WrapperView','FileConflict'],
+	function ($,cookie,_,Backbone,WrapperView,FileConflict) {
 
 	var ConflictEditView=WrapperView.extend({
 		el:$('.page-wrapper'),
@@ -23,7 +23,7 @@ define(['jquery','underscore','backbone','WrapperView','FileConflict'],
 		render:function (data) {
 			this.data=data;
 			this.$el.empty();
-			var detail=new FileConflict({path:data.path,content:data.content,action:data.action,resolve:data.resolve});
+			var detail=new FileConflict({path:data.path,content:data.content,action:data.action});
 			var self=this;
 			detail.save().done(function(result){
 				self.$el.append(self.template({data:data,result:result.result}));
@@ -40,7 +40,8 @@ define(['jquery','underscore','backbone','WrapperView','FileConflict'],
 		resolve:function(){
 			this.data.date=new Date().getTime();
 			this.data.content=this.editor.session.getDocument().getValue();
-			this.data.resolve=1;
+			// this.data.resolve=1;
+			this.data.revision=$.cookie('conflict-revision');
 			var doing="<span class='save-doing'><i class='icon-refresh'/> 正在保存</span>";
 			var success="<span class='save-success'><i class='icon-ok-sign'/> 已保存</span>";
 			var fail="<span class='save-fail'><i class='icon-warning-sign'/> 保存失败</span>";

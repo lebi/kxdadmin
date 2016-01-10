@@ -16,7 +16,10 @@ define(['jquery','underscore','backbone','cookie','UnitList'],
 			var self=this;
 			this.unitList.fetch({reset: true}).done(function () {
 				var uid=$.cookie('unitChoose');
+				if(!uid)
+					uid=self.unitList.at(0).get('id');
 				window.location.href="#detail?"+uid;
+					
 			});
 		},
 		/*
@@ -25,7 +28,6 @@ define(['jquery','underscore','backbone','cookie','UnitList'],
 		*			it's children's layer is /1/4/5/{id}
 		*/
 		render:function () {
-			console.log('units update');
 			var stack=[];
 			this.tree={children:[]};
 			var self=this;

@@ -1,5 +1,5 @@
-define(['jquery','underscore','backbone','WrapperView'],
-	function ($,_,Backbone,WrapperView) {
+define(['jquery','underscore','backbone','WrapperView','DiffEntry'],
+	function ($,_,Backbone,WrapperView,DiffEntry) {
 	var DiffView=WrapperView.extend({
 		template:_.template($('#diff-temp').html()),
 		events:{

@@ -47,7 +47,7 @@
 	  					<%_.each(dirs,function (dir) {%>
 	  						<% if(dir.get('kind')==0){%>
 		  					<li class="dir <%=$.cookie(dir.get('path'))==true?'active':''%>">
-				  				<div href="#dir/<%=dir.get('path')%>" class="dropdown content">
+				  				<div href="#dir<%=dir.get('path')%>" class="dropdown content">
 				  					<i class="icon-caret-down dir-caret"></i><i class="icon-caret-right dir-caret"></i>
 				  					<span><%=dir.get('name')%></span><i class="icon-cogs setting dropdown-toggle" data-toggle="dropdown"></i>
 				  					<ul class="setting-dropdown dropdown-menu">
@@ -59,7 +59,7 @@
 		  					</li>
 	  						<%}else{%>
 	  							<li class="file">
-			  						<div href="#file/<%=dir.get('path')%>" class="dropdown content">
+			  						<div href="#file<%=dir.get('path')%>" class="dropdown content">
 			  							<i class="icon-file-alt"> </i><span><%=dir.get('name')%></span>
 			  							<i class="icon-cogs setting dropdown-toggle" data-toggle="dropdown"></i>
 			  							<ul class="setting-dropdown dropdown-menu">
