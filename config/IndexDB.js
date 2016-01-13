@@ -172,6 +172,7 @@
 
         */
         function _check(file) {
+            console.log(file);
             if(file.path&&file.action&&file.date&&!isNaN(file.kind))return true;
             throw Error('file format error');
         }

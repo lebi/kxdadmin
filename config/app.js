@@ -75,13 +75,14 @@ require(['jquery','underscore','backbone','bootstrap','cookie','tool','IndexDB',
 			'conflict/*path':'showConflict'
 		},
 		showFileNav:function (path,v) {
-			console.log(path);
+			path='/'+path;
 			bodyView.activeByPath(path);
 			if(!v)
 				v=$.cookie('working-revision');
 			fileRightNav.createView(path,v,bodyView);
 		},
 		showComponentNav:function (path,v) {
+			path='/'+path;
 			bodyView.activeByPath(path);
 			if(!v)
 				v=$.cookie('working-revision');
@@ -109,6 +110,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','tool','IndexDB',
 			conflictRightNav.createView();
 		},
 		showConflict:function(path){
+			path='/'+path;
 			conflictEdit.createView(path);
 			// conflictRightNav.createView();
 		}

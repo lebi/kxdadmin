@@ -51,7 +51,7 @@ define(['jquery','cookie','underscore','backbone','WrapperView'],
 			DBManager.manager.delete(this.path,function () {
 				if(self.data.action=='add'){
 					self.fileRightNav.fileDeleteAPI(self.path);
-					window.location.href="#dir/"+self.path.parent();
+					window.location.href="#dir"+self.path.parent();
 				}else{
 					self.fileRightNav.createView(self.path);
 				}

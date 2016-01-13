@@ -135,7 +135,7 @@ define(['jquery','underscore','backbone','cookie','bootstrap','highcharts','Time
 						
 						for(var j=0;j<params.length;j++){
 							var result=new Array()
-							for(var i=historyDetail.get('chartData').length-1;i>=0;i--){
+							for(var i=0;i<historyDetail.get('chartData').length;i++){
 								var reg=new RegExp(historyDetail.get('reg'));
 								if(type==0)
 									result.push(reg.calculate(historyDetail.get('chartData')[i].perfdata,ruleList[j]));

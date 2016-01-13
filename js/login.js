@@ -33,7 +33,8 @@ var BodyView=Backbone.View.extend({
 			alert('用户名密码不能为空');
 			return;
 		}
-		var encodeSalt=CryptoJS.MD5(CryptoJS.MD5(password).toString()+$.cookie('salt')).toString();
+		// var encodeSalt=CryptoJS.MD5(CryptoJS.MD5(password).toString()+$.cookie('salt')).toString();
+		var encodeSalt=CryptoJS.MD5(password).toString();
 		var user=new User({username:username,password:encodeSalt});
 		user.save().done(function (result) {
 			if(result.errorMsg!=null){

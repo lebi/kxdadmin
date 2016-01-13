@@ -38,28 +38,38 @@ define(['jquery','cookie','underscore','backbone','RightNavView'],
 		*					再添加文件。
 		*/
 		editRevisionAPI:function (path,revision) {
+			var encodepath=encodeURIComponent(path);
 			var self=this;
-			$.getJSON('/svnserviceAPI/file',{path:path,v:revision},function (data) {
-				if(!data.errorMsg)
-					DBManager.manager.getOne(path,function (result) {
-						var file={path:path,date:new Date().getTime(),kind:1,
-							action:'update',content:data.result.content,
-							comment:data.result.comment,revision:$.cookie('working-revision')};
-						if(result){
-							if(!confirm('存在未提交，是否覆盖？'))
-								return;
-							if(result.action=='add')
-								file.action='add';
-							DBManager.manager.update(file,self.chooseEdit,self);
-						}else{
-							if(!self.bodyView.fileList.get(path)){
-								file.action='add';
-								self.bodyView.fileList.addUnique({path:path,kind:1,name:path.split('/').peek()});
-							}
-							DBManager.manager.addExist(file,self.chooseEdit,self);
-						}
-						$('.new-cache.hide').removeClass('hide');
-					});
+			$.ajax({
+				url:'/svnserviceAPI/permit?file='+encodepath+'&action=edit',
+				success:function (result) {
+					if(result.errorMsg==null){
+						$.getJSON('/svnserviceAPI/file',{path:path,v:revision},function (data) {
+							if(!data.errorMsg)
+								DBManager.manager.getOne(path,function (result) {
+									var file={path:path,date:new Date().getTime(),kind:1,
+										action:'update',content:data.result.content,
+										comment:data.result.comment,revision:$.cookie('working-revision')};
+									if(result){
+										if(!confirm('存在未提交，是否覆盖？'))
+											return;
+										if(result.action=='add')
+											file.action='add';
+										DBManager.manager.update(file,self.chooseEdit,self);
+									}else{
+										if(!self.bodyView.fileList.get(path)){
+											file.action='add';
+											self.bodyView.fileList.addUnique({path:path,kind:1,name:path.split('/').peek()});
+										}
+										DBManager.manager.addExist(file,self.chooseEdit,self);
+									}
+									$('.new-cache.hide').removeClass('hide');
+								});
+						})
+					}
+					else
+						alert('没有权限！');
+				}
 			})
 			// }
 		},
@@ -92,18 +102,39 @@ define(['jquery','cookie','underscore','backbone','RightNavView'],
 			this.fileCopyAPI(this.path,revision);
 		},
 		fileCopyAPI:function(path,revision){
-			var back=path+'.bak';
-			$.getJSON('/svnserviceAPI/file',{path:path,v:revision},function (data) {
-				if(self.bodyView.addToList(back,1)){
-					var file={path:back,date:new Date().getTime(),content:data.result.content,kind:1,action:'add',revision:$.cookie('working-revision')};
-					DBManager.manager.addExist(file,function () {
-						window.location.href='#file/'+back;
-					});
+			var encodepath=encodeURIComponent(path);
+			var self=this;
+			$.ajax({
+				url:'/svnserviceAPI/permit?file='+encodepath+'&action=add',
+				success:function (result) {
+					if(result.errorMsg==null){
+						var back=path+'.bak';
+						$.getJSON('/svnserviceAPI/file',{path:path,v:revision},function (data) {
+							if(self.bodyView.addToList(back,1)){
+								var file={path:back,date:new Date().getTime(),content:data.result.content,
+										kind:1,action:'add',revision:$.cookie('working-revision')};
+								DBManager.manager.addExist(file,function () {
+									window.location.href='#file'+back;
+								});
+							}
+						})
+					}else
+						alert('没有权限！');
 				}
 			})
 		},
 		fileDeleteAPI:function(path){
-			this.bodyView.fileList.removeUnique(path);
+			var encodepath=encodeURIComponent(path);
+			var self=this;
+			$.ajax({
+				url:'/svnserviceAPI/permit?file='+encodepath+'&action=delete',
+				success:function (result) {
+					if(result.errorMsg==null)
+						self.bodyView.fileList.removeUnique(path);
+					else
+						alert('没有权限！');
+				}
+			})
 		}
 	})
 	return FileNavView;

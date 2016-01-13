@@ -1,10 +1,11 @@
+
+
 var User=MyModel.extend({
 	urlRoot:'/webserviceAPI/admin/user',
 	defaults:{
 		'username':null,
 		'id':null,
-		'password':null,
-		'roleList':null
+		'password':null
 	}
 })
 

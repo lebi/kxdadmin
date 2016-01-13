@@ -1,4 +1,4 @@
-define(['backbone'],function(Backbone){
+define(['jquery','underscore','backbone'],function($,_,Backbone){
 	var MyModel=Backbone.Model.extend({
 		set:function (models, options) {
 			if(models.errorMsg)return;

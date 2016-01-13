@@ -56,10 +56,9 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 		*	@tips:need to change list to tree before render  */
 		renderFileList:function () {
 			$('#file-list').empty();
+			var forest=new Array();
 			var stack=new Array();
 			var self=this;
-			this.revision=this.fileList.at(0).get('revision');
-			$.cookie('working-revision',this.revision);
 			this.fileList.each(function (file) {
 				while(stack.length!=0){
 					var str=stack.peek().get('path');
@@ -70,14 +69,24 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 						break;
 					}else stack.pop();
 				}
+				if(stack.length==0)
+					forest.push(file);
 				if(file.get('kind')==0){
 					file.set('children',new Array());
 					stack.push(file);
 				}
 			})
-			// console.log(this.fileList);
+			// console.log(forest);
+			this.revision=_.reduce(forest,function (memo,dir) {
+				if(dir.get('revision')>memo)
+					return dir.get('revision');
+				else
+					return memo;
+			},0);
+			// console.log(this.revision);
+			$.cookie('working-revision',this.revision);
 			var temp=_.template($('#dir-list-temp').html());
-			$('#file-list').append(temp({dirs:this.fileList.at(0).get('children'),active:this.active,deep:0}));
+			$('#file-list').append(temp({dirs:forest,active:this.active,deep:0}));
 			$('#file-list').children('.dir-list').addClass('product-list');
 
 			$('.update').empty();
@@ -132,11 +141,12 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 		},
 		toggle:function () {
 			var target=$(event.target);
-			console.log(target);
+			// console.log(target);
 			if(!target.hasClass('dir-caret'))
 				return;
 			var product=$(event.target).closest('.dir');
 			var path=this.findPath(product.children('.content'));
+			// console.log(path);
 			if(product.hasClass('active')){
 				delete this.active[path];
 				$.cookie(path,null);
@@ -153,21 +163,24 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 				return;
 
 			var file=target.closest('.content');
-
 			var locate=$(file).attr('href');
 			window.location.href=locate;
 
-			$('.content.confirm').removeClass('confirm');
-			$(file).addClass('confirm');
 		},
 		findPath:function (son) {
-			var path="";
+			var path=son.children('span').text();
+			son=son.closest('li').parent().closest('li').children('.content');
 			while(son.length>0){
-				path=$(son.children('span')).text()+'/'+path;
+				var t=$(son.children('span')).text();
+				if(t.endWith('/'))
+					path=t+path;
+				else
+					path=t+'/'+path;
 				son=son.closest('li').parent().closest('li').children('.content');
-				// console.log(path)
 			}
-			return path.substr(0,path.length-1);
+			if(!path.startWith('/'))
+				path='/'+path;
+			return path;
 		},
 		searchFile:function () {
 			$('.content',this.$el).closest('li').addClass('active');
@@ -177,7 +190,7 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 			var reg=eval('/(.*'+str+'.*)/');
 
 			_.each($('#file-list>ul>li'),function (dir) {
-					console.log(dir);
+					// console.log(dir);
 				down($(dir));
 			})
 
@@ -199,28 +212,40 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 		},
 		setting:function () {
 			var target=$(event.target).closest('li').attr('target');
-			// //console.log(target);
+			var file=$(event.target).closest('.content');
+			var path=this.findPath(file);
+			console.log(path);
 			switch(target){
 				case 'rename':
-					this.rename();
+					this.checkPermission(file,path,'edit',this.rename,this);
 					break;
 				case 'delete':
-					this.deleteFile();
+					this.checkPermission(file,path,'delete',this.deleteFile,this);
 					break;
 				case 'addfile':
-					this.addFile();
+					this.checkPermission(file,path,'add',this.addFile,this);
 					break;
 				case 'adddir':
-					this.addDir();
+					this.checkPermission(file,path,'add',this.addDir,this);
 					break;
 				case 'diff':
-					this.diff();
+					this.diff(file,path);
 					break;
 			}
 		},
-		deleteFile:function () {
-			var file=$(event.target).closest('.content');
-			var path=this.findPath(file);
+		checkPermission:function (file,path,action,callback,target) {
+			var encodepath=encodeURIComponent(path);
+			$.ajax({
+				url:'/svnserviceAPI/permit?file='+encodepath+'&action='+action,
+				success:function (result) {
+					if(result.errorMsg==null)
+						callback.call(target,file,path);
+					else
+						alert('没有权限！');
+				}
+			})
+		},
+		deleteFile:function (file,path) {
 			var model=this.fileList.get(path);
 			var obj={path:path,action:'delete',kind:model.get('kind'),date:new Date().getTime(),revision:$.cookie('working-revision')};
 
@@ -238,31 +263,23 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 				callback.call(obj);
 			})
 		},
-		rename:function () {
-			var file=$(event.target).closest('.content');
-			var path=this.findPath(file);
+		rename:function (file,path) {
 			$('#rename-modal input').val(path);
 			$('#rename-modal').attr('origin',path);
 			$('#rename-modal').modal('show');
 		},
-		addFile:function () {
-			var file=$(event.target).closest('.content');
-			var path=this.findPath(file);
+		addFile:function (file,path) {
 			$('#add-product-modal input[name=addpath]').val(path+'/');
 			$('#add-product-modal input[type=radio][value=file]').prop('checked',true);
 			$('#add-product-modal').modal('show');
 		},
-		addDir:function () {
-			var file=$(event.target).closest('.content');
-			var path=this.findPath(file);
+		addDir:function (file,path) {
 			$('#add-product-modal input[name=addpath]').val(path+'/');
 			$('#add-product-modal input[type=radio][value=dir]').prop('checked',true);
 			$('#add-product-modal').modal('show');
 		},
-		diff:function () {
+		diff:function (file,path) {
 			$('#diff-modal input').val('');
-			var file=$(event.target).closest('.content');
-			var path=this.findPath(file);
 			$('#diff-modal input[name=fileA]').val(path);
 			$('#diff-modal input[name=revisionA]').val('HEAD');
 			$('#diff-modal input[name=revisionB]').val('HEAD');
@@ -354,31 +371,37 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 					DBManager.manager.addExist(newfile);
 					self.addToList(path,1);
 				}
-				window.location.href="#file/"+path;
+				window.location.href="#file"+path;
 			},this)
 		},
 		findByPath:function (path) {
-			var arr=path.split('/');
-
 			var it=$('#file-list')
-			for(var i=0;i<arr.length;i++){
+			while(path){
 				var list=it.children('ul').children('li');
+				if(!list.length)
+					return;
 				list.each(function () {
 					var name=$(this).children('.content').children('span').html();
-					if(name==arr[i]){
+					if(path.startWith(name)&&(path[name.length]=='/'||path.length==name.length)){
 						it=$(this);
-						if(i<arr.length-1)
-							it.addClass('active');
+						path=path.substr(name.length+1);
 						return false;
 					}
-				});
+					//遍历到最后一个，没有找到
+					if($(this).index()==list.length-1){
+						path='';
+						return false;
+					}
+				})
 			}
 			return it;
 		},
 		activeByPath:function (path) {
 			var it=this.findByPath(path);
-			$('.content.confirm').removeClass('confirm');
-			it.children('.content').addClass('confirm');
+			if(it){
+				$('.content.confirm').removeClass('confirm');
+				it.children('.content').addClass('confirm');
+			}
 		},
 		update:function(){
 			$.cookie('working-revision',0);
