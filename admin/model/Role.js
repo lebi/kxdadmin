@@ -3,8 +3,9 @@ define(['model'],function (MyModel) {
 		urlRoot:'/webserviceAPI/admin/role',
 		defaults:{
 			'name':null,
+			'code':null,
 			'id':null,
-			'permits':null
+			'operations':null
 		}
 	})
 	return Role;

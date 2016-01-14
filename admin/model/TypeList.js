@@ -9,7 +9,11 @@ define(['model','collection'],function (MyModel,MyCollection) {
 
 	var TypeList=MyCollection.extend({
 		model:AssetType,
-		url:'/webserviceAPI/list/type'
+		url:'/webserviceAPI/list/type',
+		set:function (models,options) {
+			MyCollection.prototype.set.call(this,models,options);
+			var self=this;
+		},
 	})
 	
 	return TypeList;

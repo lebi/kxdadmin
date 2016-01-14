@@ -110,7 +110,7 @@ body{
 	font-size: 24px;
 	border-bottom: 1px solid #f2f2f2;
 	box-shadow: 0 1px 0px 0 rgba(0,0,0,.14);
-	padding:15 0 5 20;
+	padding:15 20 5 20;
 }
 .tool-content{
 	padding: 50px 20px;

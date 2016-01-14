@@ -16,5 +16,5 @@ define(['model','collection'],function (MyModel,MyCollection) {
 		url:'/webserviceAPI/list/unit'
 	})
 	
-	return TypeList;
+	return UnitList;
 })

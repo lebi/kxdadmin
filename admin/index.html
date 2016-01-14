@@ -15,89 +15,76 @@
 				<nav>
 					<div id="navbar">
 						<ul class="sidebar-items nav">
-							<li target="user-admin">用户管理<div class="choose"></div></li>
-							<li target="account-add">添加用户<div class="choose"></div></li>
-							<li target="role-admin">角色管理<div class="choose"></div></li>
+							<a href="#user"><li>用户管理<div class="choose"></div></li></a>
+							<a href="#role"><li>角色管理<div class="choose"></div></li></a>
+							<a href="#permit"><li>角色管理<div class="choose"></div></li></a>
 						</ul>
 					</div>
 				</nav>
 			</div>
 			<div class="tool-wrapper">
+			</div>
+			<script type="text/template" id="user-admin-temp">
 				<div class="tool tool-big" id="user-admin">
 					<div class="tool-header">
-						<span>用户权限管理</span>
+						<span>用户管理</span>
+						<div class='add-user'>添加用户</div>
 					</div>
 					<div class="tool-content">
 						<table class="table table-bordered">
 							<thead>
 								<tr>
-									<th>用户名</th><th>权限</th><th class="edit-user-button">修改</th><th class="delete-user-button">删除</th>
+									<th>#</th><th>用户名</th><th>修改</th><th>删除</th>
 								</tr>
 							</thead>
 							<tbody class="user-admin-tbody">
+								<%_.each(userList,function (model){%>
+									<tr uid="<%=model.get('id')%>">
+										<td><%=model.get('id')%></td>
+										<td><%=model.get('username')%></td>
+										<!--<td>
+											<%_.each(model.get('roleList'),function (role) {%>
+												<a href="javascript:void(0)" class="badge badge-choose" roleid="<%=role.id%>"><%=role.name%></a>
+											<%})%>
+											<a href="javascript:void(0)" class="edit-role">修改角色</a>
+										</td>-->
+										<td class="edit-user-button"><a href="javascript:void(0)" class="edit-user">修改密码</a></td>
+										<td class="delete-user-button"><a href="javascript:void(0)" class="delete-user">删除</a></td>
+									</tr>
+								<%})%>
 							</tbody>
 						</table>
-						<script type="text/template" id="user-admin-temp">
-							<%_.each(userList,function (model){%>
-								<tr>
-									<td><%=model.get('username')%></td>
-									<td>
-										<%_.each(model.get('roleList'),function (role) {%>
-											<a href="javascript:void(0)" class="badge badge-choose" roleid="<%=role.id%>"><%=role.name%></a>
-										<%})%>
-										<a href="javascript:void(0)" class="edit-role">修改角色</a>
-									</td>
-									<td class="edit-user-button"><a href="javascript:void(0)" class="edit-user">修改密码</a></td>
-									<td class="delete-user-button"><a href="javascript:void(0)" class="delete-user">删除</a></td>
-								</tr>
-							<%})%>
-						</script>
 						<form class="form-horizontal edit-user-form">
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">用户名</label>
-						    	<div class="col-sm-10">
-						    		<label class="col-sm-1 control-label username">test1</label>
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label" >新密码</label>
-						    	<div class="col-sm-10">
-						      	<input class="form-control" type="password" name="new-pwd">
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">确认密码</label>
-						    	<div class="col-sm-10">
-						      	<input class="form-control" type="password" name="confirm-pwd">
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<div class="buttonlist">
-						    		<div class="control-botton control-botton-2 cancel-submit">取消</div>
-						    		<div class="control-botton control-botton-2" id="edit-submit">提交</div>
-						    	</div>
-						    </div>
 						</form>
-						<form class="form-horizontal edit-role-form">
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">用户名</label>
-						    	<div class="col-sm-10">
-						    		<label class="control-label username"></label>
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">角色</label>
-						    	<div class="col-sm-10 role-check-list">
-    							</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<div class="buttonlist">
-						    		<a href="#" class="create-role-link">添加角色</a>
-						    		<div class="control-botton control-botton-2 cancel-submit">取消</div>
-						    		<div class="control-botton control-botton-2" id="role-submit">确定</div>
-						    	</div>
-						    </div>
-						</form>
+					</div>
+				</div>
+			</script>
+			<script type="text/template" id="edit-user-temp">
+				<div class="form-group">
+			    	<label class="col-sm-2 control-label">用户名</label>
+			    	<div class="col-sm-10">
+			      		<input class="form-control" type="text" name="username" value="<%=user.username%>">
+			    	</div>
+			  	</div>
+			  	<div class="form-group">
+			    	<label class="col-sm-2 control-label" >新密码</label>
+			    	<div class="col-sm-10">
+			      	<input class="form-control" type="password" name="password">
+			    	</div>
+			  	</div>
+			  	<div class="form-group">
+			    	<label class="col-sm-2 control-label">确认密码</label>
+			    	<div class="col-sm-10">
+			      	<input class="form-control" type="password" name="confirmpwd">
+			    	</div>
+			  	</div>
+			  	<div class="form-group">
+			    	<div class="buttonlist">
+			    		<div class="control-botton control-botton-2 cancel-submit">取消</div>
+			    		<div class="control-botton control-botton-2" id="edit-submit">提交</div>
+			    	</div>
+			    </div>
+			</script>
 						<script type="text/template" id="role-check-list">
 							<%_.each(roleList,function (role){%>
       							<div class="checkbox">
@@ -105,47 +92,8 @@
       							</div>
 							<%})%>
 						</script>
-					</div>
-				</div>
-				<div class="tool" id="account-add">
-					<div class="tool-header">
-						<span>添加用户</span>
-					</div>
-					<div class="tool-content">
-						<form class="form-horizontal">
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">用户名</label>
-						    	<div class="col-sm-10">
-						      	<input class="form-control" name='username'>
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">密码</label>
-						    	<div class="col-sm-10">
-						      	<input class="form-control" name='new-pwd' type='password'>
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">确认密码</label>
-						    	<div class="col-sm-10">
-						      	<input class="form-control" name='confirm-pwd' type='password'>
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">角色</label>
-						    	<div class="col-sm-10 role-check-list">
-						    	</div>
-						  	</div>
-						  	<div class="form-group">
-						    	<div class="buttonlist">
-						    		<div class="control-botton control-botton-2 add-reset">重置</div>
-						    		<div class="control-botton control-botton-2 add-submit">添加</div>
-						    	</div>
-						    </div>
-						</form>
-					</div>
-				</div>
- 				<div class="tool open" id="role-admin">
+			<script type="text/template" id="role-admin-temp">
+ 				<div class="tool tool-big" id="role-admin">
 					<div class="tool-header">
 						<span>角色管理</span>
 					</div>
@@ -153,54 +101,59 @@
 						<table class="table table-bordered">
 							<thead>
 								<tr>
-									<th>角色名称</th><th class="edit-role-button">修改</th><th class="delete-role-button">删除</th>
+									<th>角色名称</th>
+									<th>编码</th>
+									<%typeList.each(function (type) {%>
+										<th><%=type.get('name')%></th>
+									<%})%>
+									<th>修改</th><th>删除</th>
 								</tr>
 							</thead>
 							<tbody class="role-admin-tbody">
+								<%roleList.each(function (role) {%>
+									<tr rid="<%=role.get('id')%>">
+										<td><%=role.get('name')%></td>
+										<td><%=role.get('code')%></td>
+										<%var set={}%>
+										<%_.each(role.get('operations'),function (op) {%>
+											<%set[op.operation]=op%>
+										<%})%>
+										<%typeList.each(function (type) {%>
+											<td>
+												<%_.each(type.get('operations'),function (op) {%>
+													<%if(set[op.id]){%>
+														<a class="badge badge-exist" oid="<%=set[op.id].id%>" operation="<%=op.id%>">
+															<span><%=op.name%></span>
+															<i class="badge-remove icon-remove-sign op-remove"></i>
+														</a>
+													<%}else{%>
+														<a class="badge" operation="<%=op.id%>">
+															<span><%=op.name%></span>
+															<i class="badge-remove icon-plus-sign op-add"></i>
+														</a>
+													<%}%>
+												<%})%>
+											</td>
+										<%})%>
+										<td class="edit-role-button"><a href="javascript:void(0)" class="edit-role">修改</a></td>
+										<td class="delete-role-button"><a href="javascript:void(0)" class="delete-role">删除</a></td>
+									</tr>
+								<%})%>
 							</tbody>
 						</table>
-						<script type="text/template" id="role-admin-temp">
-							<%_.each(roleList,function (role) {%>
-								<tr>
-									<td><%=role.get('name')%></td>
-									<td class="edit-role-button"><a href="javascript:void(0)" class="edit-role">修改</a></td>
-									<td class="delete-role-button"><a href="javascript:void(0)" class="delete-role">删除</a></td>
-								</tr>
-							<%})%>
-						</script>
 						<div class="control-botton control-botton-2" id="add-new-role"><i class="icon-plus-sign"></i>添加新角色</div>
 						<form class="form-horizontal role-admin-form">
 						  	<div class="form-group">
 						    	<label class="col-sm-2 control-label">角色名称</label>
 						    	<div class="col-sm-10 rolename">
+						    		<input class="form-control" name='name'>
 						    	</div>
 						  	</div>
 						  	<div class="form-group">
-						    	<label class="col-sm-2 control-label">模块</label>
-						    	<div class="col-sm-10">
-						  			<ul class="module-list">
-						  			</ul>
-						  			<script type="text/template" id="module-list-temp">
-						  				<% for(var key in map){%>
-											<li>
-							  					<a href="javascript:void(0)" class="module-name"><%=key%> <i class="icon-double-angle-down"></i></a>
-						  						<div class="checkbox">
-						  						<table class="table table-bordered">
-						  						<%_.each(map[key],function (resource) {%>
-							  						<tr resourceid='<%=resource.id%>'>
-							  							<td class="permission-name"><label><%=resource.name%></label></td>
-								    					<td><label><input type="checkbox"><i></i> Create</label></td>
-								    					<td><label><input type="checkbox"><i></i> Read</label></td>
-								    					<td><label><input type="checkbox"><i></i> Update</label></td>
-								    					<td><label><input type="checkbox"><i></i> Delete</label></td>
-							  						</tr>
-						  						<%})%>
-						  						</table>
-						  						</div>
-						  					</li>
-						  				<%}%>
-						  			</script>
-						  		</div>
+						    	<label class="col-sm-2 control-label">角色编码</label>
+						    	<div class="col-sm-10 code">
+						    		<input class="form-control" name='code'>
+						    	</div>
 						  	</div>
 						  	<div class="form-group">
 						    	<div class="buttonlist">
@@ -211,7 +164,27 @@
 						</form>
 					</div>
 				</div>
-			</div>
+			</script>
+			<script type="text/template" id="module-list-temp">
+  				<% for(var key in map){%>
+					<li>
+	  					<a href="javascript:void(0)" class="module-name"><%=key%> <i class="icon-double-angle-down"></i></a>
+  						<div class="checkbox">
+  						<table class="table table-bordered">
+  						<%_.each(map[key],function (resource) {%>
+	  						<tr resourceid='<%=resource.id%>'>
+	 							<td class="permission-name"><label><%=resource.name%></label></td>
+		    					<td><label><input type="checkbox"><i></i> Create</label></td>
+		    					<td><label><input type="checkbox"><i></i> Read</label></td>
+		    					<td><label><input type="checkbox"><i></i> Update</label></td>
+		    					<td><label><input type="checkbox"><i></i> Delete</label></td>
+							</tr>
+						<%})%>
+						</table>
+						  						</div>
+						  					</li>
+						  				<%}%>
+						  			</script>
 		</div>
 		<script type="text/javascript" src="require.js" data-main="app.js"></script>
 	</body>
