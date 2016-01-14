@@ -68,7 +68,6 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			this.userList=new UserList();
 			this.roleList=new RoleList();
 			this.resourceList=new ResourceList();
-
 			var li=$('.sidebar-items li').get(0);
 			if(li)
 				$(li).addClass('active');
@@ -95,6 +94,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			'click #user-admin .delete-user':'deleteUser',
 			'click #user-admin .add-user':'addUser',
 			'change #user-admin input':'bind',
+
 		},
 		initialize:function (userList,show){
 			this.userList=userList;
@@ -297,12 +297,22 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 
 	var PermitView=Backbone.View.extend({
 		el:$('.tool-wrapper'),
-		initialize:function () {
+		template:_.template($('#permit-admin-temp').html()),
+		initialize:function (show) {
+			this.show=show;
 			this.permitList=new PermitList();
 			this.unitList=new UnitList();
 			this.roleList=new RoleList();
 
+			this.permitList.on('update',this.render,this);
+		},
+		showView:function () {
 			this.permitList.fetch();
+		},
+		render:function () {
+			if(this.show.target!='permit') return;
+			this.$el.empty();
+			this.$el.append(this.template({permitList:this.permitList,unitList:this.unitList}));
 		}
 	})
 
@@ -321,7 +331,8 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			roleadmin.showView();
 		},
 		permit:function () {
-
+			show.target='permit';
+			permitview.showView();
 		}
 	})
 	var view=new WholeView();
@@ -329,7 +340,8 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 	var show={target:'user'};
 	var useradmin=new UserAdminView(view.userList,show);
 	var roleadmin=new RoleAdminView(view.roleList,show);
-	var permitview=new PermitView();
+	var permitview=new PermitView(show);
 	var router=new AppRouer();
 	Backbone.history.start();
+
 })

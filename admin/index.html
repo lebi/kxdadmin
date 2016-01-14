@@ -165,6 +165,36 @@
 					</div>
 				</div>
 			</script>
+			<script type="text/template" id="permit-admin-temp">
+ 				<div class="tool tool-big" id="permit-admin">
+					<div class="tool-header">
+						<span>权限管理</span>
+					</div>
+					<div class="tool-content">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>用户名</th>
+									<th>单位</th>
+									<th>角色</th>
+									<th>删除</th>
+								</tr>
+							</thead>
+							<tbody class="role-admin-tbody">
+								<%permitList.each(function (permit) {%>
+									<tr>
+										<td><%=permit.get('username')%></td>
+										<td><%=permit.get('unitname')%></td>
+										<td><%=permit.get('rolename')%></td>
+										<td><a>删除</a></td>
+									</tr>
+								<%})%>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</script>
+
 			<script type="text/template" id="module-list-temp">
   				<% for(var key in map){%>
 					<li>
