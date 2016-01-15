@@ -34,20 +34,6 @@ require.config({
 
 require(['jquery','underscore','backbone','bootstrap','cookie','model','collection','User','UserList','Role','RoleList','core','MD5','OperationList','TypeList','UnitList','RoleOperation','Permit','PermitList'],
 	function ($,_,Backbone,bootstrap,cookie,MyModel,MyCollection,User,UserList,Role,RoleList,core,MD5,OperationList,TypeList,UnitList,RoleOperation,Permit,PermitList) {
-	var Resource=MyModel.extend({
-		urlRoot:'/webserviceAPI/admin/resource',
-		defaults:{
-			'id':null,
-			'name':null,
-			'action':null,
-			'uri':null
-		}
-	})
-
-	var ResourceList=MyCollection.extend({
-		model:Resource,
-		url:'/webserviceAPI/admin/resource'
-	})
 	var WholeView=Backbone.View.extend({
 		el:$('body'),
 		events:{
@@ -67,10 +53,9 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 
 			this.userList=new UserList();
 			this.roleList=new RoleList();
-			this.resourceList=new ResourceList();
-			var li=$('.sidebar-items li').get(0);
-			if(li)
-				$(li).addClass('active');
+			// var li=$('.sidebar-items li').get(0);
+			// if(li)
+			// 	$(li).addClass('active');
 		},
 		changeActive:function (event) {
 			$('.sidebar-items .active').removeClass('active');
@@ -92,7 +77,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			'click #user-admin #edit-submit':'editSubmit',
 			'click #user-admin .cancel-submit':'hideSubmit',
 			'click #user-admin .delete-user':'deleteUser',
-			'click #user-admin .add-user':'addUser',
+			'click #user-admin #add-user':'addUser',
 			'change #user-admin input':'bind',
 
 		},
@@ -105,11 +90,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			this.userList.on('update',this.render,this);
 		},
 		showView:function () {
-			console.log(this.userList.length);
-			// if(this.userList.length==0)
-				this.userList.fetch()
-			// else 
-				// this.render()
+			this.userList.fetch()
 		},
 		render:function(){
 			if(this.show.target!='user') return;
@@ -149,7 +130,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 				alert("确认密码不正确！");
 				return;
 			}
-			var user=new User({id:this.user.id,username:this.user.username,password:core.MD5(this.user.password).toString()});
+			var user=new User({id:this.user.id,username:this.user.username,password:this.user.password});
 			var self=this;
 			user.save().done(function (result) {
 				if(result.errorMsg==null){
@@ -183,10 +164,12 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			'click #role-admin #permission-submit':'roleSubmit',
 			'click #role-admin .edit-role':'editRole',
 			'click #role-admin #add-new-role':'addRole',
+			'click #role-admin .edit-operation':'editOperation',
 			'click #role-admin .delete-role':'deleteRole',
 			'change #role-admin .role-admin-form input':'bindRole',
 			'click #role-admin .op-remove':'removeOperation',
-			'click #role-admin .op-add':'addOperation'
+			'click #role-admin .op-add':'addOperation',
+			'click #role-admin .op-slide-up':'opSlideUp'
 		},
 		permissions:{
 			'#add-new-role':'/webservice/admin/role/C',
@@ -268,7 +251,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			this.roleList.get(i).destroy();
 		},
 		removeOperation:function () {
-			var rid=$(event.target).closest('tr').attr('rid');
+			var rid=$('#operation-view').attr('rid');
 			var oid=$(event.target).closest('.badge').attr('oid');
 			var roleOp=new RoleOperation({id:oid});
 			var self=this;
@@ -277,7 +260,7 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			})
 		},
 		addOperation:function () {
-			var rid=$(event.target).closest('tr').attr('rid');
+			var rid=$('#operation-view').attr('rid');
 			var operation=$(event.target).closest('.badge').attr('operation');
 			var roleOp=new RoleOperation({role:rid,operation:operation});
 			var self=this;
@@ -290,12 +273,27 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			var role=this.roleList.get(rid);
 			role.fetch().done(function () {
 				self.roleList.add(role);
-				self.roleList.trigger('update');
+				var temp=_.template($('#operation-temp').html());
+				$('#operation-list').html(temp({typeList:self.typeList,role:role}));
 			})
+		},
+		editOperation:function () {
+			var rid=$(event.target).closest('tr').attr('rid');
+			var temp=_.template($('#operation-temp').html());
+			$('#operation-list').html(temp({typeList:this.typeList,role:this.roleList.get(rid)}));
+			$('#operation-list').slideDown('fast');
+		},
+		opSlideUp:function () {
+			console.log(event.target)
+			$('#operation-list').slideUp('fast');
 		}
 	})
 
 	var PermitView=Backbone.View.extend({
+		events:{
+			'click #permit-admin .delete-permit':'delete',
+			'change #permit-admin input':'search'
+		},
 		el:$('.tool-wrapper'),
 		template:_.template($('#permit-admin-temp').html()),
 		initialize:function (show) {
@@ -305,34 +303,209 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 			this.roleList=new RoleList();
 
 			this.permitList.on('update',this.render,this);
+			this.unitList.on('update',this.render,this);
+
+			this.unitList.fetch();
+			this.search={username:'',rolename:'',unitname:''};
 		},
 		showView:function () {
 			this.permitList.fetch();
+			this.roleList.fetch();
 		},
 		render:function () {
 			if(this.show.target!='permit') return;
-			this.$el.empty();
-			this.$el.append(this.template({permitList:this.permitList,unitList:this.unitList}));
+			if(this.unitList.length>0){
+				var self=this;
+				this.permitList.each(function (permit) {
+					permit.set('unitname',self.unitList.get(permit.get('unit')).get('name'));
+				})
+			}
+			var search=this.search;
+			var list=this.permitList.reduce(function (memo,p) {
+				var reg=new RegExp('.*'+search.username+'.*');
+				if(!reg.test(p.get('username')))
+					return memo;
+
+				reg=new RegExp('.*'+search.rolename+'.*');
+				if(!reg.test(p.get('rolename')))
+					return memo;
+
+				reg=new RegExp('.*'+search.unitname+'.*');
+				if(!reg.test(p.get('unitname')))
+					return memo;
+				memo.add(p)
+				return memo
+			},new Backbone.Collection())
+			this.$el.html(this.template({permitList:list,search:this.search}));
+		},
+		delete:function () {
+			var id=$(event.target).closest('tr').attr('pid');
+			this.permitList.get(id).destroy();
+		},
+		search:function () {
+			var name=$(event.target).attr('name');
+			this.search[name]=$(event.target).val();
+			this.render();
 		}
+	})
+
+	var PermitAddView=Backbone.View.extend({
+		events:{
+			'click #permit-add .choose-frame a':'choose',
+			'click #permit-add .tree-icon':'toggle',
+			'click #permit-add #add':'addSubmit'
+		},
+		el:$('.tool-wrapper'),
+		template:_.template($('#permit-add-temp').html()),
+		initialize:function (show) {
+			this.show=show;
+			this.userList=new UserList();
+			this.unitList=new UnitList();
+			this.roleList=new RoleList();
+
+			this.userList.on('update',this.render,this);
+			this.unitList.on('update',this.render,this);
+			this.roleList.on('update',this.render,this);
+
+			this.unitList.fetch();
+
+			this.permit=new Permit();
+		},
+		showView:function () {
+			this.userList.fetch();
+			this.roleList.fetch();
+		},
+		render:function () {
+			if(this.show.target!='permitadd')return;
+			this.$el.html(this.template({
+				userList:this.userList,
+				unitStr:unitTree.render(this.unitList),
+				roleList:this.roleList
+			}));
+		},
+		choose:function () {
+			var frame=$(event.target).closest('.choose-frame');
+			frame.find('.chosen').removeClass('chosen');
+			$(event.target).closest('a').addClass('chosen');
+			var key=frame.attr('name');
+			var value=$(event.target).closest('a').attr('value');
+			console.log(this.permit)
+			this.permit.set(key,value);
+
+		},
+		toggle:function () {
+			var parent=$(event.target).closest('.unit-li');
+			if(parent.hasClass('active'))
+				parent.removeClass('active');
+			else
+				parent.addClass('active');
+		},
+		addSubmit:function () {
+			if(!this.permit.get('user')){
+				alert('请选择用户');
+				return
+			}
+			if(!this.permit.get('unit')){
+				alert('请选择单位');
+				return
+			}
+			if(!this.permit.get('role')){
+				alert('请选择角色');
+				return
+			}
+			var self=this;
+			this.permit.save().done(function () {
+				self.permit=new Permit();
+				self.render();
+				var str='<span class="hint success-hint"><i class="icon-ok-sign"></i>添加成功 </span>';
+				$('#add').before(str);
+				setTimeout(function () {
+					$('.hint').remove();
+				},1000);
+			})
+			.fail(function () {
+				self.render();
+				var str='<span class="hint error-hint"><i class="icon-remove-sign"></i>添加失败 </span>';
+				$('#add').before(str);
+				setTimeout(function () {
+					$('.hint').remove();
+				},1000);
+			})
+		}
+	})
+
+	var TreeView=Backbone.View.extend({
+		template:_.template($('#unit-temp').html()),
+		render:function (unitList) {
+			var stack=[];
+			this.tree={children:[]};
+			var self=this;
+			unitList.each(function (u) {
+				var obj=u.toJSON();
+				obj.children=[];
+				if(stack.length==0){
+					self.tree.children.push(obj);
+					stack.push(obj);
+				}else{
+					while(stack.length!=0){
+						var peek=stack[stack.length-1];
+						var reg=new RegExp('^'+peek.layer+'/');
+						if(reg.test(obj.layer)){
+							peek.children.push(obj);
+							stack.push(obj);
+							break;
+						}else{
+							stack.pop();
+						}
+					}
+					if(stack.length==0){
+						self.tree.children.push(obj);
+						stack.push(obj);
+					}
+				}
+			})
+			return this.template({trees:this.tree.children,parent:0});
+		},
 	})
 
 	var AppRouer=Backbone.Router.extend({
 		routes:{
+			'':'defalut',
 			'user':'user',
 			'role':'role',
-			'permit':'permit'
+			'permit':'permit',
+			'permitadd':'permitadd'
+		},
+		defalut:function () {
+			var li=$('.sidebar-items li').get(0);
+			$(li).addClass('active');
+			show.target='user';
+			useradmin.showView();
 		},
 		user:function () {
+			var li=$('.sidebar-items li').get(0);
+			$(li).addClass('active');
+
 			show.target='user';
 			useradmin.showView();
 		},
 		role:function () {
+			var li=$('.sidebar-items li').get(1);
+			$(li).addClass('active');
 			show.target='role';
 			roleadmin.showView();
 		},
 		permit:function () {
+			var li=$('.sidebar-items li').get(2);
+			$(li).addClass('active');
 			show.target='permit';
 			permitview.showView();
+		},
+		permitadd:function () {
+			var li=$('.sidebar-items li').get(2);
+			$(li).addClass('active');
+			show.target='permitadd';
+			permitaddview.showView();
 		}
 	})
 	var view=new WholeView();
@@ -341,6 +514,10 @@ require(['jquery','underscore','backbone','bootstrap','cookie','model','collecti
 	var useradmin=new UserAdminView(view.userList,show);
 	var roleadmin=new RoleAdminView(view.roleList,show);
 	var permitview=new PermitView(show);
+	var permitaddview=new PermitAddView(show);
+	var unitTree=new TreeView();
+
+
 	var router=new AppRouer();
 	Backbone.history.start();
 

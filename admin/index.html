@@ -5,6 +5,7 @@
 		<link href="../css/font-awesome.min.css" rel="stylesheet" />
 		<link href="css/kxd.css" rel="stylesheet" />
 		<link href="css/admin.css" rel="stylesheet" />
+		<link href="css/tree.css" rel="stylesheet" />
 		<link href="../css/top.css" rel="stylesheet" />
 	</head>
 	<body>
@@ -17,7 +18,7 @@
 						<ul class="sidebar-items nav">
 							<a href="#user"><li>用户管理<div class="choose"></div></li></a>
 							<a href="#role"><li>角色管理<div class="choose"></div></li></a>
-							<a href="#permit"><li>角色管理<div class="choose"></div></li></a>
+							<a href="#permit"><li>权限管理<div class="choose"></div></li></a>
 						</ul>
 					</div>
 				</nav>
@@ -28,7 +29,7 @@
 				<div class="tool tool-big" id="user-admin">
 					<div class="tool-header">
 						<span>用户管理</span>
-						<div class='add-user'>添加用户</div>
+						<div class='add-button' id='add-user'><i class="icon-plus-sign"></i>添加用户</div>
 					</div>
 					<div class="tool-content">
 						<table class="table table-bordered">
@@ -85,13 +86,7 @@
 			    	</div>
 			    </div>
 			</script>
-						<script type="text/template" id="role-check-list">
-							<%_.each(roleList,function (role){%>
-      							<div class="checkbox">
-	        						<label><input type="checkbox" roleid="<%=role.get('id')%>" value="<%=role.get('name')%>"> <%=role.get('name')%></label>
-      							</div>
-							<%})%>
-						</script>
+
 			<script type="text/template" id="role-admin-temp">
  				<div class="tool tool-big" id="role-admin">
 					<div class="tool-header">
@@ -103,10 +98,9 @@
 								<tr>
 									<th>角色名称</th>
 									<th>编码</th>
-									<%typeList.each(function (type) {%>
-										<th><%=type.get('name')%></th>
-									<%})%>
-									<th>修改</th><th>删除</th>
+									<th>管理操作</th>
+									<th>修改</th>
+									<th>删除</th>
 								</tr>
 							</thead>
 							<tbody class="role-admin-tbody">
@@ -114,33 +108,14 @@
 									<tr rid="<%=role.get('id')%>">
 										<td><%=role.get('name')%></td>
 										<td><%=role.get('code')%></td>
-										<%var set={}%>
-										<%_.each(role.get('operations'),function (op) {%>
-											<%set[op.operation]=op%>
-										<%})%>
-										<%typeList.each(function (type) {%>
-											<td>
-												<%_.each(type.get('operations'),function (op) {%>
-													<%if(set[op.id]){%>
-														<a class="badge badge-exist" oid="<%=set[op.id].id%>" operation="<%=op.id%>">
-															<span><%=op.name%></span>
-															<i class="badge-remove icon-remove-sign op-remove"></i>
-														</a>
-													<%}else{%>
-														<a class="badge" operation="<%=op.id%>">
-															<span><%=op.name%></span>
-															<i class="badge-remove icon-plus-sign op-add"></i>
-														</a>
-													<%}%>
-												<%})%>
-											</td>
-										<%})%>
-										<td class="edit-role-button"><a href="javascript:void(0)" class="edit-role">修改</a></td>
-										<td class="delete-role-button"><a href="javascript:void(0)" class="delete-role">删除</a></td>
+										<td><a href="javascript:void(0)" class="edit-operation">管理操作</a></td>
+										<td><a href="javascript:void(0)" class="edit-role">修改</a></td>
+										<td><a href="javascript:void(0)" class="delete-role">删除</a></td>
 									</tr>
 								<%})%>
 							</tbody>
 						</table>
+						<div id="operation-list"></div>
 						<div class="control-botton control-botton-2" id="add-new-role"><i class="icon-plus-sign"></i>添加新角色</div>
 						<form class="form-horizontal role-admin-form">
 						  	<div class="form-group">
@@ -165,10 +140,45 @@
 					</div>
 				</div>
 			</script>
+			<script type="text/template" id="operation-temp">
+				<div id="operation-view" rid="<%=role.get('id')%>">
+					<div class="row form-horizontal">
+						<label class="col-sm-2 control-label"><%=role.get('name')%></label>
+						<label class="col-sm-offset-8 control-label" >
+							<a href="javascript:void(0)" class='op-slide-up'><i class="icon-double-angle-up"></i> 收回</a>
+						</label>
+					</div>
+					<%typeList.each(function (type) {%>
+						<div class="row form-horizontal">
+							<label class="col-sm-2 control-label"><%=type.get('name')%></label>
+							<div class="col-sm-10">
+								<%var set={}%>
+								<%_.each(role.get('operations'),function (op) {%>
+								<%set[op.operation]=op%>
+								<%})%>
+								<%_.each(type.get('operations'),function (op) {%>
+									<%if(set[op.id]){%>
+										<a class="badge badge-exist" oid="<%=set[op.id].id%>" operation="<%=op.id%>">
+											<span><%=op.name%></span>
+											<i class="badge-remove icon-remove-sign op-remove"></i>
+										</a>
+									<%}else{%>
+										<a class="badge" operation="<%=op.id%>">
+											<span><%=op.name%></span>
+											<i class="badge-remove icon-plus-sign op-add"></i>
+										</a>
+									<%}%>
+								<%})%>
+							</div>
+						</div>
+					<%})%>
+				</div>
+			</script>
 			<script type="text/template" id="permit-admin-temp">
  				<div class="tool tool-big" id="permit-admin">
 					<div class="tool-header">
 						<span>权限管理</span>
+						<a class='add-button' id='add-permit' href="#permitadd"><i class="icon-plus-sign"></i>添加权限</a>
 					</div>
 					<div class="tool-content">
 						<table class="table table-bordered">
@@ -180,13 +190,19 @@
 									<th>删除</th>
 								</tr>
 							</thead>
+								<tr>
+									<td><input name="username" value="<%=search.username%>"></td>
+									<td><input name="unitname" value="<%=search.unitname%>"></td>
+									<td><input name="rolename" value="<%=search.rolename%>"></td>
+									<td></td>
+								</tr>
 							<tbody class="role-admin-tbody">
 								<%permitList.each(function (permit) {%>
-									<tr>
+									<tr pid="<%=permit.get('id')%>">
 										<td><%=permit.get('username')%></td>
 										<td><%=permit.get('unitname')%></td>
 										<td><%=permit.get('rolename')%></td>
-										<td><a>删除</a></td>
+										<td><a href="javascript:void(0)" class='delete-permit'>删除</a></td>
 									</tr>
 								<%})%>
 							</tbody>
@@ -194,27 +210,77 @@
 					</div>
 				</div>
 			</script>
-
-			<script type="text/template" id="module-list-temp">
-  				<% for(var key in map){%>
-					<li>
-	  					<a href="javascript:void(0)" class="module-name"><%=key%> <i class="icon-double-angle-down"></i></a>
-  						<div class="checkbox">
-  						<table class="table table-bordered">
-  						<%_.each(map[key],function (resource) {%>
-	  						<tr resourceid='<%=resource.id%>'>
-	 							<td class="permission-name"><label><%=resource.name%></label></td>
-		    					<td><label><input type="checkbox"><i></i> Create</label></td>
-		    					<td><label><input type="checkbox"><i></i> Read</label></td>
-		    					<td><label><input type="checkbox"><i></i> Update</label></td>
-		    					<td><label><input type="checkbox"><i></i> Delete</label></td>
-							</tr>
-						<%})%>
-						</table>
-						  						</div>
-						  					</li>
-						  				<%}%>
-						  			</script>
+			<script type="text/template" id="permit-add-temp">
+ 				<div class="tool tool-big" id="permit-add">
+					<div class="tool-header">
+						<span>添加权限</span>
+						<a class='add-button' href="#permit"></i>所有权限</a>
+					</div>
+					<div class="tool-content">
+						<div class="row">
+							<div class="col-sm-4">
+								<div class="choose-frame list-frame" id="user-frame" name="user">
+									<div class='frame-header'><span>选择用户</span></div>
+									<ul>
+										<%userList.each(function (user) {%>
+											<a value="<%=user.get('id')%>"><%=user.get('username')%></a>
+										<%})%>
+									</ul>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="choose-frame unit-tree" id="unit-frame" name="unit">
+									<div class='frame-header'><span>选择单位</span></div>
+									<%=unitStr%>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="choose-frame list-frame" id="role-frame" name="role">
+									<div class='frame-header'><span>选择角色</span></div>
+									<ul>
+										<%roleList.each(function (role) {%>
+											<a value="<%=role.get('id')%>"><%=role.get('name')%></a>
+										<%})%>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="row permit-button">
+							<div style="float:right;margin-right:10px">
+								<button class="btn btn-primary" id="add">添加</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</script>
+			<script type="text/javascript">
+				function parse (tree) {
+					var template=_.template($('#unit-temp').html());
+					return template({trees:tree.children,parent:tree.id});
+				}
+			</script>
+			<script type="text/template" id="unit-temp">
+				<%_.each(trees,function (tree) {%>
+					<ul>
+						<li class='unit-li active'>
+						<%if(tree.children.length>0){%>
+							<a class="parent" value="<%=tree.id%>">
+								<i class="tree-icon">
+									<i class="icon-caret-down"></i>
+									<i class="icon-caret-right"></i>
+								</i>
+								<span><%=tree.name%></span>
+							</a>
+						<%}else{%>
+							<a class="children" value="<%=tree.id%>">
+								<span><%=tree.name%></span>
+							</a>
+						<%}%>
+						<%=parse(tree)%>
+						</li>
+					</ul>
+				<%})%>
+			</script>
 		</div>
 		<script type="text/javascript" src="require.js" data-main="app.js"></script>
 	</body>

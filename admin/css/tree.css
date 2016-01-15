@@ -1,0 +1,38 @@
+.tree-icon{
+	width: 12px;
+	display: inline-block;
+	text-align: center;
+	padding: 5px 0px;
+}
+.icon-caret-right{
+	padding: 5px;
+}
+.children{
+	padding: 2px;
+	padding-left: 16px;
+}
+.unit-li>ul{
+	display: none;
+}
+.unit-li.active>ul{
+	display: block;
+}
+.unit-li>.parent .icon-caret-down{
+	display: none;
+}
+.unit-li.active>.parent .icon-caret-down{
+	display: inherit;
+}
+.unit-li.active>.parent .icon-caret-right{
+	display: none;
+}
+.unit-li >a{
+	display: block;
+}
+.tree-icon:hover{
+	color: #555;
+}
+.unit-tree ul {
+	padding-left: 15px;
+	margin: 0px 0px 0px 0px;
+}

@@ -4,19 +4,15 @@ a{
 a:hover{
 	text-decoration: none;
 }
-.add-user{
-	float: right;
-	display: inline-block;
-	font-size: 15px;
-	border: 2px solid #696969;
-	padding: 3px 5px;
-	color: #FFF;
-	cursor: pointer;
-	background-color: #696969;
+ul{
+	list-style: none;
+	padding-left: 0px;
 }
-.add-user:hover{
-	color: #333;
-	background-color: #eee;
+#operation-list{
+	padding: 10px;
+	border: 1px solid #DFDFDF;
+	display: none;
+	margin-bottom: 10px;
 }
 .badge-remove:hover {
 	color: #FF0202;
@@ -27,7 +23,7 @@ a:hover{
 .badge{
 	border-radius: 3;
 	font-size: 15px;
-	padding: 3px;
+	padding: 5px;
 	margin-right: 2px;
 }
 .badge-choose{
@@ -98,4 +94,65 @@ a:hover{
 }
 .module-list input[type=checkbox]:checked + i{
 	background-color: #009933;
+}
+.frame-header{
+	padding: 3px 15px;
+	border-bottom: 1px solid #ADADAD;
+	background-color: #eee;
+	color: #555;
+	font-size: 15px;
+}
+.choose-frame{
+	min-height: 200px;
+	max-height: 500px;
+	border: 1px solid #ADADAD;
+	border-radius: 3px;
+	padding: 0px 0px;
+}
+.permit-button{
+	margin-right: -10px;
+	margin-top: 10px;
+}
+.choose-frame a.chosen{
+	background-color: #2A7DC9;
+	color: #eee;
+}
+.list-frame a{
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 15px;
+	cursor: pointer;
+	display: block;
+}
+.list-frame a:hover{
+	background-color: #2A7DC9;
+	color: #eee;
+	
+}
+.children,.parent{
+	cursor: pointer;
+}
+.children:hover,.parent:hover{
+	background-color: #2A7DC9;
+}
+.children:hover>span,.parent:hover>span{
+	color: #eee;
+}
+.add-button{
+	float: right;
+	display: inline-block;
+	font-size: 15px;
+	border: 2px solid #fff;
+	padding: 3px 10px;
+	cursor: pointer;
+	-webkit-transition: all .10s ease-out;
+}
+.add-button:hover{
+	border: 2px solid #555;
+}
+.success-hint{
+	color: green;
+}
+.error-hint{
+	color: red;
 }
