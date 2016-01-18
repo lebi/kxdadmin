@@ -149,11 +149,11 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 			// console.log(path);
 			if(product.hasClass('active')){
 				delete this.active[path];
-				$.cookie(path,null);
+				localStorage.removeItem(path);
 				product.removeClass('active');
 			}else{
 				this.active[path]=1;
-				$.cookie(path,1);
+				localStorage.setItem(path,1);
 				product.addClass('active');
 			}
 		},
@@ -380,8 +380,14 @@ define(['jquery','underscore','backbone','cookie','DirEntryCollection'],
 				var list=it.children('ul').children('li');
 				if(!list.length)
 					return;
+				console.log(path);
 				list.each(function () {
 					var name=$(this).children('.content').children('span').html();
+					if(name=='/'){
+						it=$(this);
+						path=path.substr(1);
+						return false;
+					}
 					if(path.startWith(name)&&(path[name.length]=='/'||path.length==name.length)){
 						it=$(this);
 						path=path.substr(name.length+1);
