@@ -41,6 +41,7 @@ define(['jquery','underscore','backbone','cookie','Module'],
 		},
 		_setpage:function (el) {
 			this.$el=el;
+			this.delegateEvents();
 
 			$('a[data-toggle=tooltip]',this.$el).each(function() {
 
